@@ -22,7 +22,7 @@ export default {
 
 <style>
 * {
-		font-family: "Lato", sans-serif;
+		font-family: "Arial", sans-serif;
 	}
 
 	body {
