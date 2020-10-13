@@ -8,6 +8,22 @@ export default new Vuex.Store({
         user: {
             email: 'deboracrisf91@gmail.com',
             name: 'Débora'
+        },
+        menuVisible: true,
+        hideAdminFunctions: false
+    },
+    props: {
+        title: String,
+        hideMenu: Boolean,
+    },
+    mutations:{
+        hideMenu(){
+            this.state.menuVisible = false
+        },
+        showMenu(){
+            this.state.menuVisible = true
         }
+
+           
     }
 })

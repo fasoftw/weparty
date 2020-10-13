@@ -1,6 +1,7 @@
 <template>
-  <div class="new-party">
-      <h1> New Party </h1>
+
+  <div class="home">
+      <h1>Teste</h1>
   </div>
 </template>
 

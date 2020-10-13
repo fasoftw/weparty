@@ -1,10 +1,12 @@
 <template>
-    <h1> Page Title </h1>
+  <div class="games">
+      <h1>Games</h1>
+  </div>
 </template>
 
 <script>
 export default {
-    name: "PageTitle"
+
 }
 </script>
 

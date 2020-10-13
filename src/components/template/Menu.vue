@@ -1,6 +1,6 @@
 <template>
  <div class="menu">
-    <h1>Menu</h1>
+    <h1>Recomendações</h1>
  </div>
 </template>
 
