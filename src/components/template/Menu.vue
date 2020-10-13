@@ -13,7 +13,7 @@ export default {
 <style>
     .menu {
         grid-area: menu;
-        background-color: darkorange;
+        background-color: #ffffff;
 
         display: flex;
         flex-direction: column;

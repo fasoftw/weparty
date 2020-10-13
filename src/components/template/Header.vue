@@ -11,8 +11,12 @@
                     <b-nav-item to="/party"  @click="hideMenu">New Party</b-nav-item>                        
                 </b-navbar-nav>
             </b-collapse>
+            
          </b-navbar>
-
+        <div class ="buttons">
+             <b-button variant="success" @click="hideMenu" to="/signup" size= "sm" class="mr-2">Sign up</b-button>
+             <b-button variant="light" @click="hideMenu" to="/signin" size= "sm" class="mr-2">Sign in</b-button>
+        </div>
         <div class="userdropdown">
             <UserDropDown />
         </div>
@@ -45,10 +49,25 @@ export default {
         grid-area: header;
         background-color:#6600cc!important  ;
         display:flex;
-        justify-content: space-between
+        justify-content: space-between;
 
 
     }
+
+    .btn-success {
+        color: #fff;
+        background-color: darkorange !important;
+        border-color: darkorange !important;
+    }
+
+    .buttons{
+        display:flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: auto;
+        flex-direction: row;
+    }
+    
 
     .navbar-dark .navbar-nav .nav-link {
         background-color:#6600cc!important;
