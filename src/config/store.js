@@ -20,7 +20,7 @@ export default new Vuex.Store({
     mutations:{
         hideMenu(){
         
-            if(this.state.path == ('/games' || '/party')) {
+            if(this.state.path != '/') {
                 this.state.menuVisible = false
                 
             }
