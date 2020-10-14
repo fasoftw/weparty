@@ -13,10 +13,6 @@ export default new Vuex.Store({
         hideAdminFunctions: false,
         path: '/'
     },
-    props: {
-        title: String,
-        hideMenu: Boolean,
-    },
     mutations:{
         hideMenu(){
         

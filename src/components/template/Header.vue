@@ -17,18 +17,23 @@
              <b-button variant="success" @click="hideMenu" to="/signup" size= "sm" class="mr-2">Sign up</b-button>
              <b-button variant="light" @click="hideMenu" to="/signin" size= "sm" class="mr-2">Sign in</b-button>
         </div>
+          <div class="notification">
+           <Notification />
+        </div>
         <div class="userdropdown">
             <UserDropDown />
         </div>
+
+       
     </div>
 </template>
 
 <script>
-
+import Notification from './Notification'
 import UserDropDown from './UserDropDown.vue'
 export default {
     name: "Header",
-    components: {UserDropDown},
+    components: {UserDropDown,Notification},
     methods:{
         hideMenu() {
             this.$store.state.path = this.$route.path;
@@ -70,6 +75,15 @@ export default {
         margin-left: auto;
         flex-direction: row;
     }
+
+    .notification{
+         display:flex;
+         justify-content: flex-start;
+         align-items: center;
+         margin-top: 3px;
+         margin-left:8px ;
+         padding:5px;
+    }
     
 
     .navbar-dark .navbar-nav .nav-link {
@@ -92,7 +106,6 @@ export default {
         background-color:	#9B30FF !important;
         color: #fff;
     }
-
 
 
  
