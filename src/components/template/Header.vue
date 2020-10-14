@@ -31,12 +31,15 @@ export default {
     components: {UserDropDown},
     methods:{
         hideMenu() {
+            this.$store.state.path = this.$route.path;
             this.$store.commit('hideMenu')
         },
         showMenu(){
+            this.$store.state.path = this.$route.path;
             this.$store.commit('showMenu')
         }
-    }
+    },
+
 }
 </script>
 

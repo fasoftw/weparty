@@ -9,8 +9,9 @@ export default new Vuex.Store({
             email: 'deboracrisf91@gmail.com',
             name: 'Débora'
         },
-        menuVisible: false,
-        hideAdminFunctions: false
+        menuVisible: true,
+        hideAdminFunctions: false,
+        path: '/'
     },
     props: {
         title: String,
@@ -18,10 +19,15 @@ export default new Vuex.Store({
     },
     mutations:{
         hideMenu(){
-            this.state.menuVisible = false
+        
+            if(this.state.path == ('/games' || '/party')) {
+                this.state.menuVisible = false
+                
+            }
+
         },
         showMenu(){
-            this.state.menuVisible = true
+            if(this.state.path === '/') this.state.menuVisible = true
         }
 
            
