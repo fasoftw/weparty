@@ -9,7 +9,7 @@ export default new Vuex.Store({
             email: 'deboracrisf91@gmail.com',
             name: 'Débora'
         },
-        menuVisible: true,
+        menuVisible: false,
         hideAdminFunctions: false
     },
     props: {

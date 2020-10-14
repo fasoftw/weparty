@@ -53,7 +53,12 @@ export default {
 <style>
     .sign-in{
         display: flex;
-        justify-content: center;;
+        
         align-items: center;
+        flex-direction: column;
+        background-color: #FFF;
+        padding: 20px;
+
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
     }
 </style>
