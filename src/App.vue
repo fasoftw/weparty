@@ -1,6 +1,7 @@
 <template>
   <div id="app"  :class="{'hide-menu': !menuVisible }">
-    <Header />
+    <Header :hideUserDropdown="
+	!user"/>
     <Menu v-if="menuVisible"/>
     <Content />
     <Footer />
@@ -18,7 +19,10 @@ import {mapState} from 'vuex'
 export default {
   name: 'App',
   components: {Content, Footer, Header, Menu},
-  computed: mapState(['menuVisible'])
+  computed: mapState(['menuVisible', 'user']),
+  created(){  this.$store.commit('toggleMenu',this.$route.path)
+
+  }
 }
 </script>
 
