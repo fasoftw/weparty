@@ -6,23 +6,25 @@
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item to="/"  @click="showMenu">Home</b-nav-item>
-                    <b-nav-item to="/games" @click="hideMenu">Games</b-nav-item>
-                    <b-nav-item to="/party"  @click="hideMenu">New Party</b-nav-item>                        
+                    <b-nav-item to="/"  @click="hideMenu">Home</b-nav-item>
+                    <b-nav-item to="/community"  @click="hideMenu">Comunidade</b-nav-item>
+                    <b-nav-item to="/about"  @click="hideMenu">Sobre</b-nav-item>                         
                 </b-navbar-nav>
             </b-collapse>
             
          </b-navbar>
         <div class ="buttons">
-             <b-button variant="success" @click="hideMenu" to="/signup" size= "sm" class="mr-2">Sign up</b-button>
-             <b-button variant="light" @click="hideMenu" to="/signin" size= "sm" class="mr-2">Sign in</b-button>
+             <b-button variant="success" @click="hideMenu" to="/signup" size= "sm"
+              v-if="hideUserDropdown"
+              class="mr-2">Sign up</b-button>
+             <b-button variant="light" @click="hideMenu" to="/signin" size= "sm" 
+              class="mr-2"
+              v-if="hideUserDropdown">Sign in</b-button>
         </div>
-          <div class="notification">
-           <Notification />
+          <div class="notification" >
+           <Notification v-if="!hideUserDropdown" />
         </div>
-        <div class="userdropdown">
-            <UserDropDown />
-        </div>
+           <UserDropDown v-if="!hideUserDropdown" />
 
        
     </div>
@@ -34,14 +36,13 @@ import UserDropDown from './UserDropDown.vue'
 export default {
     name: "Header",
     components: {UserDropDown,Notification},
+    props: {
+        hideUserDropdown: Boolean
+    },
     methods:{
         hideMenu() {
-            this.$store.state.path = this.$route.path;
-            this.$store.commit('hideMenu')
-        },
-        showMenu(){
-            this.$store.state.path = this.$route.path;
-            this.$store.commit('showMenu')
+           this.$store.commit('toggleMenu',this.$route.path)
+
         }
     },
 

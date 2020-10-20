@@ -6,8 +6,10 @@
             </div>
             <i class="fa fa-angle-down"></i>
         </div>
-        <div class="user-dropdown-content">
-                <i class="fa fa-cogs"></i> Configurações
+        <div class="user-dropdown-content">                
+                <router-link to="/profile" v-if="!user.admin" >
+                <i class="fa fa-cogs"></i> Meu Perfil 
+            </router-link>
             <a href @click.prevent="logout"><i class="fa fa-sign-out"></i> Sair</a>
         </div>
     </div>
@@ -16,10 +18,21 @@
 <script>
 import Gravatar from 'vue-gravatar'
 import { mapState } from 'vuex'
+import {userKey} from '../../../global'
 export default {
     name: 'UserDropDown',
     components: {Gravatar},
     computed: mapState(['user']),
+    methods:{
+        logout(){
+            localStorage.removeItem(userKey)
+            this.$store.commit('setUser',null)
+            this.$router.push({name: 'signin'})
+
+            sessionStorage.clear();
+        }
+    }
+
 }
 
 

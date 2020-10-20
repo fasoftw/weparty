@@ -18,7 +18,10 @@
 import NotificationBell from 'vue-notification-bell'
 export default {
     name: 'Notification',
-    components: {NotificationBell}
+    components: {NotificationBell},
+    props: {
+        hideNotification: Boolean
+    }
 
 }
 </script>
