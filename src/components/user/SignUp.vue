@@ -1,7 +1,7 @@
 <template>
   <div class="sign-up">
      <div class="auth-modal">
-           <b-form @submit="onSubmit" v-if="show">
+           <b-form @submit="onSubmit">
             <h2> Create an account</h2>
             <h4> It's free and join to other players </h4>
                 <div class="form-sign-up">
@@ -38,17 +38,23 @@
                     <b-input type="password" id="text-password" v-model="user.password" 
                     aria-describedby="password-help-block"></b-input>
                     
-                    <label for="text-password">Confirm Password</label>
-                    
-                    <b-input type="password" id="text-password" 
-                    aria-describedby="password-help-block"
-                    v-model="user.confirmPassword"></b-input>
-               
+                     <b-form-group>
+                        <label for="confirm-password">Confirm Password</label>
+                        
+                        <b-input type="password" id="confirm-password" 
+                        aria-describedby="password-help-block"
+                        v-model="user.confirmPassword"></b-input>
+                     </b-form-group>
+
+                    <b-form-group>
+                      <b-button class="mr-2" variant="primary" @click="onSubmit">Cadastrar</b-button>
+                     <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Limpar</b-button>
+                    </b-form-group>
+
                 </div>
 
 
-                <b-button class="mr-2" variant="primary" @click="onSubmit">Submit</b-button>
-                <b-button type="reset" class="mr-2" variant="danger">Reset</b-button>
+              
     </b-form>
      </div>
   </div>
@@ -61,8 +67,7 @@ export default {
     name: 'Signup',
     data(){
         return {
-            user: {},
-            show: true
+            user: {}
         }
     },
     methods:{
@@ -76,7 +81,7 @@ export default {
 
         },
         onReset(){
-
+            this.user ={}
         }
     }
 }

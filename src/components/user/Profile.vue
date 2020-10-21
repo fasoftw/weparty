@@ -2,11 +2,27 @@
     <div class= "profile">
        <b-card no-body>
             <b-tabs pills card vertical>
-            <b-tab title="Editar Perfil" active><b-card-text>
-                <EditUser />        
-            </b-card-text></b-tab>
-            <b-tab title="Informações de Jogos"><b-card-text>Tab contents 2</b-card-text></b-tab>
-            <b-tab title="Grupos"><b-card-text>Tab contents 3</b-card-text></b-tab>
+            <b-tab title="Dados do Cadastro" active>
+                <b-card-text>
+                <EditUser :type="isEditUser"/>        
+                </b-card-text>
+            </b-tab>
+
+            <b-tab title="Redefinição de senha">
+                <b-card-text>
+                     <EditUser :type="isPassword"/>    
+                </b-card-text>                
+            </b-tab>
+
+            <b-tab title="Meus Jogos">
+                <b-card-text>
+                </b-card-text>
+            </b-tab>
+             <b-tab title="Excluir conta">
+                 <b-card-text>
+                     <EditUser :type="isDelete"/>
+                 </b-card-text>
+            </b-tab>
             </b-tabs>
         </b-card>
     </div>
@@ -18,7 +34,15 @@ import {mapState} from 'vuex'
 export default {
     name: 'Profile',
     components: {EditUser},
-    computed: mapState['user']
+    computed: mapState['user'],
+    data(){
+        return{
+            isPassword:"isPassword",
+            isEditUser: "isEditUser",
+            isMyGames: "isMyGames",
+            isDelete: "isDelete"
+        }
+    }
     
 }
 </script>

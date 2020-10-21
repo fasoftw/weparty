@@ -7,7 +7,7 @@
             <i class="fa fa-angle-down"></i>
         </div>
         <div class="user-dropdown-content">                
-                <router-link to="/profile" v-if="!user.admin" >
+                <router-link to="/profile">
                 <i class="fa fa-cogs"></i> Meu Perfil 
             </router-link>
             <a href @click.prevent="logout"><i class="fa fa-sign-out"></i> Sair</a>

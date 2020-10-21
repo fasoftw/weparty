@@ -1,9 +1,11 @@
 <template>
     <div class="user-config">
-        <b-form @submit="onSubmit">
+        <b-form @submit="verifyData">
+
         <b-form-group
             id="name"
             label="Nome:"
+            v-if="type === 'isEditUser'"
             label-cols-sm="4"
             label-cols-lg="3"
             label-for="name">
@@ -12,6 +14,7 @@
 
          <b-form-group
             id="email"
+            v-if="type === 'isEditUser'"
             label-cols-sm="4"
             label-cols-lg="3"
             label="Email:"
@@ -21,26 +24,57 @@
         
         </b-form-group>
 
+        <!-- <b-form-group
+            id="old-password"
+            v-if="type === 'isPassword'"
+            label= "Senha atual:"
+            label-cols-sm="4"
+            label-cols-lg="3"
+            label-for="old-password">
+            <b-form-input id="old-password" v-model="this.user.password"   type="password"></b-form-input>
+        </b-form-group> -->
+
          <b-form-group
             id="password"
+            v-if="type === 'isPassword'"
             label= "Senha:"
             label-cols-sm="4"
             label-cols-lg="3"
             label-for="password">
-            <b-form-input id="password" v-model="user.password"   type="password"></b-form-input>
+            <b-form-input id="password" v-model="newPassword"  type="password"></b-form-input>
         </b-form-group>
 
          <b-form-group
             id="confirmPassword"
+            v-if="type === 'isPassword'"
             label= "Confirme a senha:"
             label-cols-sm="4"
             label-cols-lg="3"
             label-for="confirmPassword">
             <b-form-input id="confirmPassword" v-model="user.confirmPassword" type="password"></b-form-input>
+           <span class="span-aviso"> {{ msg}}</span>
         </b-form-group>
 
-         <b-button variant="primary" class="mr-2" @click="onSubmit" @keydown.enter="onSubmit">Salvar</b-button>
-         <b-button variant="danger" >Cancelar</b-button>
+         <b-button  v-if="type === 'isEditUser' || type === 'isPassword'" 
+         variant="primary" class="mr-2"
+          @click="verifyData"
+           @keydown.enter="verifyData">Salvar</b-button>
+         
+         
+         <b-button variant="danger"  
+         v-if="type === 'isEditUser' || type === 'isPassword'"  >Cancelar</b-button>
+        
+        <b-form-group v-if="type === 'isDelete'" label=" Deseja excluir sua conta?">
+            <b-form-radio-group
+                class="mt-10"
+                v-model="selected"
+                :options="options"
+                name="radio-inline"
+            ></b-form-radio-group>
+        </b-form-group>
+
+      
+         <b-button variant="danger"  v-if="type === 'isDelete'" @click="deleteUser">Excluir Conta</b-button>
         
         </b-form>
     </div>
@@ -53,17 +87,46 @@ export default {
     name: 'EditUser',
     data: function(){
         return{
-            user: {}
+            user: {},
+            newPassword: '',
+            msg: '',
+            selected: false,
+            options: [
+             { text: 'Sim', value: true },
+            { text: 'Não', value: false }
+            ]
         }
     },
+    props:{
+        type: String
+    },
     methods:{
-        putConfirmPassword(){
-             if(this.user.confirmPassword === undefined){
-                this.user.confirmPassword = this.user.password
-             }
+        verifyData(){
+            if(this.$props.type === 'isPassword'){
+                if(this.user.confirmPassword === this.newPassword){
+                    this.user.password = this.newPassword
+                    this.onSubmit()
+                } else {
+                    this.msg = 'Confirme corretamente a senha informada!'
+                }
+            } else {
+                if(this.user.confirmPassword === undefined && this.$props.type === 'isEditUser'){
+                    this.user.confirmPassword = this.user.password
+                    this.onSubmit()
+                    
+                }
+            }
+        },
+        deleteUser(){
+            if(this.selected){
+                axios.delete(`${baseApiUrl}/users/${this.$store.state.user.id}`).then(               
+                    this.$toasted.global.defaultSuccess()        
+                    
+                ).catch(showError)
+            }
         },
         getUser(){
-
+           
             axios.get(`${baseApiUrl}/users/${this.$store.state.user.id}`).then(
                 res =>{
                     this.user = res.data                      
@@ -72,7 +135,6 @@ export default {
             ).catch(showError)
         },
         onSubmit(){
-           
            
              axios.put(`${baseApiUrl}/users/${this.$store.state.user.id}`, this.user).then(
                 () =>{ 
@@ -84,12 +146,23 @@ export default {
     },
     mounted(){
         this.getUser()
-        this.putConfirmPassword()
+      
     }
 
 }
 </script>
 
-<style>
+<style scoped>
+    .span-aviso{
+        color: red;
+        font-size: 14px;
+        margin-top: 4px;
+        margin-left: 10px;  
+    }
+
+    .deletar-conta{
+        display:flex;
+        align-content: center;
+    }
 
 </style>
