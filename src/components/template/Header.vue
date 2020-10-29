@@ -8,7 +8,8 @@
                 <b-navbar-nav>
                     <b-nav-item to="/"  @click="hideMenu">Home</b-nav-item>
                     <b-nav-item to="/community"  @click="hideMenu">Comunidade</b-nav-item>
-                    <b-nav-item to="/about"  @click="hideMenu">Sobre</b-nav-item>                         
+                    <b-nav-item to="/about"  @click="hideMenu">Sobre</b-nav-item>       
+                    <b-nav-item to="/games"  @click="hideMenu">Games</b-nav-item>                         
                 </b-navbar-nav>
             </b-collapse>
             
@@ -50,6 +51,12 @@ export default {
 </script>
 
 <style scoped>
+    *{
+        
+		font-family: Arial, Helvetica, sans-serif;
+        font-size: 1.4rem;
+        
+    }
    .bg-info {
          background-color:#6600cc !important;
     }
@@ -57,7 +64,10 @@ export default {
     .header{
         grid-area: header;
         background-color:#6600cc!important  ;
-        display:flex;
+        font-weight: 100;
+
+
+        display: flex;
         justify-content: space-between;
 
 

@@ -28,7 +28,8 @@ export default {
 
 <style>
 * {
-		font-family: "Arial", sans-serif;
+		font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+		font-size: 1.1rem;
 	}
 
 	body {

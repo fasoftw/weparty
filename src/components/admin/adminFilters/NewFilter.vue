@@ -1,12 +1,10 @@
 <template>
-  <div class="games">
-      <h1>Games</h1>
-  </div>
+<h1>Edit Games</h1>
 </template>
 
 <script>
 export default {
-
+    name:'EditGame',
 }
 </script>
 

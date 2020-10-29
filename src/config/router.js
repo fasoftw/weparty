@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Home from '../components/home/Home'
-import Games from '../components/games/Games.vue'
+import Games from '../components/admin/AdminPages.vue'
 import NewParty from '../components/parties/NewParty'
 import SignUp from '../components/user/SignUp'
 import SignIn from '../components/user/SignIn'

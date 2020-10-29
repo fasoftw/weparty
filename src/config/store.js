@@ -14,7 +14,10 @@ export default new Vuex.Store({
         user:  null,
         menuVisible: false,
         hideAdminFunctions: false,
-        path: '/'
+        path: '/',
+
+        gameS: null,
+        modeS: 'save',
     },
     mutations:{
         hideMenu(){        
@@ -23,7 +26,7 @@ export default new Vuex.Store({
         showMenu(){
           
         },
-        toggleMenu(state,path){
+        toggleMenu(state, path){
             if(path === '/') {
               state.menuVisible = true
             }
@@ -34,13 +37,25 @@ export default new Vuex.Store({
             //console.log("toggleMenu=" + state.isMenuInvisible);
         },
 
-        setUser(state,user){
+        setUser(state, user){
             state.user = user
             if(user){
                 axios.defaults.headers.common['Authorization'] = `bearer ${user.token}`
             } else{
                 delete axios.defaults.headers.common['Authorization']
             }
+        },
+        setGame(state, {game, mode}){
+            state.gameS = game
+            state.modeS = mode
+        },
+        resetGame(store){
+            store.gameS = {},
+            store.modeS = 'save'
+            
+        },
+        setModeStore(state, value){
+            state.modeS = value
         }
 
            
