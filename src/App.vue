@@ -1,8 +1,7 @@
 <template>
-  <div id="app"  :class="{'hide-menu': !menuVisible }">
+  <div id="app">
     <Header :hideUserDropdown="
 	!user"/>
-    <Menu v-if="menuVisible"/>
     <Content />
     <Footer />
   </div>
@@ -13,16 +12,12 @@
 import Content from './components/template/Content'
 import Footer from './components/template/Footer'
 import Header from './components/template/Header'
-import Menu from './components/template/Menu'
 import {mapState} from 'vuex'
 
 export default {
   name: 'App',
-  components: {Content, Footer, Header, Menu},
-  computed: mapState(['menuVisible', 'user']),
-  created(){  this.$store.commit('toggleMenu',this.$route.path)
-
-  }
+  components: {Content, Footer, Header},
+  computed: mapState(['user'])
 }
 </script>
 
@@ -46,15 +41,8 @@ export default {
 		grid-template-columns: 300px 1fr;
 		grid-template-areas:
 			"header header"
-			"menu content"
-			"footer footer";
-	}
-
-
-	#app.hide-menu {
-		grid-template-areas:
-			"header header"
 			"content content"
 			"footer footer";
 	}
+
 </style>

@@ -1,26 +1,28 @@
 <template>
     <div class="header">
      
-        <b-navbar toggleable="lg" type="dark" variant="info">
+        <b-navbar toggleable="sm" type="dark" variant="info">
             <b-navbar-brand href="#">WeParty</b-navbar-brand>
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item to="/"  @click="hideMenu">Home</b-nav-item>
-                    <b-nav-item to="/community"  @click="hideMenu">Comunidade</b-nav-item>
-                    <b-nav-item to="/about"  @click="hideMenu">Sobre</b-nav-item>       
-                    <b-nav-item to="/games"  @click="hideMenu">Games</b-nav-item>                         
+                    <b-nav-item to="/" >Home</b-nav-item>
+                    <b-nav-item to="/community" >Comunidade</b-nav-item>
+                    <b-nav-item to="/about"  >Sobre</b-nav-item>       
+                    <b-nav-item to="/games" >Games</b-nav-item> 
+                    <b-nav-item to="/signup" v-if="$mq === 'xs'" >Sign up</b-nav-item>       
+                    <b-nav-item to="/signin" v-if="$mq === 'xs'" >Sign in</b-nav-item>                            
                 </b-navbar-nav>
             </b-collapse>
             
          </b-navbar>
         <div class ="buttons">
-             <b-button variant="success" @click="hideMenu" to="/signup" size= "sm"
-              v-if="hideUserDropdown"
+             <b-button variant="success"  to="/signup" size= "sm"
+              v-if="hideUserDropdown && $mq !== 'xs'"
               class="mr-2">Sign up</b-button>
-             <b-button variant="light" @click="hideMenu" to="/signin" size= "sm" 
+             <b-button variant="light"  to="/signin" size= "sm" 
               class="mr-2"
-              v-if="hideUserDropdown">Sign in</b-button>
+              v-if="hideUserDropdown && $mq !== 'xs'">Sign in</b-button>
         </div>
           <div class="notification" >
            <Notification v-if="!hideUserDropdown" />
@@ -39,14 +41,7 @@ export default {
     components: {UserDropDown,Notification},
     props: {
         hideUserDropdown: Boolean
-    },
-    methods:{
-        hideMenu() {
-           this.$store.commit('toggleMenu',this.$route.path)
-
-        }
-    },
-
+    }
 }
 </script>
 
@@ -57,6 +52,34 @@ export default {
         font-size: 1.4rem;
         
     }
+    /* Extra small devices (phones, 600px and down) */
+    @media only screen and (max-width: 600px) {
+        *{font-size: 1.0rem;}   
+    }
+
+    /* Small devices (portrait tablets and large phones, 600px and up) */
+    @media only screen and (min-width: 600px) {
+        *{font-size: 1rem;}
+    }
+
+    /* Medium devices (landscape tablets, 768px and up) */
+    @media only screen and (min-width: 768px) {
+        *{font-size: 1rem;}
+    }
+    /* Large devices (laptops/desktops, 992px and up) */
+    @media only screen and (min-width: 992px) {
+        *{font-size: 1rem;}
+    }
+
+    /* Extra large devices (large laptops and desktops, 1200px and up) */
+    @media only screen and (min-width: 1200px) {
+        *{font-size: 1.1rem;}
+    }
+
+    @media only screen and (min-width: 1400px) {
+        *{font-size: 1.4rem;}
+    }
+
    .bg-info {
          background-color:#6600cc !important;
     }
@@ -116,6 +139,10 @@ export default {
      .navbar-dark .navbar-nav .nav-link:hover{
         background-color:	#9B30FF !important;
         color: #fff;
+    }
+
+    .navbar{
+        z-index: 9999;
     }
 
 
