@@ -1,7 +1,6 @@
 <template>
 
   <div class="home" >
-     <h1>current: {{$mq}}</h1>
       <div class="card-games">
        <b-container fluid>
             <b-row cols="1" cols-sm="2" cols-md="3" cols-lg="4">
