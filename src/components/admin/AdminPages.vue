@@ -6,6 +6,9 @@
           <b-tab  title="Games" active>
             <NewGame />
           </b-tab>
+          <b-tab  title="Plataformas">
+            <NewPlatform />
+          </b-tab>
           <b-tab  title="Filtros">
             <NewFilter />
           </b-tab>
@@ -16,11 +19,6 @@
       </b-card>
     </div>
 
-    <div class="lists">
-      <template :class="{active: 'Games'}"><ListGames /></template>
-      <template :class="{active: 'Filtros'}"><NewFilter /></template>
-      <template :class="{active: 'Categorias'}"><NewCategory /></template>  
-    </div>
   </div>
 
 </template>
@@ -29,14 +27,11 @@
 import NewGame from "./adminGames/NewGame";
 import NewFilter from "./adminFilters/NewFilter";
 import NewCategory from "./adminCategories/NewCategory";
+import NewPlatform from "./adminPlatform/NewPlatform";
 
-import ListGames from "./adminGames/ListGames";
-//import ListFilters from "./adminFilters/ListFilters";
-//import ListCategories from "./adminCategories/ListCategories";
-//ListFilters, ListCategories
 export default {
   name: "GamesPage",
-  components: { NewGame, NewFilter, NewCategory, ListGames, },
+  components: { NewGame, NewFilter, NewCategory, NewPlatform },
   
 };
 </script>
@@ -47,15 +42,11 @@ export default {
   flex-direction: row;
   justify-content: center;
   margin: 10px;
-        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
 
 }
-.lists {
-  flex: 1;
-  margin: 10px;
-}
+
 .games-pages-tabs {
-  flex: 0.7;
+  flex: 1;
   margin: 10px;
 }
 

@@ -1,100 +1,228 @@
 <template>
-  <div class="add-game">
-    <b-form>
-      <input id="game-id" type="hidden" />
+  <div class="game-admin">
+    <div class="add-games">
+      <b-form>
+        <input id="game-id" type="hidden" />
 
-      <b-form-group label="Nome: " label-for="game-name">
-        <b-form-input id="game-name" type="text" 
-        v-model="gameS.name" required
-        :readonly="modeS === 'remove'"
-        />
-      </b-form-group>
+        <b-form-group label="Nome: " label-for="game-name">
+          <b-form-input
+            id="game-name"
+            type="text"
+            v-model="game.name"
+            required
+            :readonly="mode === 'remove'"
+            placeholder="Informe o Nome do Jogo..."
+          />
+        </b-form-group>
 
-      <b-form-group label="Imagem(URL): " label-for="game-imageUrl">
-        <b-form-input id="game-imageUrl" type="url" 
-          v-model="gameS.imageUrl" required
-          :readonly="modeS === 'remove'"
-        />
-      </b-form-group>
+        <b-form-group label="Imagem(URL): " label-for="game-imageUrl" v-if="mode === 'save'">
+          <b-form-input
+            id="game-imageUrl"
+            type="url"
+            v-model="game.imageUrl"
+            required
+            :readonly="mode === 'remove'"
+          />
+        </b-form-group>
 
-      <b-form-group label="Descrição: " label-for="game-description">
-        <b-form-input id="ame-description" type="text" 
-          v-model="gameS.description" required
-          :readonly="modeS === 'remove'"
-        />
-      </b-form-group>
+        <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'">
+          <b-form-input
+            id="ame-description"
+            type="text"
+            v-model="game.description"
+            required
+            :readonly="mode === 'remove'"
+          />
+        </b-form-group>
 
-      <b-form-group label="Categoria: " label-for="game-category">
-        <b-form-input id="game-category" 
-          v-model="gameS.categoryId" required
-          :readonly="modeS === 'remove'"
-        />
-      </b-form-group>
 
-      <b-form-group label="Número de jogadores: " label-for="game-num-players">
-        <b-form-input id="game-num-players" type="number" 
-          v-model="gameS.maxPlayers" required
-          :readonly="modeS === 'remove'"
-        />
-      </b-form-group>
+        <b-form-group label="Número de jogadores: " label-for="game-num-players" v-if="mode === 'save'"> 
+          <b-form-input
+            id="game-num-players"
+            type="number"
+            v-model="game.maxPlayers"
+            required
+            :readonly="mode === 'remove'"
+          />
+        </b-form-group>
 
-      <b-form-group label="Level Máximo: " label-for="game-max-level">
-        <b-form-input id="game-max-level" type="number" 
-          v-model="gameS.levelMax" required
-          :readonly="modeS === 'remove'"
-        />
-      </b-form-group>
+        <b-form-group label="Level Máximo: " label-for="game-max-level" v-if="mode === 'save'">
+          <b-form-input
+            id="game-max-level"
+            type="number"
+            v-model="game.levelMax"
+            required
+            :readonly="mode === 'remove'"
+          />
+        </b-form-group>
 
-      <b-form-group label="Filtros: " label-for="game-filters">
-        <b-form-select id="game-filters" />
-      </b-form-group>
-    </b-form>
+        <b-form-group label="Categoria: " label-for="game-category" v-if="mode === 'save'">
+          <template>
+              <b-form-select v-model="game.categoryId" :options="categories" 
+                value-field="id"
+                text-field="name"
+              >
+              </b-form-select>
+              <div class="mt-3">Selected: <strong>{{ categories.name }}</strong ></div>
+          </template>
+        </b-form-group>
+      
+        <b-form-group label="Plataformas: " label-for="game-platform" v-if="mode === 'save'" >
+           <b-form-select id="game-platform" v-model="platformsSelected" 
+              :options="platforms" 
+              multiple :select-size="Number(platforms.length)"
+              value-field="id"
+              text-field="name"
+           >
+           </b-form-select>
+          <div class="mt-3">Selecionados: <strong>{{ platformsSelected }} </strong></div>
+        </b-form-group>
 
-    <div class="buttons">
-      <b-button class="mr-3" variant="success" v-if="modeS === 'save'"> Salvar
-      </b-button>
-      <b-button class="mr-3" variant="danger" v-if="modeS === 'remove'" @click="remove">
-        Remover
-      </b-button>
-      <b-button variant="primary" @click="reset"> Cancelar </b-button>
+      </b-form>
+
+      <div class="buttons">
+        <b-button
+          class="mr-3"
+          variant="success"
+          v-if="mode === 'save'"
+          @click="save"
+        >
+          Salvar
+        </b-button>
+        <b-button
+          class="mr-3"
+          variant="danger"
+          v-if="mode === 'remove'"
+          @click="remove"
+        >
+          Remover
+        </b-button>
+        <b-button variant="primary" @click="reset"> Cancelar </b-button>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="table-games">
+      <b-table hover striped :items="games" :fields="fields">
+        <template #cell(actions)="row">
+          <b-button @click="loadGame(row.item)" class="mr-2">
+            <i class="fas fa-pencil-alt"></i>
+          </b-button>
+          <b-button @click="loadGame(row.item, 'remove')">
+            <i class="fas fa-trash-alt"></i>
+          </b-button>
+        </template>
+      </b-table>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-//import axios from 'axios'
-//import { baseApiUrl, showError } from '../../../global.js'
+import axios from "axios";
+import { baseApiUrl, showError } from "../../../../global";
 
 export default {
   name: "NewGame",
   data: function () {
     return {
-      game:{},
-      fields: [],
+      mode: "save",
+      game: {},
+      games: [],
+      categories: [],
+      platforms: [],
+      platformsSelected: [],
+      fields: [
+        { key: "id", label: "Código", sortable: true },
+        { key: "name", label: "Nome", sortable: true },
+        { key: "actions", label: "Ações" },
+      ],
     };
   },
-  computed: mapState(["gameS", "modeS"]),
   methods: {
-    save() {},
-    remove() {},
-    reset() {
-      this.$store.commit("resetGame");
+    save() {
+      this.game.platforms = this.platformsSelected
+      const method = this.game.id ? "put" : "post";
+      const id = this.game.id ? `/${this.game.id}` : "";
+      axios[method](`${baseApiUrl}/games${id}`, this.game)
+        .then(() => {
+          this.$toasted.global.defaultSuccess();
+          this.reset();
+        })
+        .catch(showError); 
     },
+    remove() {
+      const id = this.game.id
+      axios.delete(`${baseApiUrl}/games/${id}`)
+        .then(() => {
+          this.$toasted.global.defaultSuccess();
+          this.reset();
+        })
+        .catch(showError);
+
+    },
+    reset() {
+      this.mode = "save" 
+      this.game = {} 
+      this.platformsSelected = []
+      this.platforms = []
+      this.getPlatforms()
+      this.loadGames()
+    },
+    loadGame(game, mode = 'save') {
+        this.mode = mode
+        this.game = {...game}
+    },
+    loadGames() {
+      const url = `${baseApiUrl}/games`;
+      axios.get(url).then((res) => {
+        this.games = res.data;
+      });
+    },
+    async getCategories(){
+      const url = `${baseApiUrl}/categories`
+      await axios.get(url)
+              .then( res => {
+                  this.categories = res.data.map( category => {
+                      return {id:category.id, name: category.name}
+                  })
+              })
+      
+    },
+    async getPlatforms(){
+      const url = `${baseApiUrl}/platforms`
+      await axios.get(url)
+              .then( res => {
+                  this.platforms = res.data.map( platform => {
+                      return {id:platform.id, name: platform.name}
+                  })
+              })
+      
+    }
   },
-  watch:{          
+  mounted() {
+    this.reset()
+    this.getCategories()
+    this.getPlatforms()
   },
-  mounted(){
-    this.$store.commit("resetGame");
-  }
 };
 </script>
 
 <style>
-.add-game {
+.game-admin {
   display: flex;
-  flex-direction: column;
-  margin: 10px;
+  flex-direction: row;
+}
+
+.add-games{
+  flex: 1;
+  padding: 10px;
+  
+}
+
+.table-games{
+  flex: 1;
+  padding: 10px;
 }
 
 b-form-input {
@@ -104,5 +232,34 @@ b-form-input {
 .buttons {
   display: flex;
   flex-direction: row;
+}
+
+.list .list-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 20px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #aaa;
+}
+
+.list h1 {
+  display: flex;
+  justify-content: center;
+}
+
+.list .list-filter i {
+  color: #aaa;
+  margin-right: 10px;
+}
+
+.list input {
+  color: black;
+  font-size: 1.3rem;
+  border: 0;
+  outline: 0;
+  width: 100%;
+  background: transparent;
 }
 </style>
