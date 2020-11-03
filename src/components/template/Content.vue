@@ -12,10 +12,9 @@ export default {
 
 <style>
     .content{
-         grid-area: content;
+        grid-area: content;
         background-color: #efefef;
         padding: 2%;
-
-        
+        justify-content: center        
     }
 </style>
