@@ -3,12 +3,12 @@ import VueRouter from 'vue-router'
 
 import Home from '../components/home/Home'
 import Games from '../components/admin/AdminPages.vue'
-import NewParty from '../components/parties/NewParty'
 import SignUp from '../components/user/SignUp'
 import SignIn from '../components/user/SignIn'
 import Profile from '../components/user/Profile'
 import Community from '../components/main/Community'
 import About from '../components/main/About'
+import Dashboard from '../components/dashboard/Dashboard'
 
 import {userKey} from '../../global'
 
@@ -22,10 +22,6 @@ const routes = [{
     name: 'games',
     path: '/games',
     component: Games
-},{
-    name: 'party',
-    path: '/party',
-    component: NewParty
 },{
     name:'signup',
     path: '/signup',
@@ -49,7 +45,12 @@ const routes = [{
     name: 'about',
     path: '/about',
     component: About
-}
+},
+  {
+    name: 'dashboard',
+    path:'/dashboard',
+    component: Dashboard
+  }
 ]
 
  
