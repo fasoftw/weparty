@@ -16,7 +16,7 @@
         </b-form-group>
 
         <b-form-group label="Imagem(URL): " label-for="game-imageUrl"  v-if="mode === 'save'" label-cols-sm="2">
-              <b-form-file id="game-imageUrl" size="lg" v-model="game.imageUrl"></b-form-file>
+              <b-form-input id="game-imageUrl" type="text" size="lg" v-model="game.imageUrl"></b-form-input>
         </b-form-group>
 
         <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'" label-cols-sm="2">
@@ -69,10 +69,12 @@
 
         
         <b-form-group label="Rank: " label-for="game-rank" v-if="mode === 'save'" label-cols-sm="2">
-        <toggle-button id="game-rank"
+        <toggle-button 
+                       v-model="game.rank"
+                       id="game-rank"
                        width="75"
                        height="35" 
-                       v-model="game.rank"               
+                       :sync="true"
         />
         </b-form-group>
       
@@ -84,8 +86,12 @@
               text-field="name"
            >
            </b-form-select>
-          <div class="mt-3">Selecionados: <strong>{{ platformsSelected }} </strong></div>
+          <div class="mt-3">Selecionados: <strong>{{ platformsSelected }}</strong></div>
         </b-form-group>
+
+        
+
+
 
       </b-form>
 
@@ -182,6 +188,7 @@ export default {
     loadGame(game, mode = 'save') {
         this.mode = mode
         this.game = {...game}
+        this.game.rank = this.game.rank === 1 ? true : false
     },
     loadGames() {
       const url = `${baseApiUrl}/games`;
@@ -233,6 +240,7 @@ export default {
 .table-games{
   flex: 1;
   padding: 10px;
+  box-shadow: 0px 0px 1px black;
 }
 
 b-form-input {
