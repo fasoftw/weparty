@@ -9,7 +9,8 @@
         <b-nav-item to="/" >Home</b-nav-item>
             <b-nav-item to="/community" >Comunidade</b-nav-item>
             <b-nav-item to="/about"  >Sobre</b-nav-item>       
-            <b-nav-item to="/games" >Games</b-nav-item> 
+            <b-nav-item to="/games" >Games</b-nav-item>     
+            <b-nav-item to="/dashboard" >Dashboard</b-nav-item> 
             <b-nav-item to="/signup" v-if="$mq === 'xs' && hideUserDropdown" >Sign up</b-nav-item>       
             <b-nav-item to="/signin" v-if="$mq === 'xs' && hideUserDropdown" >Sign in</b-nav-item> 
             <b-nav-item @click.prevent="logout" v-if="$mq === 'xs' && !hideUserDropdown" >Sign out</b-nav-item>                           
