@@ -16,13 +16,17 @@
         </b-form-group>
 
         <b-form-group label="Imagem(URL): " label-for="game-imageUrl"  v-if="mode === 'save'" label-cols-sm="2">
-              <b-form-input id="game-imageUrl" required v-model="game.imageUrl"></b-form-input>
+              <b-form-file id="game-imageUrl" size="lg" v-model="game.imageUrl"></b-form-file>
         </b-form-group>
 
         <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'" label-cols-sm="2">
-          <b-form-input
+          <b-form-textarea
             id="ame-description"
             type="text"
+            size="md"
+            rows="3"
+            max-rows="8"
+            no-auto-shrink
             v-model="game.description"
             required
             :readonly="mode === 'remove'"
