@@ -4,7 +4,7 @@
       <b-form>
         <input id="game-id" type="hidden" />
 
-        <b-form-group label="Nome: " label-for="game-name">
+        <b-form-group label="Nome: " label-for="game-name" label-cols-sm="2">
           <b-form-input
             id="game-name"
             type="text"
@@ -15,59 +15,64 @@
           />
         </b-form-group>
 
-        <b-form-group label="Imagem(URL): " label-for="game-imageUrl" v-if="mode === 'save'">
-          <b-form-input
-            id="game-imageUrl"
-            type="url"
-            v-model="game.imageUrl"
-            required
-            :readonly="mode === 'remove'"
-          />
+        <b-form-group label="Imagem(URL): " label-for="game-imageUrl"  v-if="mode === 'save'" label-cols-sm="2">
+              <b-form-file id="game-imageUrl" size="lg" v-model="game.imageUrl"></b-form-file>
         </b-form-group>
 
-        <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'">
+        <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'" label-cols-sm="2">
           <b-form-input
             id="ame-description"
             type="text"
             v-model="game.description"
             required
             :readonly="mode === 'remove'"
+            placeholder="Informe a descrição do jogo..."
           />
         </b-form-group>
 
 
-        <b-form-group label="Número de jogadores: " label-for="game-num-players" v-if="mode === 'save'"> 
+        <b-form-group label="Núm. Jogadores:" label-for="game-num-players" v-if="mode === 'save'" label-cols-sm="2"> 
           <b-form-input
             id="game-num-players"
             type="number"
             v-model="game.maxPlayers"
             required
             :readonly="mode === 'remove'"
+            placeholder="Informe o número de jogados por grupo..."
           />
         </b-form-group>
 
-        <b-form-group label="Level Máximo: " label-for="game-max-level" v-if="mode === 'save'">
+        <b-form-group label="Level Máximo: " label-for="game-max-level" v-if="mode === 'save'" label-cols-sm="2">
           <b-form-input
             id="game-max-level"
             type="number"
             v-model="game.levelMax"
             required
             :readonly="mode === 'remove'"
+            placeholder="Informe o level máximo do Jogo..."
           />
         </b-form-group>
 
-        <b-form-group label="Categoria: " label-for="game-category" v-if="mode === 'save'">
+        <b-form-group label="Categoria: " label-for="game-category" v-if="mode === 'save'" label-cols-sm="2">
           <template>
               <b-form-select v-model="game.categoryId" :options="categories" 
                 value-field="id"
                 text-field="name"
               >
               </b-form-select>
-              <div class="mt-3">Selected: <strong>{{ categories.name }}</strong ></div>
           </template>
         </b-form-group>
+
+        
+        <b-form-group label="Rank: " label-for="game-rank" v-if="mode === 'save'" label-cols-sm="2">
+        <toggle-button id="game-rank"
+                       width="75"
+                       height="35" 
+                       v-model="game.rank"               
+        />
+        </b-form-group>
       
-        <b-form-group label="Plataformas: " label-for="game-platform" v-if="mode === 'save'" >
+        <b-form-group label="Plataformas: " label-for="game-platform" v-if="mode === 'save'" label-cols-sm="2">
            <b-form-select id="game-platform" v-model="platformsSelected" 
               :options="platforms" 
               multiple :select-size="Number(platforms.length)"
@@ -144,6 +149,7 @@ export default {
       this.game.platforms = this.platformsSelected
       const method = this.game.id ? "put" : "post";
       const id = this.game.id ? `/${this.game.id}` : "";
+      console.log(this.game)
       axios[method](`${baseApiUrl}/games${id}`, this.game)
         .then(() => {
           this.$toasted.global.defaultSuccess();
@@ -262,4 +268,6 @@ b-form-input {
   width: 100%;
   background: transparent;
 }
+
+
 </style>

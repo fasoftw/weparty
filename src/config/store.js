@@ -1,10 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import Button from 'vue-js-toggle-button'
+
+
 
 import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
+Vue.use(Button)
 
 export default new Vuex.Store({
     plugins: [createPersistedState({
