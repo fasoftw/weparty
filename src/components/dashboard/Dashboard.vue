@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard">
     <b-container class="bv-example-row">
-        <b-row align-v="center" cols="16" >
+        <b-row class="nav-dashboard" align-v="center" cols="16" >
            
             <b-nav pills>
                 <b-nav-item-dropdown
@@ -37,6 +37,18 @@
             </b-nav>
            
         </b-row>
+        <div class="main">
+        <b-container v-if="main" class="border border-secondary">
+            <b-row>
+                <b-col>Party em andamento</b-col>
+            </b-row>
+        </b-container>
+          <b-container v-if="main" class="border border-secondary" style="margin-top: 1%;">
+            <b-row>
+                <b-col>Recomendações</b-col>
+            </b-row>
+        </b-container>
+        </div>
          <div class="secao">
         <NewParty v-if="newParty"></NewParty>
         </div>
@@ -53,13 +65,15 @@ export default {
     data(){
         return {
             newParty: false,
-            searchParty: false
+            searchParty: false,
+            main: true
         }
     },
     methods:{
         show(parametro){
            if(parametro === 'party'){
              this.newParty = true 
+             this.main = false
            }
         }
     }
@@ -75,6 +89,10 @@ export default {
         flex-wrap: wrap;
         background-color: #FFF;
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-dashboard{
+        background-color: #FFF;
     }
 
 

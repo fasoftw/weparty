@@ -16,7 +16,7 @@
         </b-form-group>
 
         <b-form-group label="Imagem(URL): " label-for="game-imageUrl"  v-if="mode === 'save'" label-cols-sm="2">
-              <b-form-file id="game-imageUrl" size="lg" v-model="game.imageUrl"></b-form-file>
+              <b-form-input id="game-imageUrl" required v-model="game.imageUrl"></b-form-input>
         </b-form-group>
 
         <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'" label-cols-sm="2">

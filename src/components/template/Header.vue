@@ -41,6 +41,7 @@
                 <em><b-avatar badge badge-variant="success" src="https://placekitten.com/300/300"></b-avatar></em>
             </template>
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
+            <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
             <b-dropdown-item @click.prevent="logout">Sign Out</b-dropdown-item>
             
             </b-nav-item-dropdown>
