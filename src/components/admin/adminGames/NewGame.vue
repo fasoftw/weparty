@@ -132,6 +132,10 @@
             </b-form-tags>
         </b-form-group>
 
+        
+
+
+
       </b-form>
 
       <div class="buttons">
@@ -229,11 +233,7 @@ export default {
       this.loadGames()
     },
     loadGame(game, mode = 'save') {
-        if(game.rank === "1"){
-        game.rank = true
-         } else{
-        game.rank = false
-        }
+        this.game.rank = this.game.rank === 1 ? true : false
 
         this.mode = mode
         this.getFiltersByGameId(game.id)
@@ -321,6 +321,7 @@ export default {
 .table-games{
   flex: 1;
   padding: 10px;
+  box-shadow: 0px 0px 1px black;
 }
 
 b-form-input {

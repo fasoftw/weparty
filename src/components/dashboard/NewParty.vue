@@ -24,7 +24,8 @@
 
 
           <label for="games">Selecione o jogo</label>
-          <b-form-select id="games" v-model="gameSelected" :options="games"></b-form-select>
+          <b-form-select id="games" v-model="gameSelected" :options="games" 
+            v-on:change="getGameId"></b-form-select>
 
           <label for="platform">Selecione a plataforma</label>
           <b-form-select id="platform" v-model="platformSelected" :options="platforms"></b-form-select>
@@ -36,13 +37,15 @@
             aria-describedby="input-live-help input-live-feedback"
           ></b-form-input>
 
-          <label for="rank">Rank minimo</label>
-          <b-form-input
-            id="rank"
-            type="number"
-            v-model="party.rank"
-            aria-describedby="input-live-help input-live-feedback"
-          ></b-form-input>
+
+          <b-form-group  label="Rank: " label-for="rank" v-show="verRank">
+            <b-form-input
+              id="rank"
+              type="number"
+              v-model="party.rank"
+              aria-describedby="input-live-help input-live-feedback"
+            ></b-form-input>
+          </b-form-group>
         </b-form>
 
          <b-form-group label="Tagged input using dropdown">
@@ -114,7 +117,8 @@ export default {
       name:'NewParty',
       data() {
       return {
-        party:{},
+        verRank: 0,
+        party: {},
         gameSelected: '',
         platformSelected: '',
         options: [
@@ -168,9 +172,17 @@ export default {
 
           })
         })
-      }
-    } ,
-      computed: {
+      },
+      getGameId: async function(gameId) { // Just a regular js function that takes 1 arg
+        console.log(gameId)
+        await axios.get(`${baseApiUrl}/games/${gameId}`)
+          .then(res =>{
+            this.verRank = res.data
+          })
+          this.verRank = this.verRank.rank ? 1 : 0
+      },
+    },
+    computed: {
       criteria() {
         // Compute the search criteria
         return this.search.trim().toLowerCase()
