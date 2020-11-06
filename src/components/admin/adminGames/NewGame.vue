@@ -16,7 +16,7 @@
         </b-form-group>
 
         <b-form-group label="Imagem(URL): " label-for="game-imageUrl"  v-if="mode === 'save'" label-cols-sm="2">
-              <b-form-file id="game-imageUrl" size="lg" v-model="game.imageUrl"></b-form-file>
+              <b-form-input id="game-imageUrl" size="lg" v-model="game.imageUrl"></b-form-input>
         </b-form-group>
 
         <b-form-group label="Descrição: " label-for="game-description" v-if="mode === 'save'" label-cols-sm="2">
@@ -70,21 +70,66 @@
         
         <b-form-group label="Rank: " label-for="game-rank" v-if="mode === 'save'" label-cols-sm="2">
         <toggle-button id="game-rank"
-                       width="75"
-                       height="35" 
-                       v-model="game.rank"               
+                       :width=75
+                       :height=35
+                       v-model="game.rank"
+                                    
         />
         </b-form-group>
       
         <b-form-group label="Plataformas: " label-for="game-platform" v-if="mode === 'save'" label-cols-sm="2">
-           <b-form-select id="game-platform" v-model="platformsSelected" 
+           <b-form-select id="game-platform" v-model="game.platformsSelected" 
               :options="platforms" 
               multiple :select-size="Number(platforms.length)"
               value-field="id"
               text-field="name"
            >
            </b-form-select>
-          <div class="mt-3">Selecionados: <strong>{{ platformsSelected }} </strong></div>
+          <div class="mt-3">Selecionados: <strong>{{ game.platformsSelected }} </strong></div>
+        </b-form-group>
+
+        <b-form-group>
+           <b-form-tags v-model="game.filtersSelected" no-outer-focus class="mb-2">
+              <template v-slot="{ tags, inputAttrs, inputHandlers, addTag, removeTag }">
+                <b-input-group aria-controls="my-custom-tags-list">
+                  <input
+                    v-bind="inputAttrs"
+                    v-on="inputHandlers"
+                    placeholder="New tag - Press enter to add"
+                    class="form-control">
+                  <b-input-group-append>
+                    <b-button @click="addTag()" variant="primary">Add</b-button>
+                  </b-input-group-append>
+                </b-input-group>
+                <ul
+                  id="my-custom-tags-list"
+                  class="list-unstyled d-inline-flex flex-wrap mb-0"
+                  aria-live="polite"
+                  aria-atomic="false"
+                  aria-relevant="additions removals"
+                >
+                  <!-- Always use the tag value as the :key, not the index! -->
+                  <!-- Otherwise screen readers will not read the tag
+                      additions and removals correctly -->
+                  <b-card
+                    v-for="tag in tags"
+                    :key="tag"
+                    :id="`my-custom-tags-tag_${tag.replace(/\s/g, '_')}_`"
+                    tag="li"
+                    class="mt-1 mr-1"
+                    body-class="py-1 pr-2 text-nowrap"
+                  >
+                    <strong>{{ tag }}</strong>
+                    <b-button
+                      @click="removeTag(tag)"
+                      variant="link"
+                      size="sm"
+                      :aria-controls="`my-custom-tags-tag_${tag.replace(/\s/g, '_')}_`"
+                    >remove</b-button>
+                  </b-card>
+                </ul>
+              </template>
+            </b-form-tags>
         </b-form-group>
 
       </b-form>
@@ -140,20 +185,23 @@ export default {
       games: [],
       categories: [],
       platforms: [],
-      platformsSelected: [],
       fields: [
         { key: "id", label: "Código", sortable: true },
         { key: "name", label: "Nome", sortable: true },
         { key: "actions", label: "Ações" },
-      ],
+      ]
     };
   },
   methods: {
     save() {
-      this.game.platforms = this.platformsSelected
+    
+      this.game.platforms = this.game.platformsSelected
+      this.game.filters = this.game.filtersSelected
+
+
       const method = this.game.id ? "put" : "post";
       const id = this.game.id ? `/${this.game.id}` : "";
-      console.log(this.game)
+      
       axios[method](`${baseApiUrl}/games${id}`, this.game)
         .then(() => {
           this.$toasted.global.defaultSuccess();
@@ -174,14 +222,25 @@ export default {
     reset() {
       this.mode = "save" 
       this.game = {} 
-      this.platformsSelected = []
+      this.game.platformsSelected = []
+      this.game.filtersSelected = []
       this.platforms = []
       this.getPlatforms()
       this.loadGames()
     },
     loadGame(game, mode = 'save') {
+        if(game.rank === "1"){
+        game.rank = true
+         } else{
+        game.rank = false
+        }
+
         this.mode = mode
-        this.game = {...game}
+        this.getFiltersByGameId(game.id)
+        this.getPlatformsByGameId(game.id)
+        
+        this.game = game
+
     },
     loadGames() {
       const url = `${baseApiUrl}/games`;
@@ -203,17 +262,46 @@ export default {
       const url = `${baseApiUrl}/platforms`
       await axios.get(url)
               .then( res => {
+                
                   this.platforms = res.data.map( platform => {
                       return {id:platform.id, name: platform.name}
                   })
+                  
               })
       
+    },
+    getPlatformsByGameId(id){
+      const url = `${baseApiUrl}/platforms/${id}`
+      axios.get(url)
+     
+              .then( res => {
+                  this.game.platformsSelected = res.data.map( platform => {
+                     
+                      return platform.platformId
+                  })          
+                  
+              })
+      
+    },
+
+    getFiltersByGameId(id){
+      const url = `${baseApiUrl}/filters/${id}`
+      axios.get(url)     
+              .then( res => {                  
+                  this.game.filtersSelected = res.data.map( filter => {
+                     
+                      return filter.name
+                  })                
+                  
+              })    
     }
   },
   mounted() {
     this.reset()
     this.getCategories()
     this.getPlatforms()
+    this.game.platformsSelected =[]
+    this.game.filtersSelected =[]
   },
 };
 </script>
