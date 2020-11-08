@@ -16,7 +16,6 @@
           <b-form-input
             id="input-live"
             v-model="party.name"
-            :state="nameState"
             aria-describedby="input-live-help input-live-feedback"
             placeholder="Nome da party"
             trim
@@ -48,7 +47,7 @@
           </b-form-group>
         </b-form>
 
-         <b-form-group label="Tagged input using dropdown">
+         <b-form-group label="Tags:">
       <b-form-tags v-model="value" no-outer-focus class="mb-2">
         <template v-slot="{ tags, disabled, addTag, removeTag }">
           <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
@@ -103,7 +102,10 @@
           
       </b-card-text>
       
-      <b-button variant="primary">Go somewhere</b-button>
+        <b-form-group>
+          <b-button class="mr-2" variant="primary" @click="onSubmit">Cadastrar</b-button>
+          <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Limpar</b-button>
+        </b-form-group>
     </b-card-body>
   </b-card>
 
@@ -121,35 +123,42 @@ export default {
         party: {},
         gameSelected: '',
         platformSelected: '',
-        options: [
-              { value: { C: '3PO' }, text: 'Option with object value' },
-              { value: { R: '2D2' }, text: 'Another option with object value' }
-            ],
-        optionsTags: ['Apple', 'Orange', 'Banana', 'Lime', 'Peach', 'Chocolate', 'Strawberry'],
+        optionsTags: ['Nenhum jogo foi selecionado'],
         search: '',
         value: [],
-        platforms:[],
-        games:[]
+        platforms:['Nenhum jogo foi selecionado'],
+        games:[],
+        gameId: null
       }
     },
     methods: {
-      onSubmit(evt) {
+      async onSubmit(evt) {
         evt.preventDefault()
-        alert(JSON.stringify(this.form))
+        this.party.filters = this.value
+        this.party.gameId = this.gameId
+        this.party.userId = this.$store.state.user.id
+        this.party.platformId = this.platformSelected
+        this.party.isOpen = 1
+
+        console.log(this.party)
+        await axios.post(`${baseApiUrl}/parties`, this.party)
+          .then(()=>{           
+              this.$toasted.global.defaultSuccess();
+              this.party = {}
+              this.$router.push({path: '/dashboard'})
+          })
       },
       onReset(evt) {
         evt.preventDefault()
-        // Reset our form values
-        this.form.email = ''
-        this.form.name = ''
-        this.form.food = null
-        this.form.checked = []
-        // Trick to reset/clear native browser form validation state
-        this.show = false
-        this.$nextTick(() => {
-          this.show = true
-        })
-        
+        this.party= {}
+        this.gameSelected= ''
+        this.platformSelected = ''
+        this.optionsTags = ['Nenhum jogo foi selecionado']
+        this.search = ''
+        this.value = []
+        this.platforms=['Nenhum jogo foi selecionado']
+        this.games=[]
+        this.gameId= null
       },
       onOptionClick({ option, addTag }) {
         addTag(option)
@@ -164,23 +173,35 @@ export default {
           })
         })
       },
-      loadPlatforms(){
-          axios.get(`${baseApiUrl}/platforms`)
-          .then(res =>{
-            this.platforms = res.data.map(platform => {
-                      return { ...platform, value: platform.id, text: platform.name }
-
-          })
-        })
-      },
       getGameId: async function(gameId) { // Just a regular js function that takes 1 arg
         console.log(gameId)
+        this.gameId = gameId
         await axios.get(`${baseApiUrl}/games/${gameId}`)
           .then(res =>{
             this.verRank = res.data
           })
           this.verRank = this.verRank.rank ? 1 : 0
+          this.getFilters()
+          this.getPlatforms()
+          console.log(this.platforms)
       },
+      getFilters(){
+        axios.get(`${baseApiUrl}/filters/${this.gameId}`)
+          .then( res => {
+            this.optionsTags = res.data.map( filter =>{
+              return filter.name
+            })
+          })
+      },
+       getPlatforms(){
+        axios.get(`${baseApiUrl}/platforms/${this.gameId}`)
+          .then( res => {
+            this.platforms  = res.data.map( platform =>{
+               return { ...platform, value: platform.id, text: platform.name }
+            })
+            console.log(this.platforms)
+          })
+      }
     },
     computed: {
       criteria() {
@@ -207,7 +228,7 @@ export default {
     },
     mounted(){
       this.loadGames()
-      this.loadPlatforms()
+     
     }
     
 
