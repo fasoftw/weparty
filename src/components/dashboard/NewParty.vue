@@ -98,7 +98,7 @@
           </b-dropdown>
         </template>
       </b-form-tags>
-    </b-form-group>
+          </b-form-group>
           
       </b-card-text>
       
@@ -114,7 +114,7 @@
 
 <script>
 import axios from 'axios'
-import {baseApiUrl} from '../../../global.js'
+import {baseApiUrl, showError} from '../../../global.js'
 export default {
       name:'NewParty',
       data() {
@@ -140,13 +140,13 @@ export default {
         this.party.platformId = this.platformSelected
         this.party.isOpen = 1
 
-        console.log(this.party)
         await axios.post(`${baseApiUrl}/parties`, this.party)
           .then(()=>{           
               this.$toasted.global.defaultSuccess();
               this.party = {}
               this.$router.push({path: '/dashboard'})
           })
+          .catch(showError); 
       },
       onReset(evt) {
         evt.preventDefault()
@@ -174,7 +174,6 @@ export default {
         })
       },
       getGameId: async function(gameId) { // Just a regular js function that takes 1 arg
-        console.log(gameId)
         this.gameId = gameId
         await axios.get(`${baseApiUrl}/games/${gameId}`)
           .then(res =>{
@@ -183,7 +182,6 @@ export default {
           this.verRank = this.verRank.rank ? 1 : 0
           this.getFilters()
           this.getPlatforms()
-          console.log(this.platforms)
       },
       getFilters(){
         axios.get(`${baseApiUrl}/filters/${this.gameId}`)
@@ -199,7 +197,6 @@ export default {
             this.platforms  = res.data.map( platform =>{
                return { ...platform, value: platform.id, text: platform.name }
             })
-            console.log(this.platforms)
           })
       }
     },
