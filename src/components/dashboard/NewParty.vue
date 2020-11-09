@@ -12,12 +12,11 @@
 
       <b-card-text>
         <b-form @submit="onSubmit">
-          <label for="input-live">Nome do Grupo:</label>
+          <label for="input-live">Nome do Grupo</label>
           <b-form-input
             id="input-live"
             v-model="party.name"
             aria-describedby="input-live-help input-live-feedback"
-            placeholder="Nome da party"
             trim
           ></b-form-input>
 
@@ -29,12 +28,20 @@
           <label for="platform">Selecione a plataforma</label>
           <b-form-select id="platform" v-model="platformSelected" :options="platforms"></b-form-select>
 
-          <label for="numberPlayers">Número de Jogadores:</label>
+          <label for="numberPlayers">Número de Jogadores</label>
           <b-form-input
             id="numberPlayers"
             v-model="party.numberPlayers"
             aria-describedby="input-live-help input-live-feedback"
           ></b-form-input>
+
+            <label for="textarea-default">Descrição</label>
+
+            <b-form-textarea
+              id="textarea-default"
+              v-model="party.description"
+            ></b-form-textarea>
+
 
 
           <b-form-group  label="Rank: " label-for="rank" v-show="verRank">

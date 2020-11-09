@@ -1,7 +1,7 @@
 <template>
-    <div class ="about">
-        <h1> Sobre</h1>
-    </div>
+  <div class="community">
+      <h1>Comunidade</h1>
+  </div>
 </template>
 
 <script>
