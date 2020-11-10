@@ -1,5 +1,6 @@
 <template>
     <div class="new-party">
+      <Nav />
 <b-card no-body>
     <b-card-header header-tag="nav">
       <b-nav card-header tabs>
@@ -122,8 +123,10 @@
 <script>
 import axios from 'axios'
 import {baseApiUrl, showError} from '../../../global.js'
+import Nav from './Nav'
 export default {
       name:'NewParty',
+      components:{Nav},
       data() {
       return {
         verRank: 0,

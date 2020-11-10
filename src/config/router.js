@@ -8,7 +8,9 @@ import SignIn from '../components/user/SignIn'
 import Profile from '../components/user/Profile'
 import Community from '../components/navigation/Community'
 import About from '../components/navigation/About'
-import Dashboard from '../components/dashboard/Dashboard'
+import Dashboard from '../components/dashboard/Main'
+import NewParty from '../components/dashboard/NewParty'
+import GameProfile from '../components/dashboard/gameProfile/GameProfile'
 
 import {userKey} from '../../global'
 
@@ -50,7 +52,17 @@ const routes = [{
     name: 'dashboard',
     path:'/dashboard',
     component: Dashboard
+  },
+  {
+    name: 'gameProfile',
+    path:'/gameProfile',
+    component: GameProfile
+  },{
+    name: 'newParty',
+    path:'/newParty',
+    component: NewParty
   }
+  
 ]
 
  

@@ -9,10 +9,10 @@
                 text="Party"
                 toggle-class="nav-link-custom"
                 right>
-                    <b-dropdown-item @click="show('party')">New Party</b-dropdown-item>
-                    <b-dropdown-item @click="show">Game Profile</b-dropdown-item>
+                    <b-dropdown-item to="/newParty">New Party</b-dropdown-item>
+                    <b-dropdown-item to="/gameProfile" >Game Profile</b-dropdown-item>
                     <b-dropdown-divider ></b-dropdown-divider>
-                    <b-dropdown-item @click="show" >Recomendações de Grupos</b-dropdown-item>
+                    <b-dropdown-item to="/highlights" >Recomendações de Grupos</b-dropdown-item>
                     </b-nav-item-dropdown>
                 
                 <b-nav-item-dropdown
@@ -20,7 +20,7 @@
                     text="Search"
                     toggle-class="nav-link-custom"
                     right>
-                    <b-dropdown-item>Party</b-dropdown-item>
+                    <b-dropdown-item to="/searchParty">Party</b-dropdown-item>
                     <b-dropdown-item>Friends</b-dropdown-item>
                     </b-nav-item-dropdown>
 
@@ -36,47 +36,15 @@
                     </b-nav-item-dropdown>
             </b-nav>
            
-        </b-row>
-        <div class="main">
-        <b-container v-if="main" class="border border-secondary">
-            <b-row>
-                <b-col>Party em andamento</b-col>
-            </b-row>
-        </b-container>
-          <b-container v-if="main" class="border border-secondary" style="margin-top: 1%;">
-            <b-row>
-                <b-col>Recomendações</b-col>
-            </b-row>
-        </b-container>
-        </div>
-         <div class="secao">
-        <NewParty v-if="newParty"></NewParty>
-        </div>
+        </b-row>   
     </b-container>
-   
     </div>
 </template>
 
 <script>
-import NewParty from './NewParty'
+
 export default {
-    name:'Dashboard',
-    components:{NewParty},
-    data(){
-        return {
-            newParty: false,
-            searchParty: false,
-            main: true
-        }
-    },
-    methods:{
-        show(parametro){
-           if(parametro === 'party'){
-             this.newParty = true 
-             this.main = false
-           }
-        }
-    }
+    name:'Dashboard'
 }
 </script>
 
