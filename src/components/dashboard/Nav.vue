@@ -63,5 +63,9 @@ export default {
         background-color: #FFF;
     }
 
+    .card-header {
+        background-color: rgb(42 169 230 / 11%);
+    }
+
 
 </style>

@@ -107,6 +107,16 @@ export default {
     /* Extra small devices (phones, 600px and down) */
     @media only screen and (max-width: 600px) {
         *{font-size: 1.0rem;}   
+        .navbar-nav > li{
+        display: flex;
+        flex-direction: column;
+        padding-left: 7px !important;
+        margin-bottom: 0;
+        list-style: none;
+         background-color:#6600cc!important;
+        color: #fff;
+    }
+
     }
 
     /* Small devices (portrait tablets and large phones, 600px and up) */
@@ -162,15 +172,6 @@ export default {
         flex-direction: row;
     }
 
-    .notification{
-         display:flex;
-         justify-content: flex-start;
-         align-items: center;
-         margin-top: 3px;
-         padding:5px;
-    }
-    
-
  
 
     .navbar-brand{
@@ -188,17 +189,10 @@ export default {
         color: #fff;
     }
 
-    .navbar-nav {
-        display: flex;
-        flex-direction: column;
-        padding-left: 7px !important;
-        margin-bottom: 0;
-        list-style: none;
-        background-color:#6600cc!important;
+    .navbar{
+         background-color:#6600cc!important;
         color: #fff;
     }
-
-
 
     .navbar{
         z-index: 9999;

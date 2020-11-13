@@ -1,4 +1,6 @@
 import '@fortawesome/fontawesome-free/js/all.js';
+import 'vue-search-select/dist/VueSearchSelect.css'
+import "vue-select/dist/vue-select.css";
 import Vue from 'vue'
 import App from './App.vue'
 import './config/bootstrap'

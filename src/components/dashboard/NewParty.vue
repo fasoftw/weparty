@@ -1,11 +1,12 @@
 <template>
     <div class="new-party">
       <Nav />
+
 <b-card no-body>
     <b-card-header header-tag="nav">
       <b-nav card-header tabs>
-        <b-nav-item active>Criar Party</b-nav-item>
-        <b-nav-item>Editar Party</b-nav-item>
+        <b-nav-item active>New party</b-nav-item>
+        <b-nav-item>My parties</b-nav-item>
       </b-nav>
     </b-card-header>
 
