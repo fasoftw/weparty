@@ -89,7 +89,7 @@
         </b-form-group>
 
         <b-form-group>
-           <b-form-tags v-model="game.filtersSelected" no-outer-focus class="mb-2">
+           <b-form-tags  v-if="mode === 'save'" v-model="game.filtersSelected" no-outer-focus class="mb-2">
               <template v-slot="{ tags, inputAttrs, inputHandlers, addTag, removeTag }">
                 <b-input-group aria-controls="my-custom-tags-list">
                   <input
@@ -185,7 +185,9 @@ export default {
   data: function () {
     return {
       mode: "save",
-      game: {},
+      game: {
+        "platformsSelected": []
+      },
       games: [],
       categories: [],
       platforms: [],
@@ -193,7 +195,8 @@ export default {
         { key: "id", label: "Código", sortable: true },
         { key: "name", label: "Nome", sortable: true },
         { key: "actions", label: "Ações" },
-      ]
+      ],
+      
     };
   },
   methods: {
@@ -215,6 +218,7 @@ export default {
     },
     remove() {
       const id = this.game.id
+      
       axios.delete(`${baseApiUrl}/games/${id}`)
         .then(() => {
           this.$toasted.global.defaultSuccess();
@@ -233,13 +237,24 @@ export default {
       this.loadGames()
     },
     loadGame(game, mode = 'save') {
-        this.game.rank = this.game.rank === 1 ? true : false
-
+      
         this.mode = mode
+        this.game = {
+          "platformsSelected": [],
+          "filtersSelected": []
+        }
+        this.game.id = game.id
+        this.game.name = game.name
+        this.game.imageUrl = game.imageUrl
+        this.game.description = game.description
+        this.game.categoryId = game.categoryId
+        this.game.rank = game.rank === 1 ? true : false
+        this.game.maxPlayers = game.maxPlayers
+        this.game.levelMax = game.levelMax
+
+        
         this.getFiltersByGameId(game.id)
         this.getPlatformsByGameId(game.id)
-        
-        this.game = game
 
     },
     loadGames() {
@@ -278,8 +293,8 @@ export default {
                   this.game.platformsSelected = res.data.map( platform => {
                      
                       return platform.platformId
-                  })          
-                  
+                  })        
+
               })
       
     },
@@ -300,7 +315,6 @@ export default {
     this.reset()
     this.getCategories()
     this.getPlatforms()
-    this.game.platformsSelected =[]
     this.game.filtersSelected =[]
   },
 };
