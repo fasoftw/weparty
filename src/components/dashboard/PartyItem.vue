@@ -2,7 +2,7 @@
     <div class="party-item">
 
         <div class="party-game-name">
-            <span> Grupo:  <strong>{{ party.name }}</strong></span>
+            <span> Grupo:  <strong>{{ party }}</strong></span>
         </div>
 
 
@@ -12,11 +12,10 @@
                         <div class="party-player-img">
                             <img 
                                 src="@/assets/desconhecido.jpg"
-                                height="50" width="50" alt="Player"
+                                height="75" width="75" alt="Player"
                             >
                         </div>
-                        <div class="party-player-name">
-                            {{party.numberPlayers}}
+                        <div class="party-player-info">
                         </div>
                     </li>
                 </ul>
@@ -40,15 +39,18 @@
 </template>
 
 <script>
+import { baseApiUrl } from '../../../global.js'
+import axios from 'axios'
 export default {
     name: 'PartyItem',
     props: ['party'],
     numbers: 1,
+    players: [],
     data(){
         return{
             statusParty: null,
             showStatusParty: 'Aberto',
-            qtdPlayers: 1
+            qtdPlayers: null,
         }
     },
     methods:{
@@ -56,7 +58,14 @@ export default {
 
         },
         enterParty(){
-            this.statusParty = 0;
+
+        },
+        countPlayers(){
+            console.log(this.party.gameId)
+            axios.get(`${baseApiUrl}/gamesParties/${this.party.gameId}`).then((res) => {
+                this.players = res.data
+                console.log(this.players)
+            })
         }
     },
     watch: {
@@ -67,6 +76,7 @@ export default {
     mounted(){
         this.statusParty = this.party.isOpen
         this.statusParty === 1 ? this.showStatusParty = 'Aberto' : this.showStatusParty ='Fechado'
+        this.countPlayers()
     }
 }
 </script>
@@ -110,6 +120,7 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: row;
+    justify-content: space-around;
     flex-wrap: wrap;
     width: 100%;
     padding-left: 0;
@@ -118,11 +129,11 @@ export default {
 .party-player{
     
     margin: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 20px;    
     background-color: #f2f2f2;
     padding: 20px;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
 }
 
 
