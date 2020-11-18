@@ -2,11 +2,14 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Home from '../components/home/Home'
-import Games from '../components/admin/AdminPages.vue'
+import Games from '../components/admin/Main.vue'
+import NewGames from '../components/admin/AdminPages.vue'
+import NewArticles from '../components/admin/news/Articles.vue'
 import SignUp from '../components/user/SignUp'
 import SignIn from '../components/user/SignIn'
 import Profile from '../components/user/Profile'
-import Community from '../components/navigation/Community'
+import News from '../components/navigation/News'
+import PostDetail from '../components/navigation/blog/PostDetail'
 import About from '../components/navigation/About'
 import Dashboard from '../components/dashboard/Main'
 import NewParty from '../components/dashboard/NewParty'
@@ -21,10 +24,21 @@ const routes = [{
     path: '/',
     component: Home
 },{
-    name: 'games',
-    path: '/games',
-    component: Games
-},{
+    name: 'admin',
+    path: '/admin',
+    component: Games,    
+    children: [{
+          path: 'articles',
+          name: 'Articles',
+          component: NewArticles
+        }, {
+          path: 'games',
+          name: 'Games',
+          component: NewGames
+        }]
+    }
+  
+,{
     name:'signup',
     path: '/signup',
     component: SignUp
@@ -40,10 +54,14 @@ const routes = [{
         requiresAuth: true
     }
 },{
-    name: 'community',
-    path: '/community',
-    component: Community
-},{
+    name: 'news',
+    path: '/news',
+    component: News
+},
+{ 
+    path: '/post/:id', 
+    component: PostDetail },
+{
     name: 'about',
     path: '/about',
     component: About

@@ -9,6 +9,8 @@ import router from './config/router'
 import './config/msgs'
 import './config/axios'
 import './config/mq'
+import './config/resource'
+import './config/paginate'
 
 
 Vue.config.productionTip = false
