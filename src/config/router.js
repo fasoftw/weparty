@@ -11,6 +11,7 @@ import About from '../components/navigation/About'
 import Dashboard from '../components/dashboard/Main'
 import NewParty from '../components/dashboard/NewParty'
 import GameProfile from '../components/dashboard/gameProfile/GameProfile'
+import PartyGame from '../components/dashboard/PartyGame'
 
 import {userKey} from '../../global'
 
@@ -61,7 +62,15 @@ const routes = [{
     name: 'newParty',
     path:'/newParty',
     component: NewParty
-  }
+  },{
+    name: 'PartyGameId',
+    path:'/partiesgame/:id',
+    component: PartyGame
+  },{
+    name: 'PartyGameAll',
+    path:'/partiesgame/',
+    component: PartyGame
+  },
   
 ]
 
