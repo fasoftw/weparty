@@ -30,12 +30,13 @@
           <label for="platform">Selecione a plataforma</label>
           <b-form-select id="platform" v-model="platformSelected" :options="platforms"></b-form-select>
 
+
+
           <label for="numberPlayers">Número de Jogadores</label>
-          <b-form-input
-            id="numberPlayers"
-            v-model="party.numberPlayers"
-            aria-describedby="input-live-help input-live-feedback"
-          ></b-form-input>
+
+          <b-form-select id="platform" v-model="numberSelected" :options="numberPlayers"></b-form-select>
+
+
 
             <label for="textarea-default">Descrição</label>
 
@@ -131,6 +132,7 @@ export default {
       data() {
       return {
         verRank: 0,
+        numberPlayers: ['Nenhum número foi selecionado'],
         party: {},
         gameSelected: '',
         platformSelected: '',
@@ -138,6 +140,7 @@ export default {
         search: '',
         value: [],
         platforms:['Nenhum jogo foi selecionado'],
+        game: null,
         games:[],
         gameId: null
       }
@@ -149,8 +152,9 @@ export default {
         this.party.gameId = this.gameId
         this.party.userId = this.$store.state.user.id
         this.party.platformId = this.platformSelected
+        this.party.numberPlayers = this.numberSelected
+        console.log(this.numberSelected)
         this.party.isOpen = 1
-
         await axios.post(`${baseApiUrl}/parties`, this.party)
           .then(()=>{           
               this.$toasted.global.defaultSuccess();
@@ -164,6 +168,7 @@ export default {
         this.party= {}
         this.gameSelected= ''
         this.platformSelected = ''
+        this.numberPlayers = ['Nenhum número foi selecionado'],
         this.optionsTags = ['Nenhum jogo foi selecionado']
         this.search = ''
         this.value = []
@@ -184,13 +189,20 @@ export default {
           })
         })
       },
-      getGameId: async function(gameId) { // Just a regular js function that takes 1 arg
+      getGameId: async function(gameId) { 
         this.gameId = gameId
         await axios.get(`${baseApiUrl}/games/${gameId}`)
           .then(res =>{
             this.verRank = res.data
+            
           })
+
+          this.numberPlayers = new Array(this.verRank.maxPlayers).fill(0).map((_,i) => {return {value: i+1, text: i+1} } )
+
+  
           this.verRank = this.verRank.rank ? 1 : 0
+          
+ 
           this.getFilters()
           this.getPlatforms()
       },
