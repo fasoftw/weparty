@@ -207,7 +207,7 @@ export default {
           this.getPlatforms()
       },
       getFilters(){
-        axios.get(`${baseApiUrl}/filters/${this.gameId}`)
+        axios.get(`${baseApiUrl}/game/${this.gameId}/filters`)
           .then( res => {
             this.optionsTags = res.data.map( filter =>{
               return filter.name
@@ -215,7 +215,7 @@ export default {
           })
       },
        getPlatforms(){
-        axios.get(`${baseApiUrl}/platforms/${this.gameId}`)
+        axios.get(`${baseApiUrl}/game/${this.gameId}/platforms`)
           .then( res => {
             this.platforms  = res.data.map( platform =>{
                return { ...platform, value: platform.id, text: platform.name }

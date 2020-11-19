@@ -3,13 +3,16 @@
     <paginate
       name="blogs"
       :list="posts"
-      :per="10"
+      :per="3"
       tag="div"
     >
       <section v-for="blog in paginated('blogs')" :key="blog.id">
         <b-card :title="blog.name" >
         <b-card-text>{{blog.description}}</b-card-text>
-        <b-card-text>Click the button to toggle the overlay:</b-card-text>
+        <b-card-text>   
+           <img v-if="blog.imageUrl"
+                    :src="blog.imageUrl"
+                    height="100" width="150" alt="Article"></b-card-text>
         <b-button :to="'/post/' + blog.id" variant="primary" >
           Read More
         </b-button>

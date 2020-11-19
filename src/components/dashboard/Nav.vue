@@ -10,7 +10,7 @@
                 toggle-class="nav-link-custom"
                 right>
                     <b-dropdown-item to="/newParty">New Party</b-dropdown-item>
-                    <b-dropdown-item to="/gameProfile" >Game Profile</b-dropdown-item>
+                    <b-dropdown-item to="/game/profile/user" >Game Profile</b-dropdown-item>
                     <b-dropdown-divider ></b-dropdown-divider>
                     <b-dropdown-item to="/highlights" >Recomendações de Grupos</b-dropdown-item>
                     </b-nav-item-dropdown>

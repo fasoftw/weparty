@@ -36,7 +36,12 @@
             <b-button class="ml-2" @click="reset">Cancelar</b-button>
         </b-form>
         <hr>
-        <b-table hover striped :items="articles" :fields="fields">
+        
+        <b-table id="my-table" hover striped :items="articles" 
+        :fields="fields"
+        :per-page="perPage"
+        :current-page="currentPage"
+        small>
             <template #cell(actions)="row">
                 <b-button variant="warning" @click="loadArticle(row.item)" class="mr-2">
                      <i class="fas fa-pencil-alt"></i>
@@ -46,7 +51,12 @@
                 </b-button>
             </template>
         </b-table>
-        <b-pagination size="md" v-model="page" :total-rows="count" :per-page="limit" />
+         <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+          ></b-pagination>
   </div>
 </template>
 
@@ -65,9 +75,8 @@ export default {
             article: {},
             articles: [],
             users: [],
-            page: 1,
-            limit: 0,
-            count: 0,
+            perPage: 3,
+            currentPage: 1,
             fields: [
                 { key: 'id', label: 'Código', sortable: true },
                 { key: 'name', label: 'Nome', sortable: true },
@@ -87,7 +96,11 @@ export default {
         },
         
         reset(){
-
+            this.mode = 'save'
+            this.article = {}
+            this.articles = []
+            this.perPage = 3
+            this.currentPage = 1
         },
         save() {
             const method = this.article.id ? 'put' : 'post'
@@ -117,9 +130,9 @@ export default {
          loadArticles() {
             const url = `${baseApiUrl}/articles?page=${this.page}`
             axios.get(url).then(res => {
-                this.articles = res.data.data
-                this.count = res.data.count
-                this.limit = res.data.limit
+                this.articles = res.data.map( article =>{
+                    return {id: article.id, name: article.name, userId: article.userId}
+                })
             })
         },
         
@@ -134,6 +147,12 @@ export default {
       this.loadArticles()
 
 
+    },
+    computed: {
+      rows() {
+         this.loadArticles()
+         return this.articles.length
+      }
     }
 
 

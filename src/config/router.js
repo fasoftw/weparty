@@ -74,7 +74,7 @@ const routes = [{
   },
   {
     name: 'gameProfile',
-    path:'/gameProfile',
+    path:'/game/profile/user',
     component: GameProfile
   },{
     name: 'newParty',

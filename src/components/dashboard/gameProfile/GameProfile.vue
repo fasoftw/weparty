@@ -104,14 +104,14 @@ export default {
           })
         },
         loadProfile(){
-            axios.get(`${baseApiUrl}/gameProfileUser/${this.$store.state.user.id}`)
+            axios.get(`${baseApiUrl}/game/profile/user/${this.$store.state.user.id}`)
             .then(res =>{
                 this.profileUser = res.data
             })
         },
         async getPlatforms(id){
           
-            await axios.get(`${baseApiUrl}/platforms/${id}`)
+            await axios.get(`${baseApiUrl}/game/${id}/platforms`)
             .then( res => { 
                 this.platforms  = res.data.map( platform =>{
                   return { ...platform, item: platform.platformId, name: platform.name }
@@ -128,8 +128,9 @@ export default {
               this.gameProfile.platformId = this.platformSelected
               this.gameProfile.gameId = this.game.gameId.value
               this.gameProfile.name = this.name
+              console.log(this.gameProfile)
           
-              axios.post(`${baseApiUrl}/gameProfile`, this.gameProfile)
+              axios.post(`${baseApiUrl}/game/profile/user`, this.gameProfile)
               .then(() =>{
                   this.$toasted.global.defaultSuccess();
                   this.loadProfile()
@@ -145,8 +146,7 @@ export default {
               this.gameProfile = {}
         },
         onDelete(item){
-          console.log(item.id)
-              axios.delete(`${baseApiUrl}/gameProfileUser/${item.id}`)
+              axios.delete(`${baseApiUrl}/game/profile/user/${item.id}`)
               .then(() =>{
                   this.$toasted.global.defaultSuccess();
                   this.loadProfile()

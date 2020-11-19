@@ -286,7 +286,7 @@ export default {
       
     },
     getPlatformsByGameId(id){
-      const url = `${baseApiUrl}/platforms/${id}`
+      const url = `${baseApiUrl}/game/${id}/platforms`
       axios.get(url)
      
               .then( res => {
@@ -300,7 +300,7 @@ export default {
     },
 
     getFiltersByGameId(id){
-      const url = `${baseApiUrl}/filters/${id}`
+      const url = `${baseApiUrl}/game/${id}/filters`
       axios.get(url)     
               .then( res => {                  
                   this.game.filtersSelected = res.data.map( filter => {

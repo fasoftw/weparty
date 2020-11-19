@@ -44,7 +44,7 @@ export default {
              })
         },
         getGamesById(){
-             axios.get(`${baseApiUrl}/gamesParties/${this.$route.params.id}?page=${this.page}`).then((res) => {
+             axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.parties = this.parties.concat(res.data.parties)
                 this.page++
                 if(res.data.parties.length === 0) this.loadMore = false
