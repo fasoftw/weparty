@@ -10,22 +10,15 @@
         <b-nav-item to="/" >Home</b-nav-item>
             <b-nav-item to="/news" >News</b-nav-item>
             <b-nav-item to="/about"  >About</b-nav-item>       
-            <b-nav-item to="/admin" >Admin</b-nav-item>     
-            <b-nav-item to="/signup" v-if="$mq === 'xs' && hideUserDropdown" >Sign up</b-nav-item>       
-            <b-nav-item to="/signin" v-if="$mq === 'xs' && hideUserDropdown" >Sign in</b-nav-item> 
+            <b-nav-item to="/admin" v-if="admin === 1">Admin</b-nav-item>     
+            <b-nav-item to="/signup" v-if="$mq === 'xs' && !user" >Sign up</b-nav-item>       
+            <b-nav-item to="/signin" v-if="$mq === 'xs' && !user" >Sign in</b-nav-item> 
             <b-nav-item @click.prevent="logout" v-if="$mq === 'xs' && !hideUserDropdown" >Sign out</b-nav-item>
       </b-navbar-nav>
       
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
-
-        <b-nav-item-dropdown  text="Lang" right>
-          <b-dropdown-item href="#">EN</b-dropdown-item>
-          <b-dropdown-item href="#">ES</b-dropdown-item>
-          <b-dropdown-item href="#">RU</b-dropdown-item>
-          <b-dropdown-item href="#">FA</b-dropdown-item>
-        </b-nav-item-dropdown>
 
         <b-nav-form v-if="hideUserDropdown && $mq !== 'xs'">
             <b-button variant="success"  to="/signup" size= "sm"                
@@ -84,6 +77,11 @@ export default {
     props: {
         hideUserDropdown: Boolean
     },
+    data(){
+        return {
+            admin : 0
+        }
+    },
     computed: mapState(['user']),
     methods:{
         logout(){
@@ -92,6 +90,16 @@ export default {
             this.$router.push({name: 'signin'})
 
             sessionStorage.clear();
+        }
+    },
+    watch: {
+        '$store.state.user' : function(){
+            console.log(this.admin)
+            if(this.$store.state.user.admin === 0){
+                this.admin = 0
+            } else {
+                this.admin = 1
+            }
         }
     }
 }
@@ -199,9 +207,4 @@ export default {
     }
 
 
-
-
-
-
- 
 </style>
