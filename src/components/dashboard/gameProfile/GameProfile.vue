@@ -128,8 +128,7 @@ export default {
               this.gameProfile.platformId = this.platformSelected
               this.gameProfile.gameId = this.game.gameId.value
               this.gameProfile.name = this.name
-              console.log(this.gameProfile)
-          
+         
               axios.post(`${baseApiUrl}/game/profile/user`, this.gameProfile)
               .then(() =>{
                   this.$toasted.global.defaultSuccess();

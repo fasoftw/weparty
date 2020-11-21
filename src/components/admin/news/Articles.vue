@@ -105,7 +105,6 @@ export default {
         save() {
             const method = this.article.id ? 'put' : 'post'
             const id = this.article.id ? `/${this.article.id}` : ''
-            console.log(this.article)
             axios[method](`${baseApiUrl}/articles${id}`, this.article)
                 .then(() => {
                     this.$toasted.global.defaultSuccess()

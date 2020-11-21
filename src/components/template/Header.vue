@@ -88,13 +88,12 @@ export default {
             localStorage.removeItem(userKey)
             this.$store.commit('setUser',null)
             this.$router.push({name: 'signin'})
-
+            this.admin = 0
             sessionStorage.clear();
         }
     },
     watch: {
         '$store.state.user' : function(){
-            console.log(this.admin)
             if(this.$store.state.user.admin === 0){
                 this.admin = 0
             } else {

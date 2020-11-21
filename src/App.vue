@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header :hideUserDropdown="!user"/>
+    <Header :hideUserDropdown="!userData"/>
 	<Loading v-if="validatingToken" />
     <Content />
   </div>
@@ -19,33 +19,35 @@ export default {
   name: 'App',
   components: {Content, Header,Loading},
   computed: mapState(['user']),
-  data: function() {
-		return {
-			validatingToken: true
-		}
-},
-  methods: {async validateToken() {
+	data: function() {
+			return {
+				validatingToken: true,
+				userData:null
+			}
+	},
+	methods: {async validateToken() {
 			this.validatingToken = true
 
 			const json = localStorage.getItem(userKey)
+			this.userData = json 
 			const userData = JSON.parse(json)
 			this.$store.commit('setUser', null)
 
 			if(!userData) {
 				this.validatingToken = false
-				this.$router.push({ name: '/' })
 				return
 			}
 
 			const res = await axios.post(`${baseApiUrl}/validateToken`, userData)
-
 			if (res.data) {
 				this.$store.commit('setUser', userData)
 				
 	
 			} else {
+				this.userData = null
 				localStorage.removeItem(userKey)
-				this.$router.push({ name: '/' })
+				this.$router.push({ path: '/signin' })
+				
 			}
 
 			this.validatingToken = false
@@ -53,6 +55,12 @@ export default {
 	},
 	created() {
 		this.validateToken()
+	},
+	watch:{
+		'$store.state.user' : function(){
+			if(this.$store.state.user) 
+			this.userData = this.$store.state.user
+		}
 	}
 }
 </script>

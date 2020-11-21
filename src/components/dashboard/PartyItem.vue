@@ -88,10 +88,10 @@ export default {
             console.log(this.statusParty)
         },
         countPlayers(){
-           // console.log(this.party.gameId)
+
             axios.get(`${baseApiUrl}/gamesParties/${this.party.gameId}`).then((res) => {
                 this.players = res.data
-              //  console.log(this.players)
+
             })
         },
         flipCard(){

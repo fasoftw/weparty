@@ -75,7 +75,6 @@ export default {
     save() {
       const method = this.category.id ? "put" : "post";
       const id = this.category.id ? `/${this.category.id}` : "";
-      console.log(this.category)
       axios[method](`${baseApiUrl}/categories${id}`, this.category)
         .then(() => {
           this.$toasted.global.defaultSuccess();
@@ -84,7 +83,6 @@ export default {
         .catch(showError); 
     },
     remove() {
-        console.log(this.category)
       const id = this.category.id
       axios.delete(`${baseApiUrl}/categories/${id}`)
         .then(() => {
