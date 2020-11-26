@@ -244,6 +244,9 @@ export default {
           return 'There are no tags matching your search criteria'
         }
         return ''
+      },
+      nameState(){
+        this.validations.nameState = true
       }
     },
     mounted(){
