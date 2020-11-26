@@ -1,18 +1,23 @@
 <template>
     <div class="parties-games">
-        <div class="list-parties-games">
-            <ul>
-                <li v-for="party in parties" :key="party.id">
-                    <PartyItem :party="party" />
-                </li>
-            </ul>
-        </div>
+    <b-container fluid>   
+            <b-row cols="1" cols-sm="2" cols-md="3" cols-lg="3">
+             <b-col
+             v-for="party in parties" :key="party.id"
+              col
+              no-gutters
+              class="mb-2"
+            >
+            <PartyItem :party="party" />
+
+             </b-col>
+            </b-row>
         <div class="load-more">
             <button v-if="loadMore" @click="loadMoreGames"    
                 class="btn btn-lg btn-outline-primary"
                 >Carregar Mais Grupos</button>
         </div>
-
+    </b-container>
     </div>
 </template>
 
@@ -63,28 +68,11 @@ export default {
 </script>
 
 <style>
-.parties-games{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.list-parties-games ul {
-	display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.list-parties-games li {
-    list-style-type: none;
-    padding: 10px;
-}
-
-.parties-games .load-more{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 25px;
+.parties-games {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-around;
+  padding-top: 20px;
 }
 </style>

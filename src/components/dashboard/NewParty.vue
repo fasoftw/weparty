@@ -14,108 +14,141 @@
 
       <b-card-text>
         <b-form @submit="onSubmit">
-          <label for="input-live">Nome do Grupo</label>
+          <label for="input-name">Name Party</label>
           <b-form-input
-            id="input-live"
+            id="input-name"
+            name="input-name"
+            :state="validateState('name')"
             v-model="party.name"
-            aria-describedby="input-live-help input-live-feedback"
-            trim
-          ></b-form-input>
+            aria-describedby="input-live-help input-live-feedback">
+          </b-form-input>
 
-
-          <label for="games">Selecione o jogo</label>
-          <b-form-select id="games" v-model="gameSelected" :options="games" 
-            v-on:change="getGameId"></b-form-select>
-
-          <label for="platform">Selecione a plataforma</label>
-          <b-form-select id="platform" v-model="platformSelected" :options="platforms"></b-form-select>
+          <b-form-invalid-feedback
+          id="input-1-live-feedback">This is a required field.
+          </b-form-invalid-feedback>
 
 
 
-          <label for="numberPlayers">Número de Jogadores</label>
+          <label for="games">Select game</label>
+          <b-form-select id="games" v-model="party.gameSelected" 
+            :state="validateState('gameSelected')"
+            :options="games" 
+            aria-describedby="input-games-feedback"
+            v-on:change="getGameId">
+          </b-form-select>
 
-          <b-form-select id="platform" v-model="numberSelected" :options="numberPlayers"></b-form-select>
+            <b-form-invalid-feedback
+              id="input-games-feedback">This is a required field.
+            </b-form-invalid-feedback>
 
+            <b-form-group v-show="showForm">
 
+                <label for="platform"> Selected platform</label>
+                <b-form-select id="platform" v-model="party.platformSelected"
+                :state="validateState('platformSelected')" 
+                aria-describedby="input-platforms-feedback"
+                :options="platforms">
+                </b-form-select>
 
-            <label for="textarea-default">Descrição</label>
+                <b-form-invalid-feedback
+                  id="input-platforms-feedback">This is a required field.
+                </b-form-invalid-feedback>
 
-            <b-form-textarea
-              id="textarea-default"
-              v-model="party.description"
-            ></b-form-textarea>
+    
+                  <label for="textarea-default">Party Description</label>
+                  <b-form-textarea
+                    id="textarea-default"
+                    :state="validateState('description')"
+                    aria-describedby="input-textarea-default-feedback"
+                    v-model="party.description">
+                  </b-form-textarea>
 
+                <b-form-invalid-feedback
+                  id="input-textarea-default-feedback">This is a required field.
+                </b-form-invalid-feedback>
 
+                <label for="numberPlayers">Number of Players</label>
+                <b-input id="numberPlayers" type="number" min="0"
+                :state="validateState('numberPlayers')"
+                 aria-describedby="input-numberPlayers-feedback"
+                :max="maxPlayers" v-model="party.numberPlayers" ></b-input>
 
-          <b-form-group  label="Rank: " label-for="rank" v-show="verRank">
-            <b-form-input
-              id="rank"
-              type="number"
-              v-model="party.rank"
-              aria-describedby="input-live-help input-live-feedback"
-            ></b-form-input>
+                 <b-form-invalid-feedback
+                  id="input-numberPlayers-feedback">This is a required field and max number players is {{maxPlayers}}.
+                </b-form-invalid-feedback>
+
+                <b-form-group  label="Rank: " label-for="rank" v-show="verRank">
+                  <b-form-input
+                    id="rank"
+                    type="number"
+                    v-model="party.rank"
+                    aria-describedby="input-live-help input-live-feedback"
+                  ></b-form-input>
+                </b-form-group>
+
+              <b-form-group label="Tags:">
+                <b-form-tags v-model="value" no-outer-focus class="mb-2">
+                  <template v-slot="{ tags, disabled, addTag, removeTag }">
+                    <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+                      <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                        <b-form-tag
+                          @remove="removeTag(tag)"
+                          :title="tag"
+                          :disabled="disabled"
+                          variant="info"
+                        >{{ tag }}</b-form-tag>
+                      </li>
+                    </ul>
+
+                <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-100">
+                  <template #button-content>
+                    <b-icon icon="tag-fill"></b-icon> Choose tags
+                  </template>
+                  <b-dropdown-form @submit.stop.prevent="() => {}">
+                    <b-form-group
+                      label-for="tag-search-input"
+                      label="Search tags"
+                      label-cols-md="auto"
+                      class="mb-0"
+                      label-size="sm"
+                      :description="searchDesc"
+                      :disabled="disabled"
+                    >
+                      <b-form-input
+                        v-model="search"
+                        id="tag-search-input"
+                        type="search"
+                        size="sm"
+                        autocomplete="off"
+                      ></b-form-input>
+                    </b-form-group>
+                  </b-dropdown-form>
+                  <b-dropdown-divider></b-dropdown-divider>
+                  <b-dropdown-item-button
+                    v-for="option in availableOptions"
+                    :key="option"
+                    @click="onOptionClick({ option, addTag })"
+                  >
+                    {{ option }}
+                  </b-dropdown-item-button>
+                  <b-dropdown-text v-if="availableOptions.length === 0">
+                    There are no tags available to select
+                  </b-dropdown-text>
+                </b-dropdown>
+                
+                  </template>
+                  </b-form-tags>
+                </b-form-group>
           </b-form-group>
         </b-form>
-
-         <b-form-group label="Tags:">
-      <b-form-tags v-model="value" no-outer-focus class="mb-2">
-        <template v-slot="{ tags, disabled, addTag, removeTag }">
-          <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-            <li v-for="tag in tags" :key="tag" class="list-inline-item">
-              <b-form-tag
-                @remove="removeTag(tag)"
-                :title="tag"
-                :disabled="disabled"
-                variant="info"
-              >{{ tag }}</b-form-tag>
-            </li>
-          </ul>
-
-          <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-100">
-            <template #button-content>
-              <b-icon icon="tag-fill"></b-icon> Choose tags
-            </template>
-            <b-dropdown-form @submit.stop.prevent="() => {}">
-              <b-form-group
-                label-for="tag-search-input"
-                label="Search tags"
-                label-cols-md="auto"
-                class="mb-0"
-                label-size="sm"
-                :description="searchDesc"
-                :disabled="disabled"
-              >
-                <b-form-input
-                  v-model="search"
-                  id="tag-search-input"
-                  type="search"
-                  size="sm"
-                  autocomplete="off"
-                 ></b-form-input>
-              </b-form-group>
-            </b-dropdown-form>
-            <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item-button
-              v-for="option in availableOptions"
-              :key="option"
-              @click="onOptionClick({ option, addTag })"
-            >
-              {{ option }}
-            </b-dropdown-item-button>
-            <b-dropdown-text v-if="availableOptions.length === 0">
-              There are no tags available to select
-            </b-dropdown-text>
-          </b-dropdown>
-        </template>
-      </b-form-tags>
-          </b-form-group>
           
       </b-card-text>
       
         <b-form-group>
-          <b-button class="mr-2" variant="primary" @click="onSubmit">Cadastrar</b-button>
+          <b-button class="mr-2" variant="primary" :disabled="!showForm" @click="onSubmit">Cadastrar</b-button>
           <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Limpar</b-button>
         </b-form-group>
+   
     </b-card-body>
   </b-card>
 
@@ -124,37 +157,66 @@
 
 <script>
 import axios from 'axios'
+import { validationMixin } from "vuelidate";
+import { required,between } from "vuelidate/lib/validators";
 import {baseApiUrl, showError} from '../../../global.js'
 import Nav from './Nav'
 export default {
+      mixins: [validationMixin],
       name:'NewParty',
       components:{Nav},
       data() {
       return {
         verRank: 0,
-        numberPlayers: ['Nenhum número foi selecionado'],
         party: {},
-        gameSelected: '',
-        platformSelected: '',
+        maxPlayers: 0,
         optionsTags: ['Nenhum jogo foi selecionado'],
         search: '',
         value: [],
         platforms:['Nenhum jogo foi selecionado'],
         game: null,
         games:[],
-        gameId: null
+        gameId: null,
+        showForm: false
+      }
+    },
+    validations: {
+      party: {
+        name: {
+          required
+        },
+        gameSelected:{
+          required
+        },
+        platformSelected:{
+          required
+        },
+        description:{
+          required
+        },
+        numberPlayers:{
+          required,
+         between (value) {
+           return between(0, this.maxPlayers)(value)
+          }
+        }
       }
     },
     methods: {
       async onSubmit(evt) {
         evt.preventDefault()
+        this.$v.party.$touch();
+
+        if (this.$v.party.$anyError) {
+          return;
+        }
+
         this.party.filters = this.value
         this.party.gameId = this.gameId
         this.party.userId = this.$store.state.user.id
-        this.party.platformId = this.platformSelected
-        this.party.numberPlayers = this.numberSelected
-        console.log(this.numberSelected)
         this.party.isOpen = 1
+        this.party.platformId = this.party.platformSelected
+
         await axios.post(`${baseApiUrl}/parties`, this.party)
           .then(()=>{           
               this.$toasted.global.defaultSuccess();
@@ -168,13 +230,14 @@ export default {
         this.party= {}
         this.gameSelected= ''
         this.platformSelected = ''
-        this.numberPlayers = ['Nenhum número foi selecionado'],
+        this.numberPlayers = '',
         this.optionsTags = ['Nenhum jogo foi selecionado']
         this.search = ''
         this.value = []
         this.platforms=['Nenhum jogo foi selecionado']
         this.games=[]
         this.gameId= null
+        this.loadGames()
       },
       onOptionClick({ option, addTag }) {
         addTag(option)
@@ -193,15 +256,11 @@ export default {
         this.gameId = gameId
         await axios.get(`${baseApiUrl}/games/${gameId}`)
           .then(res =>{
-            this.verRank = res.data
-            
+            this.verRank = res.data            
           })
 
-          this.numberPlayers = new Array(this.verRank.maxPlayers).fill(0).map((_,i) => {return {value: i+1, text: i+1} } )
-
-  
-          this.verRank = this.verRank.rank ? 1 : 0
-          
+          this.maxPlayers = this.verRank.maxPlayers
+          this.verRank = this.verRank.rank ? 1 : 0         
  
           this.getFilters()
           this.getPlatforms()
@@ -221,7 +280,11 @@ export default {
                return { ...platform, value: platform.id, text: platform.name }
             })
           })
-      }
+      },
+      validateState(name) {
+        const { $dirty, $error } = this.$v.party[name];
+        return $dirty ? !$error : null;
+      },
     },
     computed: {
       criteria() {
@@ -245,13 +308,25 @@ export default {
         }
         return ''
       },
-      nameState(){
-        this.validations.nameState = true
+      maxPlayersFunction(gameid){
+        if(gameid){
+          return 1
+        } else{
+          return 0
+        }
+      
       }
     },
     mounted(){
       this.loadGames()
      
+    },
+    watch:{
+      'party.gameSelected': function(value){
+        if(value !== ''){
+          this.showForm = true
+        }
+      }
     }
     
 

@@ -94,10 +94,12 @@ export default {
     },
     watch: {
         '$store.state.user' : function(){
-            if(this.$store.state.user.admin === 0){
-                this.admin = 0
-            } else {
-                this.admin = 1
+            if(this.$store.state.user){
+                if(this.$store.state.user.admin === 0){
+                    this.admin = 0
+                } else {
+                    this.admin = 1
+                }
             }
         }
     }

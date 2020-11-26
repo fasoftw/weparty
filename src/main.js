@@ -11,6 +11,7 @@ import './config/axios'
 import './config/mq'
 import './config/resource'
 import './config/paginate'
+import './config/vuelidate'
 
 
 Vue.config.productionTip = false

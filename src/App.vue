@@ -31,7 +31,7 @@ export default {
 			const json = localStorage.getItem(userKey)
 			this.userData = json 
 			const userData = JSON.parse(json)
-			this.$store.commit('setUser', null)
+			
 
 			if(!userData) {
 				this.validatingToken = false
@@ -39,11 +39,13 @@ export default {
 			}
 
 			const res = await axios.post(`${baseApiUrl}/validateToken`, userData)
+
 			if (res.data) {
 				this.$store.commit('setUser', userData)
 				
 	
 			} else {
+				this.$store.commit('setUser', null)
 				this.userData = null
 				localStorage.removeItem(userKey)
 				this.$router.push({ path: '/signin' })

@@ -2,17 +2,10 @@
     <div class="main">
         <Nav />
         <div class="main-cont">
-            <b-container  class="border border-secondary">
-                <b-row>
-                    <b-col>Party em andamento</b-col>
-                </b-row>
-            </b-container>
-            <b-container class="border border-secondary" style="margin-top: 1%;">
-                <b-row>
-                    <b-col>Recomendações</b-col>
-                </b-row>
-            </b-container>
+            <Recommendation />
         </div>
+
+
     </div>
 
 </template>
@@ -20,9 +13,10 @@
 <script>
 
 import Nav from './Nav'
+import Recommendation from './recommendation/Recommendations'
 export default {
     name:'Main',
-    components:{Nav}
+    components:{Nav, Recommendation}
 
 }
 </script>
@@ -35,6 +29,7 @@ export default {
         align-items: flex-start;
         flex-wrap: wrap;
         background-color: #FFF;
+        margin-top: 5px;
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
     }
 

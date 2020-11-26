@@ -21,11 +21,13 @@
                                     <div class="party-player-img">
                                         <img 
                                             src="@/assets/desconhecido.jpg"
-                                            height="35" width="35" alt="Player"
+                                            height="25" width="25" alt="Player"
                                         >
                                     </div>
                                     <div class="party-player-info">
                                     </div>
+
+                                    
                                 </li>
                             </ul>
                         </div>
@@ -55,6 +57,8 @@
                     <div class="card-back-description">
                         <p>Description: {{party.description}}</p>
                     </div>
+
+                    <b-button variant="info">Entrar</b-button>
                
             </div>
        
@@ -89,7 +93,7 @@ export default {
         },
         countPlayers(){
 
-            axios.get(`${baseApiUrl}/gamesParties/${this.party.gameId}`).then((res) => {
+            axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
                 this.players = res.data
 
             })
@@ -115,7 +119,8 @@ export default {
 
 .party-item{
     display: flex;
-    width: 380px;
+    width: 300px;
+    flex-wrap: wrap;
     height: 270px;
     background-color: transparent;
     perspective: 1000px;
@@ -123,7 +128,7 @@ export default {
     margin-bottom: 15px;
     background-color: #ffffff;
     padding: 0px 20px 20px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(176, 6, 255, 0.2);
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
 }
 
@@ -206,11 +211,8 @@ export default {
 }
 
 .party-player{
-    margin: 5px;
-    background-color: #f2f2f2;
-    padding: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
+    padding: 10px;
+     list-style-type: none;
 }
 
 
@@ -277,14 +279,9 @@ export default {
 .card-back-top{
      display: flex;
     flex-direction: row;
+    justify-content: space-around;
     text-align: center;   
-    border-width: 10px;
-    border-style: solid;
-    border-image: 
-        linear-gradient( 
-        #6666ff,
-        rgba(0, 0, 0, 0)
-        ) 0 0 90%;
+    border-bottom: 2px inset #6600cc;
 }
 .card-back-leader{
     flex-grow: 1    ;
