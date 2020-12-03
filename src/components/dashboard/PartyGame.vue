@@ -1,19 +1,19 @@
 <template>
     <div class="parties-games">
-    <b-container fluid>   
-            <b-row cols="1" cols-sm="2" cols-md="3" cols-lg="3">
+    <b-container fluid>  
+            <b-row :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]">
              <b-col
-             v-for="party in parties" :key="party.id"
+             v-for="party in data" :key="party.id"
               col
               no-gutters
-              class="mb-2"
-            >
-            <PartyItem :party="party" />
+              class="mb-2">
+
+             <PartyItem :party="party" :type="type"/>
 
              </b-col>
             </b-row>
         <div class="load-more">
-            <button v-if="loadMore" @click="loadMoreGames"    
+            <button v-show="!isComp" v-if="loadMore" @click="loadMoreGames"    
                 class="btn btn-lg btn-outline-primary"
                 >Carregar Mais Grupos</button>
         </div>
@@ -29,28 +29,33 @@ import axios from 'axios'
 export default {
     name: 'PartyGame',
     components: { PartyItem },
+    props:['parties', 'isComp','type'],
     data: function(){
         return{
-            parties: [],
             page: 1,
             loadMore: true,
+            data: [],
+            cols: [1,2,3,3]
         }
     },
     methods:{
          getGamesAll(){
-             axios.get(`${baseApiUrl}/parties?page=${this.page}`).then((res) => {
-                this.parties = this.parties.concat(res.data.parties)
-                this.page++
 
-                if(res.data.parties.length === 0) this.loadMore = false
-                /*this.parties = res.data.party.map(data => {
-                      return { ...data }
-                })*/
-             })
-        },
+             if(this.data.length <= 2) this.cols[3] =2
+             
+             if(this.$mq === 'lg'){
+                 this.cols = [1,2,3,3]
+             } else if(this.$mq === 'xl'){
+                  this.cols = [1,2,2,4]
+             } else if(this.$mq === 'exl'){
+                  this.cols = [1,2,2,5]
+             }             
+
+            this.data = this.parties
+        },        
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
-                this.parties = this.parties.concat(res.data.parties)
+                this.data = this.data.concat(res.data.parties)
                 this.page++
                 if(res.data.parties.length === 0) this.loadMore = false
              })
@@ -61,9 +66,14 @@ export default {
 
     },
     mounted(){
-        this.$route.params.id ? this.getGamesById() : this.getGamesAll()
-        
+        this.$route.params.id ? this.getGamesById() : this.getGamesAll()       
+    },
+    watch: {
+    parties: function(){
+       this.$emit('update:parties',this.parties)
+       this.data = this.parties
     }
+  },
 }
 </script>
 

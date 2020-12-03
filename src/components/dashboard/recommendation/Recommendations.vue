@@ -1,21 +1,17 @@
 <template>
-   <div class="list-parties-games">
-            <ul>
-                <li v-for="party in parties" :key="party.id">
-                    <PartyItem :party="party" />
-                </li>
-            </ul>
-        </div>
+   <div class="list-parties-games">          
+                    <PartyGame :parties.sync="parties" :isComp="true" :type="''" />            
+    </div>
 </template>
 
 <script>
 
 import axios from 'axios'
-import PartyItem from '../PartyGame'
+import PartyGame from '../PartyGame'
 import { baseApiUrl} from "../../../../global";
 export default {
     name: "Recommendations",
-    components:{PartyItem},
+    components:{PartyGame},
     data(){
         return{
             parties:[]
@@ -26,11 +22,10 @@ export default {
             axios.get(`${baseApiUrl}/party/user/${this.$store.state.user.id}/recommendation`)
             .then( res => {
                 this.parties = res.data.parties
-                console.log(this.parties)
             }) 
         }
     },
-    created(){
+    mounted(){
         this.onLoad()
     }
     

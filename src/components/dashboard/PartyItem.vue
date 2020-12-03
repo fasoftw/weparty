@@ -1,7 +1,7 @@
 <template>
     <div class="party-item">
         
-        <div class="party-inner"   :class="{'flip':isFlipped }">        
+        <div class="party-inner"   :class="{'flip':!isFlipped }">        
             
             <div class="flip-card-front">
                     <div class="party-game-info">
@@ -17,7 +17,7 @@
                     <div class="party_players_button">
                         <div class="party-players-all">
                             <ul class="party-players">
-                                <li class="party-player" v-for="player in party.numberPlayers" :key="player">
+                                <li class="party-player" v-for="player in party.spotsFilled" :key="player">
                                     <div class="party-player-img">
                                         <img 
                                             src="@/assets/desconhecido.jpg"
@@ -33,11 +33,11 @@
                         </div>
 
                         <div class="party-buttons">
-                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Aberto'"> 
+                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Open'"> 
                                     <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}}</span>
                             </b-button>
 
-                            <b-button class="activated close" v-show="showStatusParty !== 'Aberto'"> 
+                            <b-button class="activated close" v-show="showStatusParty === 'Closed' && isFlipped"> 
                                     <i class="fas fa-lock"></i> <span>{{this.showStatusParty}}</span>
                             </b-button>
                         </div>
@@ -45,20 +45,23 @@
                     </div>
             </div>
 
-            <div class="flip-card-back">
+            <div class="flip-card-back" v-show="!isFlipped">
                     <div class="card-back-top">
                         <div class="card-back-leader">
-                            <span>Lider: <strong>{{party.userId}}</strong></span>
+                            <span>Leader: <strong>{{party.userName}}</strong></span>
                         </div>
-                        <div class="party_icon_back" v-on:click="flipCard">
+                        <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
+                            <b-icon icon="pencil-square"> </b-icon>
+                        </div>
+                        <div class="party_icon_back" v-on:click="flipCard" v-if="type !== 'edit'">
                             <i class="fas fa-undo-alt"></i>
                         </div>
                     </div>
                     <div class="card-back-description">
-                        <p>Description: {{party.description}}</p>
+                        <p>{{party.description}}</p>
                     </div>
 
-                    <b-button variant="info">Entrar</b-button>
+                    <b-button variant="info" v-on:click="enterParty" v-show="this.party.isOpen">Enter</b-button>
                
             </div>
        
@@ -68,35 +71,56 @@
 </template>
 
 <script>
-import { baseApiUrl } from '../../../global.js'
+import { baseApiUrl,showError } from '../../../global.js'
 import axios from 'axios'
 export default {
     name: 'PartyItem',
-    props: ['party'],
-    numbers: 1,
-    players: [],
+    props: ['party','type'],
     data(){
         return{
             statusParty: null,
-            showStatusParty: 'Aberto',
+            showStatusParty: 'Open',
             qtdPlayers: null,
             isFlipped: true,
+            counter: 0,
+            players: [],
+            numbers: 1
         }
     },
     methods:{
         getPlayer(){
 
         },
+        getTags(id){
+             axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
+                this.party.filters = res
+                console.log(this.party.filters)
+             })
+        },
+        toParty(id, party){
+            this.$router.push({ name:'EditParty', params: {party: party}})
+        },
         enterParty(){
             this.statusParty = !this.statusParty
-            console.log(this.statusParty)
+            console.log(this.party)
+            axios.post(`${baseApiUrl}/party/${this.party.id}/players`,this.party)
+            .then(res =>{
+                if(res.data === 'closed party'){
+                    this.showStatusParty = 'Closed'    
+                }
+            }) 
+            .catch(showError)
         },
         countPlayers(){
+             this.isFlipped = !this.isFlipped 
+            // axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
+            //     this.players = res.data
 
-            axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
-                this.players = res.data
-
-            })
+            // })
+        },
+        editParty(value){
+            console.log(value)
+            this.toParty(value.id, value)
         },
         flipCard(){
             this.isFlipped = !this.isFlipped 
@@ -104,12 +128,18 @@ export default {
     },
     watch: {
         statusParty() {
-            this.statusParty === 1 ? this.showStatusParty = 'Aberto' : this.showStatusParty = 'Fechado'
+            this.statusParty === 1 ? this.showStatusParty = 'Open' : this.showStatusParty = 'Closed'
+        },
+        party: function(){
+            this.$emit('update:party',this.party)
+            console.log(this.party)
+            this.numberPlayers = this.party.numberPlayers
+
         }
     },
     mounted(){
         this.statusParty = this.party.isOpen
-        this.statusParty === 1 ? this.showStatusParty = 'Aberto' : this.showStatusParty ='Fechado'
+        this.statusParty === 1 ? this.showStatusParty = 'Open' : this.showStatusParty ='Closed'
         this.countPlayers()
     }
 }

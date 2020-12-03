@@ -1,6 +1,6 @@
 <template>
   <div class="game-profile">
-      <Nav />
+      <!-- <Nav /> -->
       <b-card no-body>
         <b-card-header header-tag="nav">
         <b-nav card-header tabs>
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import Nav from '../Nav'
+// import Nav from '../Nav'
 import vSelect from "vue-select";
 import axios from 'axios'
 import {baseApiUrl, showError} from '../../../../global.js'
@@ -75,7 +75,7 @@ import {mapState} from 'vuex'
 export default {
 
     name: 'GameProfile',
-    components: {Nav, vSelect},
+    components: {vSelect},
     data(){
         return{
             options: [],

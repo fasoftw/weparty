@@ -20,7 +20,7 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
 
-        <b-nav-form v-if="hideUserDropdown && $mq !== 'xs'">
+        <b-nav-form v-if="!user && $mq !== 'xs'">
             <b-button variant="success"  to="/signup" size= "sm"                
             class="ml-2 mr-2">Sign up</b-button>
             <b-button variant="light"  to="/signin" size= "sm" 
@@ -29,7 +29,7 @@
 
            
 
-        <b-nav-item-dropdown right v-if="!hideUserDropdown && ($mq !== 'xs')">
+        <b-nav-item-dropdown right v-if="user && ($mq !== 'xs')">
             <!-- Using 'button-content' slot -->
                 <template  #button-content>      
                     <em><b-avatar badge="4" badge-variant="dark" src="https://placekitten.com/300/300"></b-avatar></em>

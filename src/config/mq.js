@@ -7,7 +7,8 @@ Vue.use(VueMq, {
         sm: 768,
         md: 960,
         lg: 1140,
-        xl: Infinity
+        xl: 1380,
+        exl: Infinity
     },
     defaultBreakpoint: 'lg'
 

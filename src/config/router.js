@@ -12,7 +12,9 @@ import News from '../components/navigation/News'
 import PostDetail from '../components/navigation/blog/PostDetail'
 import About from '../components/navigation/About'
 import Dashboard from '../components/dashboard/Main'
-import NewParty from '../components/dashboard/NewParty'
+import Recommendations from '../components/dashboard/recommendation/Recommendations'
+import NewParty from '../components/dashboard/party/NewParty'
+import MyParties from '../components/dashboard/party/MyParties'
 import GameProfile from '../components/dashboard/gameProfile/GameProfile'
 import PartyGame from '../components/dashboard/PartyGame'
 
@@ -27,7 +29,10 @@ const routes = [{
 },{
     name: 'admin',
     path: '/admin',
-    component: Games,    
+    component: Games, 
+    meta: {
+        requiresAdmin: true
+    },   
     children: [{
           path: 'articles',
           name: 'Articles',
@@ -37,8 +42,7 @@ const routes = [{
           name: 'Games',
           component: NewGames
         }]
-    }
-  
+    }  
 ,{
     name:'signup',
     path: '/signup',
@@ -57,38 +61,74 @@ const routes = [{
 },{
     name: 'news',
     path: '/news',
-    component: News
+    component: News,
+    meta: {
+        requiresAuth: true
+    }
 },
 { 
     path: '/post/:id', 
-    component: PostDetail },
+    component: PostDetail,
+    meta: {
+        requiresAuth: true
+    }
+},
 {
     name: 'about',
     path: '/about',
-    component: About
-},
-  {
+    component: About,
+    meta: {
+        requiresAuth: true
+    }
+},{
     name: 'dashboard',
-    path:'/dashboard',
-    component: Dashboard
-  },
-  {
-    name: 'gameProfile',
-    path:'/game/profile/user',
-    component: GameProfile
-  },{
-    name: 'newParty',
-    path:'/newParty',
-    component: NewParty
-  },{
+    path: '/dashboard',
+    component: Dashboard, 
+    meta: {
+        requiresAuth: true
+    },   
+    children: [
+        {
+          path: 'party',
+          name: 'Party',
+          component: NewParty
+        }, 
+        {
+            path: 'edit/:party',
+            name: 'EditParty',
+            component: NewParty
+        }, 
+        {
+            path: 'party/view',
+            name: 'MyParties',
+            component: MyParties
+        }, 
+        {
+          path: 'game/profile',
+          name: 'Profile',
+          component: GameProfile
+        },
+        {
+            path: '',
+            name: 'Recommendations',
+            component: Recommendations
+        }]
+    }  
+,{
     name: 'PartyGameId',
     path:'/partiesgame/:id',
-    component: PartyGame
+    component: PartyGame,
+    meta: {
+        requiresAuth: true
+    }
   },{
     name: 'PartyGameAll',
     path:'/partiesgame/',
-    component: PartyGame
-  },
+    component: PartyGame,
+    meta: {
+        requiresAuth: true
+    }
+  }
   
 ]
 
