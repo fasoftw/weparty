@@ -81,9 +81,8 @@ const routes = [{
         requiresAuth: true
     }
 },{
-    name: 'dashboard',
     path: '/dashboard',
-    component: Dashboard, 
+    components: {default: Dashboard}, 
     meta: {
         requiresAuth: true
     },   
@@ -109,8 +108,7 @@ const routes = [{
           component: GameProfile
         },
         {
-            path: '',
-            name: 'Recommendations',
+            path: 'main',
             component: Recommendations
         }]
     }  

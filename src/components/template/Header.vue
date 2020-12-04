@@ -36,7 +36,7 @@
                 </template>
            
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
-            <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
+            <b-dropdown-item to="/dashboard/main">Dashboard</b-dropdown-item>
              <b-dropdown-item to="/profile"> 
              Notifications 
              <b-badge variant="light">4</b-badge>                    

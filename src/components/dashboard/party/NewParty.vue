@@ -235,23 +235,23 @@ export default {
           return;
         }
         if(!this.$route.params.party){
-            this.party.filters = this.value
+            
             this.party.gameId = this.gameId
             this.party.userId = this.$store.state.user.id
             this.party.isOpen = 1
             this.party.platformId = this.party.platformSelected
         }
-
+      
+        this.party.filters = this.value
         const method = this.party.id ? "put" : "post";
         const id = this.party.id ? `/${this.party.id}` : "";
-        
-        axios[method](`${baseApiUrl}/games${id}`, this.game)
+      
 
         await axios[method](`${baseApiUrl}/parties${id}`, this.party)
           .then(()=>{           
               this.$toasted.global.defaultSuccess();
               this.party = {}
-              this.$router.push({path: '/dashboard'})
+              this.$router.push({path: '/dashboard/party/view'})
           })
           .catch(showError); 
       },
@@ -295,7 +295,7 @@ export default {
           this.getFilters()
           this.getPlatforms()
       },
-      getFilters(){
+      getFilters: async function(){
         axios.get(`${baseApiUrl}/game/${this.gameId}/filters`)
           .then( res => {
             this.optionsTags = res.data.map( filter =>{
@@ -358,14 +358,16 @@ export default {
          this.party.gameSelected = this.party.gameId
          this.party.platformSelected = this.party.platformId
          this.gameId = this.party.gameId
-         this.optionsTags = this.party.filters
+         this.value = this.party.filters
          this.party.name = this.party.partyName
-         this.optionsTags = this.optionsTags.map( filter =>{
+         this.value = this.value.map( filter =>{
               return filter.name
           })
-         
-         console.log(this.party)
+
+
+        this.getFilters()
       }
+    
       this.getPlatforms()
       this.loadGames()   
       

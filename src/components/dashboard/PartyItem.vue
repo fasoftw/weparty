@@ -1,7 +1,7 @@
 <template>
-    <div class="party-item">
+    <div class="party-item" v-if="party" >
         
-        <div class="party-inner"   :class="{'flip':!isFlipped }">        
+        <div class="party-inner"   :class="{'flip':!isFlipped }" >        
             
             <div class="flip-card-front">
                     <div class="party-game-info">
@@ -52,6 +52,9 @@
                         </div>
                         <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
                             <b-icon icon="pencil-square"> </b-icon>
+                        </div>
+                        <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit'">
+                            <b-icon icon="trash"> </b-icon>
                         </div>
                         <div class="party_icon_back" v-on:click="flipCard" v-if="type !== 'edit'">
                             <i class="fas fa-undo-alt"></i>
@@ -119,8 +122,16 @@ export default {
             // })
         },
         editParty(value){
-            console.log(value)
             this.toParty(value.id, value)
+        },
+        remove(value){
+            axios.delete(`${baseApiUrl}/parties/${value.id}`)
+            .then(() =>{
+               this.$toasted.global.defaultSuccess();
+               this.party = null
+               this.$forceUpdate();
+            }) 
+            .catch(showError)
         },
         flipCard(){
             this.isFlipped = !this.isFlipped 
@@ -132,7 +143,6 @@ export default {
         },
         party: function(){
             this.$emit('update:party',this.party)
-            console.log(this.party)
             this.numberPlayers = this.party.numberPlayers
 
         }
