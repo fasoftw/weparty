@@ -6,38 +6,35 @@
             <div class="flip-card-front">
                     <div class="party-game-info">
                         <div class="party-game-name">
-                            <span> Grupo:  <strong>{{ party.name }}</strong></span>
+                            <span> <strong>{{ party.partyName }}</strong></span>
                         </div>
-                        <div class="party_icon" v-on:click="flipCard">
+                        <div class="party_icon" v-on:click="flipCard" v-if="type !== 'edit'">
                             <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
+                            <b-icon icon="pencil-square"> </b-icon>
+                        </div>
+                        <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit'">
+                            <b-icon icon="trash"> </b-icon>
                         </div>
                     </div>
 
 
                     <div class="party_players_button">
-                        <div class="party-players-all">
-                            <ul class="party-players">
-                                <li class="party-player" v-for="player in party.spotsFilled" :key="player">
-                                    <div class="party-player-img">
-                                        <img 
-                                            src="@/assets/desconhecido.jpg"
-                                            height="25" width="25" alt="Player"
-                                        >
-                                    </div>
-                                    <div class="party-player-info">
-                                    </div>
-
-                                    
-                                </li>
-                            </ul>
+                        <div class = "party-description">
+                            <span> {{party.platformName}}/Spots:{{party.numberPlayers - party.spotsFilled}}</span><br>
+                            <span> Rank: {{party.rank}}/</span><span> Level:{{party.level}} </span><br>
+                            <span> Description:{{party.description}}</span><br>
+                          
+                            
                         </div>
-
+                       
                         <div class="party-buttons">
-                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Open'"> 
+                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
                                     <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}}</span>
                             </b-button>
 
-                            <b-button class="activated close" v-show="showStatusParty === 'Closed' && isFlipped"> 
+                            <b-button class="activated closed" v-show="showStatusParty === 'Closed' && isFlipped"> 
                                     <i class="fas fa-lock"></i> <span>{{this.showStatusParty}}</span>
                             </b-button>
                         </div>
@@ -48,20 +45,33 @@
             <div class="flip-card-back" v-show="!isFlipped">
                     <div class="card-back-top">
                         <div class="card-back-leader">
-                            <span>Leader: <strong>{{party.userName}}</strong></span>
+                            <span>Nick Leader: <strong>{{party.userName}}</strong></span>
                         </div>
-                        <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
-                            <b-icon icon="pencil-square"> </b-icon>
-                        </div>
-                        <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit'">
-                            <b-icon icon="trash"> </b-icon>
-                        </div>
+                        
+  
                         <div class="party_icon_back" v-on:click="flipCard" v-if="type !== 'edit'">
                             <i class="fas fa-undo-alt"></i>
                         </div>
                     </div>
-                    <div class="card-back-description">
-                        <p>{{party.description}}</p>
+                    <div class="party_players_button">
+                     <div class="party-players-all">
+                            <ul class="party-players">
+                                <li class="party-player" v-for="player in party.numberPlayers" :key="player">
+                                    <div class="party-player-img">
+                                        <img 
+                                            src="@/assets/desconhecido.jpg"
+                                            height="25" width="25" alt="Player"
+                                        >
+                                        
+                                    </div>
+                                    <div class="party-player-info">
+                                        <span style="font-size: 15px"> Nickname </span>
+                                    </div>
+
+                                    
+                                </li>
+                            </ul>
+                    </div>
                     </div>
 
                     <b-button variant="info" v-on:click="enterParty" v-show="this.party.isOpen">Enter</b-button>
@@ -84,10 +94,11 @@ export default {
             statusParty: null,
             showStatusParty: 'Open',
             qtdPlayers: null,
-            isFlipped: true,
+            isFlipped: false,
             counter: 0,
             players: [],
-            numbers: 1
+            numbers: 1,
+            confirmDel: ''
         }
     },
     methods:{
@@ -125,12 +136,32 @@ export default {
             this.toParty(value.id, value)
         },
         remove(value){
-            axios.delete(`${baseApiUrl}/parties/${value.id}`)
-            .then(() =>{
-               this.$toasted.global.defaultSuccess();
-               this.party = null
-               this.$forceUpdate();
-            }) 
+          
+            this.msgBoxConfirm = ''
+            this.$bvModal.msgBoxConfirm('Are you sure you want to delete?', {
+            title: 'Please Confirm',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'danger',
+            okTitle: 'YES',
+            cancelTitle: 'NO',
+            footerClass: 'p-2',
+            hideHeaderClose: false,
+            centered: true
+            })
+            .then(res => {
+
+                if(res){
+                    axios.delete(`${baseApiUrl}/parties/${value.id}`)
+                    .then(() =>{
+                    this.$toasted.global.defaultSuccess();
+                    this.party = null
+                    this.$forceUpdate();
+                    }) 
+                    .catch(showError)
+                }
+
+            })
             .catch(showError)
         },
         flipCard(){
@@ -139,7 +170,7 @@ export default {
     },
     watch: {
         statusParty() {
-            this.statusParty === 1 ? this.showStatusParty = 'Open' : this.showStatusParty = 'Closed'
+            this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty = 'Closed'
         },
         party: function(){
             this.$emit('update:party',this.party)
@@ -149,7 +180,7 @@ export default {
     },
     mounted(){
         this.statusParty = this.party.isOpen
-        this.statusParty === 1 ? this.showStatusParty = 'Open' : this.showStatusParty ='Closed'
+        this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty ='Closed'
         this.countPlayers()
     }
 }
@@ -215,13 +246,7 @@ export default {
     flex-direction: row;
     text-align: center;
     justify-content: space-around;    
-    border-width: 10px;
-    border-style: solid;
-    border-image: 
-        linear-gradient( 
-        #6666ff,
-        rgba(0, 0, 0, 0)
-        ) 0 0 90%;
+    border-bottom: 2px inset #6600cc;
 }
 
 .party-game-name{
@@ -241,6 +266,10 @@ export default {
 .party-players-all{
     flex-grow: 1;
 }
+
+.party-description{
+    flex-grow: 1;
+}
 .party-players{
     display: flex;
     flex-grow: 1;
@@ -251,6 +280,7 @@ export default {
 }
 
 .party-player{
+    text-align: center;
     padding: 10px;
      list-style-type: none;
 }
@@ -295,14 +325,14 @@ export default {
     border-color:#FFFFFF; 
 }
 
-.close{
+.closed{
     cursor: not-allowed !important;
     opacity: .7;
     background-color: #af2424 !important;
     color: black !important;
 }
 
-.close:hover{
+.closed:hover{
     cursor: not-allowed ;
     opacity: .7;
     background-color: #af2424 !important;

@@ -5,7 +5,7 @@
         <b-col class="col-dashboard">
         <b-card-header header-tag="nav">
             <b-nav pills card-header>
-                <b-nav-item  :active="tab === 1" @click="tab = 1" to="/dashboard" right>Dashboard</b-nav-item>
+                <b-nav-item  :active="tab === 1" @click="tab = 1" to="/dashboard/main" right>Dashboard</b-nav-item>
                 
                 <b-nav-item-dropdown
                 id="party"
