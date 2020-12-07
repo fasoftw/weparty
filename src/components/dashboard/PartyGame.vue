@@ -1,18 +1,16 @@
 <template>
     <div class="parties-games">
     <b-container fluid>  
-            <b-row 
-             v-for="party in data" :key="party.id"
-              row
-              no-gutters
-              class="mb-2">
-              <b-col>
+           <b-row :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]">
+             <b-col	            
+             v-for="party in parties" :key="party.id"	           
+              col	           
+              no-gutters	           
+              class="mb-2"	        >
 
-            <b-list-group variant="light">
 
              <PartyItem :party="party" :type="type"/>
 
-            </b-list-group>
               </b-col>
 
             </b-row>
