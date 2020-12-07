@@ -1,16 +1,20 @@
 <template>
     <div class="parties-games">
     <b-container fluid>  
-            <b-row :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]">
-             <b-col
+            <b-row 
              v-for="party in data" :key="party.id"
-              col
+              row
               no-gutters
               class="mb-2">
+              <b-col>
+
+            <b-list-group variant="light">
 
              <PartyItem :party="party" :type="type"/>
 
-             </b-col>
+            </b-list-group>
+              </b-col>
+
             </b-row>
         <div class="load-more">
             <button v-show="!isComp" v-if="loadMore" @click="loadMoreGames"    
@@ -78,11 +82,5 @@ export default {
 </script>
 
 <style>
-.parties-games {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: space-around;
-  padding-top: 20px;
-}
+
 </style>
