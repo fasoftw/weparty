@@ -3,7 +3,7 @@
         
         <div class="party-inner"   :class="{'flip':!isFlipped }" >        
             
-            <div class="flip-card-front">
+            <div class="flip-card-front"> 
                     <div class="party-game-info">
                         <div class="party-game-name">
                             <span> <strong>{{ party.partyName }}</strong></span>
@@ -22,21 +22,14 @@
 
                     <div class="party_players_button">
                         <div class = "party-description">
-                            <span> {{party.platformName}}/Spots:{{party.numberPlayers - party.spotsFilled}}</span><br>
-                            <span> Rank: {{party.rank}}/</span><span> Level:{{party.level}} </span><br>
-                            <span> Description:{{party.description}}</span><br>
-                          
+                            <span> {{party.platformName}}/Spots: {{party.numberPlayers - party.spotsFilled}}</span><br>
+                            <span> Rank: {{party.rank}} </span><br>
+                            <span> Level:{{party.level}} </span><br>
+                            <span> Description: {{party.description}}</span><br>
+                            <span> Id: {{party.id}}</span><br>
+                            <span> PlataformName: {{party.platformName}}</span><br>
+                            <span> Id: {{party.platformId}}</span><br>
                             
-                        </div>
-                       
-                        <div class="party-buttons">
-                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
-                                    <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}}</span>
-                            </b-button>
-
-                            <b-button class="activated closed" v-show="showStatusParty === 'Closed' && isFlipped"> 
-                                    <i class="fas fa-lock"></i> <span>{{this.showStatusParty}}</span>
-                            </b-button>
                         </div>
 
                     </div>
@@ -56,16 +49,15 @@
                     <div class="party_players_button">
                      <div class="party-players-all">
                             <ul class="party-players">
-                                <li class="party-player" v-for="player in party.numberPlayers" :key="player">
+                                <li class="party-player" v-for="player in players" :key="player.id">
                                     <div class="party-player-img">
                                         <img 
                                             src="@/assets/desconhecido.jpg"
                                             height="25" width="25" alt="Player"
                                         >
-                                        
                                     </div>
                                     <div class="party-player-info">
-                                        <span style="font-size: 15px"> Nickname </span>
+                                        <span style="font-size: 15px"> {{player.nickname}} </span>
                                     </div>
 
                                     
@@ -74,7 +66,15 @@
                     </div>
                     </div>
 
-                    <b-button variant="info" v-on:click="enterParty" v-show="this.party.isOpen">Enter</b-button>
+                    <div class="party-buttons">
+                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
+                                    <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}}</span>
+                            </b-button>
+
+                            <b-button class="activated closed" v-show="showStatusParty === 'Closed'"> 
+                                    <i class="fas fa-lock"></i> <span>{{this.showStatusParty}}</span>
+                            </b-button>
+                        </div>
                
             </div>
        
@@ -94,7 +94,7 @@ export default {
             statusParty: null,
             showStatusParty: 'Open',
             qtdPlayers: null,
-            isFlipped: false,
+            isFlipped: true,
             counter: 0,
             players: [],
             numbers: 1,
@@ -102,13 +102,16 @@ export default {
         }
     },
     methods:{
-        getPlayer(){
-
+        getPlayers(){
+            axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
+                this.players = res.data.party
+                //console.log(this.players)
+             })
         },
         getTags(id){
              axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
                 this.party.filters = res
-                console.log(this.party.filters)
+               // console.log(this.party.filters)
              })
         },
         toParty(id, party){
@@ -121,16 +124,11 @@ export default {
             .then(res =>{
                 if(res.data === 'closed party'){
                     this.showStatusParty = 'Closed'    
+                    this.getPlayers()
                 }
+                this.getPlayers()
             }) 
             .catch(showError)
-        },
-        countPlayers(){
-             this.isFlipped = !this.isFlipped 
-            // axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
-            //     this.players = res.data
-
-            // })
         },
         editParty(value){
             this.toParty(value.id, value)
@@ -181,7 +179,7 @@ export default {
     mounted(){
         this.statusParty = this.party.isOpen
         this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty ='Closed'
-        this.countPlayers()
+        this.getPlayers()
     }
 }
 </script>

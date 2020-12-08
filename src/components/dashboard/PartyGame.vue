@@ -3,12 +3,10 @@
     <b-container fluid>  
            <b-row :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]">
              <b-col	            
-             v-for="party in parties" :key="party.id"	           
+             v-for="party in data" :key="party.id"	           
               col	           
               no-gutters	           
-              class="mb-2"	        >
-
-
+              class="mb-2">
              <PartyItem :party="party" :type="type"/>
 
               </b-col>
@@ -37,12 +35,11 @@ export default {
             page: 1,
             loadMore: true,
             data: [],
-            cols: [1,2,3,3]
+            cols: [1,2,3,4]
         }
     },
     methods:{
          getGamesAll(){
-
              if(this.data.length <= 2) this.cols[3] =2
              
              if(this.$mq === 'lg'){
@@ -68,7 +65,7 @@ export default {
 
     },
     mounted(){
-        this.$route.params.id ? this.getGamesById() : this.getGamesAll()       
+        this.$route.params.id ? this.getGamesById() : this.getGamesAll() 
     },
     watch: {
     parties: function(){

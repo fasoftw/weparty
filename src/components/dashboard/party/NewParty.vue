@@ -239,8 +239,8 @@ export default {
             this.party.gameId = this.gameId
             this.party.userId = this.$store.state.user.id
             this.party.isOpen = 1
-            this.party.platformId = this.party.platformSelected
         }
+        this.party.platformId = this.party.platformSelected
       
         this.party.filters = this.value
         const method = this.party.id ? "put" : "post";
