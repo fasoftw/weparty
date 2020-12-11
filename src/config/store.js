@@ -20,7 +20,6 @@ export default new Vuex.Store({
         path: '/',
     },  
     mutations:{
-
         setUser(state, user){
             state.user = user
             if(user){
@@ -29,7 +28,11 @@ export default new Vuex.Store({
                 delete axios.defaults.headers.common['Authorization']
             }
         },
-
            
+    },
+    getters:{
+        getUser (state) {
+            return state.user.id;
+        }
     }
 })

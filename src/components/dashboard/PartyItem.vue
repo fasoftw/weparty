@@ -72,7 +72,7 @@
 
                             <b-button class="activated closed" v-show="showStatusParty === 'Closed'"> 
                                     <i class="fas fa-lock"></i> <span>{{this.showStatusParty}} </span>
-                                    <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
+                                    <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
                         </div>
                
@@ -93,19 +93,19 @@ export default {
         return{
             statusParty: null,
             showStatusParty: 'Open',
-            qtdPlayers: null,
             isFlipped: false,
             counter: 0,
             players: [],
             numbers: 1,
-            confirmDel: ''
+            confirmDel: '',
+            userId: null,
+
         }
     },
     methods:{
         getPlayers(){
             axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
-                //console.log(this.players)
              })
         },
         getTags(id){
@@ -119,8 +119,7 @@ export default {
         },
         enterParty(){
             this.statusParty = !this.statusParty
-            //console.log(this.party)
-            axios.post(`${baseApiUrl}/party/${this.party.id}/players`, this.party)
+            axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
             .then(res =>{
                 if(res.data === 'closed party'){
                     this.showStatusParty = 'Closed'    
@@ -166,20 +165,20 @@ export default {
             this.isFlipped = !this.isFlipped 
         }
     },
+    mounted(){
+        this.userId = this.$store.getters.getUser
+        this.statusParty = this.party.isOpen
+        this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty ='Closed'
+        this.getPlayers()
+    },
     watch: {
         statusParty() {
             this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty = 'Closed'
         },
         party: function(){
-            this.$emit('update:party',this.party)
+            this.$emit('update:party', this.party)
             this.numberPlayers = this.party.numberPlayers
-
         }
-    },
-    mounted(){
-        this.statusParty = this.party.isOpen
-        this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty ='Closed'
-        this.getPlayers()
     }
 }
 </script>

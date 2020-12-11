@@ -256,8 +256,7 @@ export default {
           .catch(showError); 
       },
       addPlayerParty(partyId){
-        console.log(this.party)
-        axios.post(`${baseApiUrl}/party/${partyId}/players`, this.party)
+        axios.post(`${baseApiUrl}/party/${partyId}/players`, {...this.party, playerId: this.party.userId})
             .then( () => {
                this.$toasted.global.defaultSuccess();
               this.party = {}
