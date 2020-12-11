@@ -188,6 +188,7 @@ export default {
 .party-item{
     display: flex;
     flex-wrap: wrap;
+    max-width: 327px;
     height: 270px;
     background-color: transparent;
     perspective: 1000px;

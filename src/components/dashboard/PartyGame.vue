@@ -3,7 +3,7 @@
     <b-container fluid>  
            <b-row
            :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]" :cols-xl="cols[4]" >
-             <b-col 	            
+             <b-col  	            
              v-for="party in data" :key="party.id"	           
               col	           
               no-gutters	           

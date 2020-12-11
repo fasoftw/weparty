@@ -236,7 +236,6 @@ export default {
           return;
         }
         if(!this.$route.params.party){
-            
             this.party.gameId = this.gameId
             this.party.userId = this.$store.state.user.id
             this.party.isOpen = 1
@@ -251,17 +250,18 @@ export default {
         await axios[method](`${baseApiUrl}/parties${id}`, this.party)
           .then((res)=>{ 
               this.addPlayerParty(res.data[0])  //Id Party
-              
           })
-          .catch(showError); 
+          .catch(showError);
+           
       },
       addPlayerParty(partyId){
+
         axios.post(`${baseApiUrl}/party/${partyId}/players`, {...this.party, playerId: this.party.userId})
             .then( () => {
-               this.$toasted.global.defaultSuccess();
-              this.party = {}
-              console.log('ola'+this.gameId)
-              this.$router.push({path: `/partiesgame/${this.gameId}` })
+                this.$toasted.global.defaultSuccess();
+                this.party = {}
+                console.log('ola'+this.gameId)
+                this.$router.push({path: `/partiesgame/${this.gameId}` })
               //this.$router.push({path: '/dashboard/party/view'})
             }) 
         .catch(showError)
