@@ -42,48 +42,54 @@ export default {
     methods:{
          getGamesAll(){
             this.data = this.parties
+            this.setSize()
         },        
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.data = this.data.concat(res.data.parties)
                 this.page++
                 if(res.data.parties.length === 0) this.loadMore = false
+                this.setSize()
              })
+
         },
         loadMoreGames(){
             this.$route.params.id ? this.getGamesById() : this.getGamesAll()
         },
         setSize(){
-            if(this.$mq === 'xs'){
-                this.cols = [1,1,2,3,3]
-            }
-            else if(this.$mq === 'Z0'){
-                this.cols = [1,1,2,3,3]
-            }
-            else if(this.$mq === 's'){
-                this.cols = [1,2,2,3,3]
-            }
-            else if(this.$mq === 'Z2'){
-                this.cols = [1,2,2,2,3]
-            }  
-            else if(this.$mq === 'md'){
-                console.log('Z2')
-                this.cols = [1,2,3,3,3]
-            } 
-            else if(this.$mq === 'lg'){
-                this.cols = [1,2,3,3,3]
-            }
-            else if(this.$mq === 'Z3'){
-                this.cols = [1,2,3,3,3]
-            } 
-            else if(this.$mq === 'xl'){
-                this.cols = [1,2,2,3,4]
+            if(this.data.length == 1){
+                this.cols = [1,1,1,1,1]
+            }else{
+                if(this.$mq === 'xs'){
+                    this.cols = [1,1,2,3,3]
+                }
+                else if(this.$mq === 'Z0'){
+                    this.cols = [1,1,2,3,3]
+                }
+                else if(this.$mq === 's'){
+                    this.cols = [1,2,2,3,3]
+                }
+                else if(this.$mq === 'Z2'){
+                    this.cols = [1,2,2,2,3]
+                }  
+                else if(this.$mq === 'md'){
+                    console.log('Z2')
+                    this.cols = [1,2,3,3,3]
+                } 
+                else if(this.$mq === 'lg'){
+                    this.cols = [1,2,3,3,3]
+                }
+                else if(this.$mq === 'Z3'){
+                    this.cols = [1,2,3,3,3]
+                } 
+                else if(this.$mq === 'xl'){
+                    this.cols = [1,2,2,3,4]
+                }
             }
         }
 
     },
     mounted(){
-        this.setSize()
         this.$route.params.id ? this.getGamesById() : this.getGamesAll() 
     },
     watch: {
