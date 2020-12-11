@@ -1,8 +1,9 @@
 <template>
     <div class="parties-games">
     <b-container fluid>  
-           <b-row :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]" :cols-xl="cols[4]" >
-             <b-col	            
+           <b-row
+           :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]" :cols-xl="cols[4]" >
+             <b-col 	            
              v-for="party in data" :key="party.id"	           
               col	           
               no-gutters	           
@@ -35,7 +36,7 @@ export default {
             page: 1,
             loadMore: true,
             data: [],
-            cols: []
+            cols: [],
         }
     },
     methods:{
