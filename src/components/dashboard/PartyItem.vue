@@ -19,26 +19,23 @@
                         </div>
                     </div>
 
-
                     <div class="party_players_button">
                         <div class = "party-description">
-                            <span> {{party.platformName}}/Spots: {{party.numberPlayers - party.spotsFilled}}</span><br>
-                            <span> Rank: {{party.rank}} </span><br>
-                            <span> Level:{{party.level}} </span><br>
+                            <span> Platform: <strong>   {{party.platformName}}  </strong></span><br>                           
+                            <span> Rank: <strong>   {{party.rank}} </strong></span><br>
+                            <span> Level:<strong>   {{party.level}} </strong></span><br>
+                            <span> Party Leader: <strong> {{party.name}}</strong> </span> <br>
                             <span> Description: {{party.description}}</span><br>
-                            <span> Id: {{party.id}}</span><br>
-                            <span> PlataformName: {{party.platformName}}</span><br>
-                            <span> Id: {{party.platformId}}</span><br>
-                            
                         </div>
 
                     </div>
+
             </div>
 
             <div class="flip-card-back" v-show="!isFlipped">
                     <div class="card-back-top">
                         <div class="card-back-leader">
-                            <span>Nick Leader: <strong>{{party.userName}}</strong></span>
+                            <span><strong>{{party.partyName}}</strong></span>
                         </div>
                         
   
@@ -66,13 +63,16 @@
                     </div>
                     </div>
 
+                            
                     <div class="party-buttons">
                             <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
-                                    <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}}</span>
+                                    <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}} </span>
+                                    <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
 
                             <b-button class="activated closed" v-show="showStatusParty === 'Closed'"> 
-                                    <i class="fas fa-lock"></i> <span>{{this.showStatusParty}}</span>
+                                    <i class="fas fa-lock"></i> <span>{{this.showStatusParty}} </span>
+                                    <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
                         </div>
                
@@ -94,7 +94,7 @@ export default {
             statusParty: null,
             showStatusParty: 'Open',
             qtdPlayers: null,
-            isFlipped: true,
+            isFlipped: false,
             counter: 0,
             players: [],
             numbers: 1,
@@ -119,8 +119,8 @@ export default {
         },
         enterParty(){
             this.statusParty = !this.statusParty
-            console.log(this.party)
-            axios.post(`${baseApiUrl}/party/${this.party.id}/players`,this.party)
+            //console.log(this.party)
+            axios.post(`${baseApiUrl}/party/${this.party.id}/players`, this.party)
             .then(res =>{
                 if(res.data === 'closed party'){
                     this.showStatusParty = 'Closed'    
@@ -188,7 +188,7 @@ export default {
 
 .party-item{
     display: flex;
-    width: 300px;
+    /*width: 100%;*/
     flex-wrap: wrap;
     height: 270px;
     background-color: transparent;
@@ -345,14 +345,14 @@ export default {
     flex-grow: 1;
 }
 .card-back-top{
-     display: flex;
+    display: flex;
     flex-direction: row;
     justify-content: space-around;
     text-align: center;   
     border-bottom: 2px inset #6600cc;
 }
 .card-back-leader{
-    flex-grow: 1    ;
+    flex-grow: 1;
 }
 
 .card-back-leader span{

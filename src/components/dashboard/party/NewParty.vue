@@ -85,7 +85,7 @@
                             id="input-numberPlayers-feedback">This is a required field and max number players is {{maxPlayers}}.
                             </b-form-invalid-feedback>
 
-                            <b-form-group v-show="verRank">
+                            <b-form-group v-show="rankParty">
                             <label for="rank">Rank</label>
                             <b-icon icon="question-circle" 
                                 v-b-tooltip.hover.rightbottom.v-light="'If you want choose a rank to invite players'"
@@ -191,7 +191,8 @@ export default {
       props: ['type', 'partySelected'],
       data() {
       return {
-        verRank: 0,
+        rankParty: 0,
+        gameChoosed: {},
         party: {},
         maxPlayers: 0,
         optionsTags: ['Nenhum jogo foi selecionado'],
@@ -248,12 +249,24 @@ export default {
       
 
         await axios[method](`${baseApiUrl}/parties${id}`, this.party)
-          .then(()=>{           
-              this.$toasted.global.defaultSuccess();
-              this.party = {}
-              this.$router.push({path: '/dashboard/party/view'})
+          .then((res)=>{ 
+              this.addPlayerParty(res.data[0])  //Id Party
+              
           })
           .catch(showError); 
+      },
+      addPlayerParty(partyId){
+        console.log(this.party)
+        axios.post(`${baseApiUrl}/party/${partyId}/players`, this.party)
+            .then( () => {
+               this.$toasted.global.defaultSuccess();
+              this.party = {}
+              console.log('ola'+this.gameId)
+              this.$router.push({path: `/partiesgame/${this.gameId}` })
+              //this.$router.push({path: '/dashboard/party/view'})
+            }) 
+        .catch(showError)
+       
       },
       onReset(evt) {
         evt.preventDefault()
@@ -286,11 +299,10 @@ export default {
         this.gameId = gameId
         await axios.get(`${baseApiUrl}/games/${gameId}`)
           .then(res =>{
-            this.verRank = res.data            
+            this.gameChoosed = res.data            
           })
-
-          this.maxPlayers = this.verRank.maxPlayers
-          this.verRank = this.verRank.rank ? 1 : 0         
+          this.maxPlayers = this.gameChoosed.maxPlayers
+          this.rankParty = this.gameChoosed.rank ? 1 : 0         
  
           this.getFilters()
           this.getPlatforms()
@@ -348,12 +360,11 @@ export default {
       }
     },
     mounted(){
-    
       if(this.$route.params.party){
           //console.log(this.$route.params.party)
          this.party =  this.$route.params.party 
          this.maxPlayers = this.party.maxPlayers
-         this.verRank = this.party.gameRank ? 1 : 0   
+         this.rankParty = this.party.gameRank ? 1 : 0   
         
          this.party.gameSelected = this.party.gameId
          this.party.platformSelected = this.party.platformId
@@ -367,8 +378,7 @@ export default {
 
         this.getFilters()
       }
-    
-      this.getPlatforms()
+      //this.getPlatforms()
       this.loadGames()   
       
      
