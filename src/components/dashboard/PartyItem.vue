@@ -48,7 +48,7 @@
                             <ul class="party-players">
                                 <li class="party-player" v-for="player in players" :key="player.id">
                                     <div class="party-player-img">
-                                        <img 
+                                        <img class="player-img"
                                             src="@/assets/desconhecido.jpg"
                                             height="25" width="25" alt="Player"
                                         >
@@ -188,7 +188,6 @@ export default {
 
 .party-item{
     display: flex;
-    /*width: 100%;*/
     flex-wrap: wrap;
     height: 270px;
     background-color: transparent;
@@ -272,7 +271,7 @@ export default {
     display: flex;
     flex-grow: 1;
     flex-direction: row;
-    justify-content: flex-start !important;
+    justify-content: space-around !important;
     flex-wrap: wrap;
     padding-left: 0;
 }
@@ -370,6 +369,8 @@ export default {
 }
 
 
-        
+.player-img{
+    border-radius: 50%;
+}
 
 </style>

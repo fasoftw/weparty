@@ -35,27 +35,14 @@ export default {
             page: 1,
             loadMore: true,
             data: [],
-            cols: [1,1,2,3,4]
+            cols: []
         }
     },
     methods:{
-         getGamesAll(){/*
-             console.log(this.data.length)
-             if(this.data.length <= 2) this.cols[3] =2
-             
-             if(this.$mq === 'lg'){
-                 this.cols = [1,1,2,3]
-             } else if(this.$mq === 'xl'){
-                  this.cols = [1,1,2,3]
-             } else if(this.$mq === 'exl'){
-                  this.cols = [1,1,2,3]
-             }             
-            console.log(this.cols)*/
+         getGamesAll(){
             this.data = this.parties
         },        
         getGamesById(){
-            
-            console.log(this.cols)
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.data = this.data.concat(res.data.parties)
                 this.page++
@@ -64,17 +51,48 @@ export default {
         },
         loadMoreGames(){
             this.$route.params.id ? this.getGamesById() : this.getGamesAll()
+        },
+        setSize(){
+            if(this.$mq === 'xs'){
+                this.cols = [1,1,2,3,3]
+            }
+            else if(this.$mq === 'Z0'){
+                this.cols = [1,1,2,3,3]
+            }
+            else if(this.$mq === 's'){
+                this.cols = [1,2,2,3,3]
+            }
+            else if(this.$mq === 'Z2'){
+                this.cols = [1,2,2,2,3]
+            }  
+            else if(this.$mq === 'md'){
+                console.log('Z2')
+                this.cols = [1,2,3,3,3]
+            } 
+            else if(this.$mq === 'lg'){
+                this.cols = [1,2,3,3,3]
+            }
+            else if(this.$mq === 'Z3'){
+                this.cols = [1,2,3,3,3]
+            } 
+            else if(this.$mq === 'xl'){
+                this.cols = [1,2,2,3,4]
+            }
         }
 
     },
     mounted(){
+        this.setSize()
         this.$route.params.id ? this.getGamesById() : this.getGamesAll() 
     },
     watch: {
-    parties: function(){
-       this.$emit('update:parties',this.parties)
-       this.data = this.parties
-    }
+        parties: function(){
+        this.$emit('update:parties',this.parties)
+        this.data = this.parties
+        },
+        $mq: function(){
+            this.setSize()
+        }
   },
 }
 </script>
