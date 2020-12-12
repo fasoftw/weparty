@@ -49,6 +49,7 @@ export default {
                 this.data = this.data.concat(res.data.parties)
                 this.page++
                 if(res.data.parties.length === 0) this.loadMore = false
+                console.log(this.data)
                 this.setSize()
              })
 

@@ -46,7 +46,7 @@
                         <b-form-group v-show="showForm">
 
                             <label for="platform"> Selected platform</label>
-                            <b-form-select id="platform" v-model="party.platformSelected"
+                            <b-form-select id="platform" v-model="party.platformSelected" 
                             :state="validateState('platformSelected')" 
                             aria-describedby="input-platforms-feedback"
                             :options="platforms">
@@ -56,7 +56,46 @@
                             id="input-platforms-feedback">This is a required field.
                             </b-form-invalid-feedback>
 
+                        </b-form-group>
+
+
+                        <b-form-group v-show="showFormPlatform">
+
+                            
+                            <b-form-group v-if="showFormProfile">
+                                <label for="profiles"> Selected profile</label>
+                                <b-form-select id="profiles" v-model="party.profiles" 
+                                  :state="validateState('profiles')" 
+                                  aria-describedby="input-profiles-feedback"
+                                  :options="profiles"
+                                  v-on:change="getUserProfilesByGame">>
+                                </b-form-select>
+
+                                <b-form-invalid-feedback
+                                id="input-profiles-feedback">This is a required field.
+                                </b-form-invalid-feedback>
+                            </b-form-group>
+                            <b-form-group v-else>
+                                
+                                <label for="input-gameProfile">Nickname </label>  
+                                
+                                <b-form-input
+                                    id="input-gameProfile"
+                                    name="input-gameProfile"
+                                    :state="validateState('gameProfile')"
+                                    v-model="party.nickname"
+                                    aria-describedby="input-live-help input-live-feedback">
+                                </b-form-input>
+                                <b-form-invalid-feedback
+                                id="input-1-live-feedback">This is a required field.
+                                </b-form-invalid-feedback>
+
+                             </b-form-group> 
                 
+
+
+
+
                             <label for="textarea-default">Party Description</label>
                             <b-form-textarea
                                 id="textarea-default"
@@ -86,80 +125,80 @@
                             </b-form-invalid-feedback>
 
                             <b-form-group v-show="rankParty">
-                            <label for="rank">Rank</label>
-                            <b-icon icon="question-circle" 
-                                v-b-tooltip.hover.rightbottom.v-light="'If you want choose a rank to invite players'"
-                                scale="1" aria-hidden="true" class="ml-1 mt-2"
-                                width="12px" heigth="12px">
-                            </b-icon>
-                    
-                            <b-form-input
-                                id="rank"
-                                type="number"
-                                v-model="party.rank"
-                                aria-describedby="input-live-help input-live-feedback"
-                            ></b-form-input>
+                              <label for="rank">Rank</label>
+                              <b-icon icon="question-circle" 
+                                  v-b-tooltip.hover.rightbottom.v-light="'If you want choose a rank to invite players'"
+                                  scale="1" aria-hidden="true" class="ml-1 mt-2"
+                                  width="12px" heigth="12px">
+                              </b-icon>
+                      
+                              <b-form-input
+                                  id="rank"
+                                  type="number"
+                                  v-model="party.rank"
+                                  aria-describedby="input-live-help input-live-feedback"
+                              ></b-form-input>
                             </b-form-group>
 
-                        <b-form-group >
-                            <label for="tags">Tags</label>
-                            <b-icon icon="question-circle" 
-                                v-b-tooltip.hover.rightbottom.v-light="'Tags to describe your spots of the game'"
-                                scale="1" aria-hidden="true" class="ml-1 mt-2"
-                                width="12px" heigth="12px">
-                            </b-icon>
-                    
-                            <b-form-tags id="tags" v-model="value" no-outer-focus class="mb-2">
-                            <template v-slot="{ tags, disabled, addTag, removeTag }">
-                                <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
-                                <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                                    <b-form-tag
-                                    @remove="removeTag(tag)"
-                                    :title="tag"
-                                    :disabled="disabled"
-                                    variant="info"
-                                    >{{ tag }}</b-form-tag>
-                                </li>
-                                </ul>
+                            <b-form-group >
+                              <label for="tags">Tags</label>
+                              <b-icon icon="question-circle" 
+                                  v-b-tooltip.hover.rightbottom.v-light="'Tags to describe your spots of the game'"
+                                  scale="1" aria-hidden="true" class="ml-1 mt-2"
+                                  width="12px" heigth="12px">
+                              </b-icon>
+                      
+                              <b-form-tags id="tags" v-model="value" no-outer-focus class="mb-2">
+                              <template v-slot="{ tags, disabled, addTag, removeTag }">
+                                  <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
+                                  <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                                      <b-form-tag
+                                      @remove="removeTag(tag)"
+                                      :title="tag"
+                                      :disabled="disabled"
+                                      variant="info"
+                                      >{{ tag }}</b-form-tag>
+                                  </li>
+                                  </ul>
 
-                            <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-100">
-                            <template #button-content>
-                                <b-icon icon="tag-fill"></b-icon> Choose tags
-                            </template>
-                            <b-dropdown-form @submit.stop.prevent="() => {}">
-                                <b-form-group
-                                label-for="tag-search-input"
-                                label="Search tags"
-                                label-cols-md="auto"
-                                class="mb-0"
-                                label-size="sm"
-                                :description="searchDesc"
-                                :disabled="disabled"
-                                >
-                                <b-form-input
-                                    v-model="search"
-                                    id="tag-search-input"
-                                    type="search"
-                                    size="sm"
-                                    autocomplete="off"
-                                ></b-form-input>
-                                </b-form-group>
-                            </b-dropdown-form>
-                            <b-dropdown-divider></b-dropdown-divider>
-                            <b-dropdown-item-button
-                                v-for="option in availableOptions"
-                                :key="option"
-                                @click="onOptionClick({ option, addTag })"
-                            >
-                                {{ option }}
-                            </b-dropdown-item-button>
-                            <b-dropdown-text v-if="availableOptions.length === 0">
-                                There are no tags available to select
-                            </b-dropdown-text>
-                            </b-dropdown>
-                            
-                            </template>
-                            </b-form-tags>
+                              <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-100">
+                              <template #button-content>
+                                  <b-icon icon="tag-fill"></b-icon> Choose tags
+                              </template>
+                              <b-dropdown-form @submit.stop.prevent="() => {}">
+                                  <b-form-group
+                                  label-for="tag-search-input"
+                                  label="Search tags"
+                                  label-cols-md="auto"
+                                  class="mb-0"
+                                  label-size="sm"
+                                  :description="searchDesc"
+                                  :disabled="disabled"
+                                  >
+                                  <b-form-input
+                                      v-model="search"
+                                      id="tag-search-input"
+                                      type="search"
+                                      size="sm"
+                                      autocomplete="off"
+                                  ></b-form-input>
+                                  </b-form-group>
+                              </b-dropdown-form>
+                              <b-dropdown-divider></b-dropdown-divider>
+                              <b-dropdown-item-button
+                                  v-for="option in availableOptions"
+                                  :key="option"
+                                  @click="onOptionClick({ option, addTag })"
+                              >
+                                  {{ option }}
+                              </b-dropdown-item-button>
+                              <b-dropdown-text v-if="availableOptions.length === 0">
+                                  There are no tags available to select
+                              </b-dropdown-text>
+                              </b-dropdown>
+                              
+                              </template>
+                              </b-form-tags>
                             </b-form-group>
                     </b-form-group>
                     </b-form>
@@ -201,8 +240,11 @@ export default {
         platforms:['Nenhum jogo foi selecionado'],
         game: null,
         games:[],
+        profiles:[],
         gameId: null,
-        showForm: false
+        showForm: false,
+        showFormPlatform: false,
+        showFormProfile: null
       }
     },
     validations: {
@@ -217,6 +259,12 @@ export default {
           required
         },
         description:{
+          required
+        },
+        profiles:{
+          required
+        },
+        gameProfile:{
           required
         },
         numberPlayers:{
@@ -246,6 +294,7 @@ export default {
         const method = this.party.id ? "put" : "post";
         const id = this.party.id ? `/${this.party.id}` : "";
       
+      console.log(this.party)
 
         await axios[method](`${baseApiUrl}/parties${id}`, this.party)
           .then((res)=>{ 
@@ -260,7 +309,6 @@ export default {
             .then( () => {
                 this.$toasted.global.defaultSuccess();
                 this.party = {}
-                console.log('ola'+this.gameId)
                 this.$router.push({path: `/partiesgame/${this.gameId}` })
               //this.$router.push({path: '/dashboard/party/view'})
             }) 
@@ -320,6 +368,15 @@ export default {
             this.platforms  = res.data.map( platform =>{
                return { ...platform, value: platform.id, text: platform.name }
             })
+          })
+      },
+      getUserProfilesByGame(){
+        axios.get(`${baseApiUrl}/user/${this.$store.state.user.id}/game/${this.gameId}/platform/${this.party.platformSelected}`)
+          .then( res => {
+            this.profiles  = res.data.map( profiles =>{
+               return { ...profiles, value: profiles.id, text: profiles.name}
+            })
+            this.profiles.length >= 1 ? this.showFormProfile = true : this.showFormProfile = false
           })
       },
       validateState(name) {
@@ -387,6 +444,13 @@ export default {
         if(value !== ''){
           this.showForm = true
         }
+      },
+      'party.platformSelected': function(value){
+        if(value !== ''){
+          this.showFormPlatform = true
+        }
+        
+        this.getUserProfilesByGame()
       }
     }
     

@@ -1,7 +1,7 @@
 <template>
     <div class="party-item" v-if="party" >
         
-        <div class="party-inner"   :class="{'flip':!isFlipped }" >        
+        <div class="party-inner"   :class="type !== 'edit' ? {'flip':!isFlipped } : {'flip':isFlipped }" >        
             
             <div class="flip-card-front"> 
                     <div class="party-game-info">
