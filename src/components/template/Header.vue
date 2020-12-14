@@ -32,12 +32,12 @@
         <b-nav-item-dropdown right v-if="user && ($mq !== 'xs')">
             <!-- Using 'button-content' slot -->
                 <template  #button-content>      
-                    <em><b-avatar badge="4" badge-variant="dark" src="https://placekitten.com/300/300"></b-avatar></em>
+                    <em><b-avatar badge="4" src="https://placekitten.com/300/300"></b-avatar></em>
                 </template>
            
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
             <b-dropdown-item to="/dashboard/main">Dashboard</b-dropdown-item>
-             <b-dropdown-item to="/profile"> 
+             <b-dropdown-item to="/notifications"> 
              Notifications 
              <b-badge variant="light">4</b-badge>                    
             </b-dropdown-item>

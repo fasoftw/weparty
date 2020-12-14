@@ -17,6 +17,7 @@ import NewParty from '../components/dashboard/party/NewParty'
 import MyParties from '../components/dashboard/party/MyParties'
 import GameProfile from '../components/dashboard/gameProfile/GameProfile'
 import PartyGame from '../components/dashboard/PartyGame'
+import Notification from '../components/notification/Notifications'
 
 import {userKey} from '../../global'
 
@@ -103,9 +104,9 @@ const routes = [{
             component: MyParties
         }, 
         {
-          path: 'game/profile',
-          name: 'Profile',
-          component: GameProfile
+            path: 'game/profile',
+            name: 'Profile',
+            component: GameProfile
         },
         {
             path: 'main',
@@ -123,6 +124,14 @@ const routes = [{
     name: 'PartyGameAll',
     path:'/partiesgame/',
     component: PartyGame,
+    meta: {
+        requiresAuth: true
+    }
+  },
+  {
+    name: 'Notifications',
+    path:'/notifications',
+    component: Notification,
     meta: {
         requiresAuth: true
     }
