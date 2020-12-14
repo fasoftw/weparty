@@ -62,7 +62,7 @@
                         <b-form-group v-show="showFormPlatform">
 
                             
-                            <b-form-group v-if="showFormProfile">
+                            <b-form-group v-if="showFormProfile && showFormProfile !== undefined">
                                 <label for="profiles"> Selected profile</label>
                                 <b-form-select id="profiles" v-model="party.profiles" 
                                   :state="validateState('profiles')" 
@@ -75,14 +75,15 @@
                                 id="input-profiles-feedback">This is a required field.
                                 </b-form-invalid-feedback>
                             </b-form-group>
-                            <b-form-group v-else>
-                                
+
+
+                            <b-form-group v-if="!showFormProfile && showFormProfile !== undefined">
                                 <label for="input-gameProfile">Nickname </label>  
                                 
                                 <b-form-input
                                     id="input-gameProfile"
                                     name="input-gameProfile"
-                                    :state="validateState('gameProfile')"
+                                    :state="validateState('nickname')"
                                     v-model="party.nickname"
                                     aria-describedby="input-live-help input-live-feedback">
                                 </b-form-input>
@@ -221,7 +222,7 @@
 <script>
 import axios from 'axios'
 import { validationMixin } from "vuelidate";
-import { required,between } from "vuelidate/lib/validators";
+import { required,between,requiredIf } from "vuelidate/lib/validators";
 import {baseApiUrl, showError} from '../../../../global.js'
 
 export default {
@@ -238,13 +239,14 @@ export default {
         search: '',
         value: [],
         platforms:['Nenhum jogo foi selecionado'],
-        game: null,
+       // game: null,  => Nao ta usando
         games:[],
         profiles:[],
+        gameProfile: {},
         gameId: null,
         showForm: false,
         showFormPlatform: false,
-        showFormProfile: null
+        showFormProfile: null,
       }
     },
     validations: {
@@ -262,10 +264,10 @@ export default {
           required
         },
         profiles:{
-          required
+          required: requiredIf(function() {return this.showFormProfile})
         },
-        gameProfile:{
-          required
+        nickname:{
+          required: requiredIf(function() {return !this.showFormProfile})
         },
         numberPlayers:{
           required,
@@ -276,35 +278,70 @@ export default {
       }
     },
     methods: {
-      async onSubmit(evt) {
+      onSubmit(evt) {
         evt.preventDefault()
+
         this.$v.party.$touch();
 
         if (this.$v.party.$anyError) {
           return;
         }
+        
         if(!this.$route.params.party){
             this.party.gameId = this.gameId
             this.party.userId = this.$store.state.user.id
             this.party.isOpen = 1
         }
+        
         this.party.platformId = this.party.platformSelected
-      
-        this.party.filters = this.value
-        const method = this.party.id ? "put" : "post";
-        const id = this.party.id ? `/${this.party.id}` : "";
-      
-      console.log(this.party)
 
-        await axios[method](`${baseApiUrl}/parties${id}`, this.party)
-          .then((res)=>{ 
-              this.addPlayerParty(res.data[0])  //Id Party
-          })
-          .catch(showError);
+        if(this.showFormProfile){ //SE O PROFILE DO USUÁRIO PARA O JOGO/PLATAFORMA JÁ ESTIVER CADASTRADO
+          console.log(this.party.profiles)
+
+          this.party.filters = this.value
+          const method = this.party.id ? "put" : "post";
+          const id = this.party.id ? `/${this.party.id}` : "";
+        
+        
+
+
+          axios[method](`${baseApiUrl}/parties${id}`, this.party)
+            .then((res)=>{ 
+                this.addPlayerParty(res.data[0])  //Id Party
+            })
+            .catch(showError);
+
+        }
+        else{ //SE NÃO (VAMOS CRIAR O PROFILE)
+          this.addGameProfile()
+        }
+
+        
            
       },
-      addPlayerParty(partyId){
+      addGameProfile(){
+        this.gameProfile.userId = this.$store.state.user.id
+        this.gameProfile.platformId = this.party.platformId
+        this.gameProfile.gameId = this.party.gameId
+        this.gameProfile.name = this.party.nickname
 
+
+        axios.post(`${baseApiUrl}/game/profile/user`, this.gameProfile)
+            .then((res) =>{
+                console.log(res)
+                this.party.profiles = res.data
+                this.party.filters = this.value
+                const method = this.party.id ? "put" : "post";
+                const id = this.party.id ? `/${this.party.id}` : "";
+                axios[method](`${baseApiUrl}/parties${id}`, this.party)
+                  .then((resposta)=>{ 
+                      this.addPlayerParty(resposta.data[0])  //Id Party
+                })
+                .catch(showError);
+            }).catch(showError); 
+        
+      },
+      addPlayerParty(partyId){ //ADD PLAYER NA PARTY
         axios.post(`${baseApiUrl}/party/${partyId}/players`, {...this.party, playerId: this.party.userId})
             .then( () => {
                 this.$toasted.global.defaultSuccess();
@@ -326,14 +363,17 @@ export default {
         this.value = []
         this.platforms=['Nenhum jogo foi selecionado']
         this.games=[]
-        this.gameId= null
+        this.gameId= null,
+        this.profiles=[],
+        this.this.gameProfile = {},
         this.loadGames()
+
       },
       onOptionClick({ option, addTag }) {
         addTag(option)
         this.search = ''
       },
-      loadGames(){
+      loadGames(){ //Carrega todos os jogos. 
           axios.get(`${baseApiUrl}/games`)
           .then(res =>{
             this.games = res.data.map(game => {
@@ -342,7 +382,7 @@ export default {
           })
         })
       },
-      getGameId: async function(gameId) { 
+      getGameId: async function(gameId) {  //RECEBE OS DADOS DO JOGO SELECIONADO NO DROPDOWN
         this.gameId = gameId
         await axios.get(`${baseApiUrl}/games/${gameId}`)
           .then(res =>{
@@ -354,7 +394,7 @@ export default {
           this.getFilters()
           this.getPlatforms()
       },
-      getFilters: async function(){
+      getFilters: async function(){ //RECEBE OS DADOS DO JOGO SELECIONADO NO DROPDOWN
         axios.get(`${baseApiUrl}/game/${this.gameId}/filters`)
           .then( res => {
             this.optionsTags = res.data.map( filter =>{
@@ -362,7 +402,7 @@ export default {
             })
           })
       },
-       getPlatforms(){
+       getPlatforms(){ //Carrega as plataformas de um jogo.
         axios.get(`${baseApiUrl}/game/${this.gameId}/platforms`)
           .then( res => {
             this.platforms  = res.data.map( platform =>{
@@ -371,12 +411,18 @@ export default {
           })
       },
       getUserProfilesByGame(){
+        
         axios.get(`${baseApiUrl}/user/${this.$store.state.user.id}/game/${this.gameId}/platform/${this.party.platformSelected}`)
           .then( res => {
             this.profiles  = res.data.map( profiles =>{
                return { ...profiles, value: profiles.id, text: profiles.name}
             })
+            if(!this.$route.params.party){
             this.profiles.length >= 1 ? this.showFormProfile = true : this.showFormProfile = false
+            }
+            else{
+              this.showFormProfile = undefined
+            }
           })
       },
       validateState(name) {
@@ -416,26 +462,26 @@ export default {
       }
     },
     mounted(){
-      if(this.$route.params.party){
-          //console.log(this.$route.params.party)
+      if(this.$route.params.party){ //Vai executar no caso de edição de party
+        console.log(this.$route.params.party)
          this.party =  this.$route.params.party 
          this.maxPlayers = this.party.maxPlayers
          this.rankParty = this.party.gameRank ? 1 : 0   
-        
          this.party.gameSelected = this.party.gameId
          this.party.platformSelected = this.party.platformId
          this.gameId = this.party.gameId
          this.value = this.party.filters
          this.party.name = this.party.partyName
+         this.showFormProfile = undefined
          this.value = this.value.map( filter =>{
               return filter.name
           })
 
 
         this.getFilters()
-      }
-      //this.getPlatforms()
-      this.loadGames()   
+      }// Vai executar em todos os casos(criar ou editar)
+      this.getPlatforms()
+      this.loadGames() 
       
      
     },
@@ -448,9 +494,8 @@ export default {
       'party.platformSelected': function(value){
         if(value !== ''){
           this.showFormPlatform = true
+          this.getUserProfilesByGame()
         }
-        
-        this.getUserProfilesByGame()
       }
     }
     
