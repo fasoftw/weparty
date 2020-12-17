@@ -5,6 +5,9 @@
             
             <div class="flip-card-front"> 
                     <div class="party-game-info">
+                        <div class="party_icon_exit" v-if="statusIn === true" v-on:click="leftParty">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
                         <div class="party-game-name">
                             <span> <strong>{{ party.partyName }}</strong></span>
                         </div>
@@ -34,47 +37,54 @@
 
             <div class="flip-card-back" v-show="!isFlipped">
                     <div class="card-back-top">
+                        <div class="party_icon_exit"  v-if="statusIn === true" v-on:click="leftParty">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
                         <div class="card-back-leader">
                             <span><strong>{{party.partyName}}</strong></span>
                         </div>
-                        
-  
                         <div class="party_icon_back" v-on:click="flipCard" v-if="type !== 'edit'">
                             <i class="fas fa-undo-alt"></i>
                         </div>
                     </div>
-                    <div class="party_players_button">
-                     <div class="party-players-all">
-                            <ul class="party-players">
-                                <li class="party-player" v-for="player in players" :key="player.id">
-                                    <div class="party-player-img">
-                                        <img class="player-img"
-                                            src="@/assets/desconhecido.jpg"
-                                            height="25" width="25" alt="Player"
-                                        >
-                                    </div>
-                                    <div class="party-player-info">
-                                        <span style="font-size: 15px"> {{player.nickname}} </span>
-                                    </div>
 
-                                    
-                                </li>
-                            </ul>
-                    </div>
+                    <div class="party_players_button">
+                        <div class="party-players-all">
+                                <ul class="party-players">
+                                    <li class="party-player" v-for="player in players" :key="player.id">
+                                        <div class="party-player-img">
+                                            <img class="player-img"
+                                                src="@/assets/desconhecido.jpg"
+                                                height="25" width="25" alt="Player"
+                                            >
+                                        </div>
+                                        <div class="party-player-info">
+                                            <span style="font-size: 15px"> {{player.nickname}} </span>
+                                        </div>
+
+                                        
+                                    </li>
+                                </ul>
+                        </div>
                     </div>
 
                             
                     <div class="party-buttons">
-                            <b-button class="activated"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
+                            <b-button class="btn green"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
                                     <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}} </span>
-                                    <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
+                                    <span><strong>- {{ cParty.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
 
-                            <b-button class="activated closed" v-show="showStatusParty === 'Closed'"> 
+                            <b-button class="btn red" v-show="showStatusParty === 'Closed'"> 
                                     <i class="fas fa-lock"></i> <span>{{this.showStatusParty}} </span>
-                                    <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                                    <span><strong>- {{ cParty.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
-                        </div>
+
+                            <b-button class="btn orange" v-show="showStatusParty === 'Waiting'"> 
+                                    <i class="far fa-clock"></i> <span>{{this.showStatusParty}} </span>
+                                    <span><strong>- {{ cParty.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                            </b-button>
+                    </div>
                
             </div>
        
@@ -91,49 +101,67 @@ export default {
     props: ['party','type'],
     data(){
         return{
-            statusParty: null,
-            showStatusParty: 'Open',
+            showStatusParty: 'Open', //Party aberta ou fechada (ou usuario nela)
             isFlipped: false,
             counter: 0,
             players: [],
             numbers: 1,
             confirmDel: '',
-            userId: null,
+            userId: null,   
+            statusIn: null, 
+            partyPlayerId: null, 
+            profiles: null,
+            cParty: {}
 
         }
     },
     methods:{
-        getPlayers(){
-            axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
-                this.players = res.data.party
-             })
-        },
-        getTags(id){
-             axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
-                this.party.filters = res
-               // console.log(this.party.filters)
-             })
-        },
-        toParty(id, party){
-            this.$router.push({ name:'EditParty', params: {party: party}})
-        },
         enterParty(){
-            this.statusParty = !this.statusParty
-            axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
-            .then(res =>{
-                if(res.data === 'closed party'){
-                    this.showStatusParty = 'Closed'    
-                    this.getPlayers()
+            if(this.profiles.length > 0)
+            {
+                this.party.profiles = this.profiles[0].id
+                axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
+                .then(() =>{
+                    //if(res.data === 'closed party'){
+                    //}
+                    this.init();
+                }) 
+                .catch(showError)
+            }
+            else{
+                console.log('voce nao tem profile')
+            }
+        },
+        leftParty(){
+            this.msgBoxConfirm = ''
+            this.$bvModal.msgBoxConfirm('Are you sure you want to leave the party?', {
+            title: 'Please Confirm',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'danger',
+            okTitle: 'YES',
+            cancelTitle: 'NO',
+            footerClass: 'p-2',
+            hideHeaderClose: false,
+            centered: true
+            })
+            .then(res => {
+                if(res){
+                    axios.delete(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
+                    .then(() =>{
+                        this.$toasted.global.defaultSuccess();
+                        //this.party = null
+                        //alterar tamanho da party // se for igual a 0 deletar a party. 
+                        
+                        this.init();
+                    }) 
+                    .catch(showError)
                 }
-                this.getPlayers()
-            }) 
+
+            })
             .catch(showError)
         },
-        editParty(value){
-            this.toParty(value.id, value)
-        },
-        remove(value){
-          
+         remove(){
             this.msgBoxConfirm = ''
             this.$bvModal.msgBoxConfirm('Are you sure you want to delete?', {
             title: 'Please Confirm',
@@ -147,13 +175,10 @@ export default {
             centered: true
             })
             .then(res => {
-
                 if(res){
-                    axios.delete(`${baseApiUrl}/parties/${value.id}`)
+                    axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
                     .then(() =>{
-                    this.$toasted.global.defaultSuccess();
-                    this.party = null
-                    this.$forceUpdate();
+                        this.$toasted.global.defaultSuccess();
                     }) 
                     .catch(showError)
                 }
@@ -161,20 +186,87 @@ export default {
             })
             .catch(showError)
         },
+        toParty(id, party){
+            this.$router.push({ name:'EditParty', params: {party: party}})
+        },
+        editParty(value){
+            this.toParty(value.id, value)
+        },
+
         flipCard(){
             this.isFlipped = !this.isFlipped 
+        },
+
+
+        getTags(id){
+             axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
+                this.party.filters = res
+               // console.log(this.party.filters)
+             })
+        },
+       
+        getPlayers(){
+            axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
+                this.players = res.data.party
+             })
+        },
+        inTheParty(){
+                axios.get(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
+                .then( (res) => {
+                    if(res.data.party.length >= 1){  //Se user esta na party
+                         this.statusIn = true
+                         this.partyPlayerId = res.data.party[0].id
+                         
+                    }
+                    else{ // User nao esta na party
+                        this.statusIn = false
+                        this.partyPlayerId = null
+                    }
+                    this.isPartyClosed() //Verificando vagas da party
+                })
+        },
+        isPartyClosed(){
+            if(this.cParty.isOpen === 1){
+                if(this.statusIn === true){
+                    this.showStatusParty = 'Waiting'
+                }else{
+                    this.showStatusParty = 'Enter'
+                }
+            }else{
+                if(this.statusIn === true){
+                    this.showStatusParty = 'Closed'
+                }else{
+                    this.showStatusParty = 'Closed'
+                }   
+            }
+
+        },
+        getProfileGame(){
+            axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
+            .then( res => {
+                this.profiles = res.data
+            })
+            .catch(showError)
+        },
+        getParty() {
+            axios.get(`${baseApiUrl}/parties/${this.party.id}`)
+            .then( res => {
+                this.cParty = res.data.party[0]
+                this.inTheParty() 
+                this.getPlayers()
+            })
+            .catch(showError)
+        },
+        init(){
+            this.userId = this.$store.state.user.id
+            this.getParty()
+            this.getProfileGame()
         }
     },
     mounted(){
-        this.userId = this.$store.getters.getUser
-        this.statusParty = this.party.isOpen
-        this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty ='Closed'
-        this.getPlayers()
+        this.init()
     },
     watch: {
-        statusParty() {
-            this.statusParty === 1 ? this.showStatusParty = 'Enter' : this.showStatusParty = 'Closed'
-        },
         party: function(){
             this.$emit('update:party', this.party)
             this.numberPlayers = this.party.numberPlayers
@@ -184,7 +276,7 @@ export default {
 </script>
 
 <style>
-
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
 .party-item{
     display: flex;
     flex-wrap: wrap;
@@ -298,6 +390,100 @@ export default {
     flex-grow: 1;
 }
 
+
+.link:hover {
+  color: #2ecc71;
+  border-bottom: 2px dotted #2ecc71;
+}
+
+/* button div */
+#buttons {
+  padding-top: 50px;
+  text-align: center;
+}
+
+/* start da css for da buttons */
+.party-buttons .btn {
+  border-radius: 5px;
+padding:0.46em 1.6em; 
+  font-size: 18px;
+  text-decoration: none;
+  margin: 20px;
+  color: #fff;
+  position: relative;
+  display: inline-block;
+}
+
+.btn:active {
+  transform: translate(0px, 5px);
+  -webkit-transform: translate(0px, 5px);
+  box-shadow: 0px 1px 0px 0px;
+}
+
+.green {
+  background-color: #2ecc71;
+  box-shadow: 0px 5px 0px 0px #15B358;
+}
+
+.green:hover {
+  background-color: #48E68B;
+}
+
+.red {
+  background-color: #e74c3c;
+  box-shadow: 0px 5px 0px 0px #CE3323;
+}
+
+.red:hover {
+  background-color: #FF6656;
+}
+
+.orange {
+  background-color: #e67e22;
+  box-shadow: 0px 5px 0px 0px #CD6509;
+}
+
+.orange:hover {
+  background-color: #FF983C;
+}
+
+.flip-card-back{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.card-back-top{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;   
+    border-bottom: 2px inset #6600cc;
+}
+.card-back-leader{
+    flex-grow: 1;
+}
+
+.card-back-leader span{
+    font-family:sans-serif;
+    font-weight: 400;
+}
+.card-back-leader strong{
+    font-family:sans-serif;
+    font-weight: 800;
+}
+
+.card-back-description{
+    margin-left: 10px;
+    flex-grow: 1;
+}
+
+
+.player-img{
+    border-radius: 50%;
+}
+
+
+/* Botoes antigo
 .party-buttons .activated{ 
     display:inline-block; 
     padding:0.46em 1.6em; 
@@ -335,42 +521,8 @@ export default {
     background-color: #af2424 !important;
     color: black !important;
 }
-
-
-
-.flip-card-back{
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-.card-back-top{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    text-align: center;   
-    border-bottom: 2px inset #6600cc;
-}
-.card-back-leader{
-    flex-grow: 1;
-}
-
-.card-back-leader span{
-    font-family:sans-serif;
-    font-weight: 400;
-}
-.card-back-leader strong{
-    font-family:sans-serif;
-    font-weight: 800;
-}
-
-.card-back-description{
-    margin-left: 10px;
-    flex-grow: 1;
-}
-
-
-.player-img{
-    border-radius: 50%;
-}
+*/
 
 </style>
+
+

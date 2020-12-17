@@ -35,8 +35,10 @@
                     <b-form-select id="games" v-model="party.gameSelected" 
                         :state="validateState('gameSelected')"
                         :options="games"
+                        :disabled="showFormProfile === undefined"
                         aria-describedby="input-games-feedback"
-                        v-on:change="getGameId">
+                        v-on:change="getGameId"
+                        >
                     </b-form-select>
 
                         <b-form-invalid-feedback
@@ -49,7 +51,8 @@
                             <b-form-select id="platform" v-model="party.platformSelected" 
                             :state="validateState('platformSelected')" 
                             aria-describedby="input-platforms-feedback"
-                            :options="platforms">
+                            :options="platforms"
+                            :disabled="showFormProfile === undefined">
                             </b-form-select>
 
                             <b-form-invalid-feedback
@@ -106,7 +109,9 @@
                             </b-form-textarea>
 
                             <b-form-invalid-feedback
-                            id="input-textarea-default-feedback">This is a required field.
+                              id="input-textarea-default-feedback"
+                            >
+                            This is a required field.
                             </b-form-invalid-feedback>
 
                             <label for="numberPlayers">Number of Players</label>
@@ -117,9 +122,13 @@
                             </b-icon>
                     
                             <b-input id="numberPlayers" type="number" min="0"
-                            :state="validateState('numberPlayers')"
-                            aria-describedby="input-numberPlayers-feedback"
-                             :max="maxPlayers" v-model="party.numberPlayers" ></b-input>
+                              :state="validateState('numberPlayers')"
+                              aria-describedby="input-numberPlayers-feedback"
+                              :max="maxPlayers" 
+                              v-model="party.numberPlayers"
+                              :disabled="showFormProfile === undefined" 
+                            >
+                            </b-input>
 
                             <b-form-invalid-feedback
                             id="input-numberPlayers-feedback">This is a required field and max number players is {{maxPlayers}}.
@@ -463,8 +472,8 @@ export default {
     },
     mounted(){
       if(this.$route.params.party){ //Vai executar no caso de edição de party
-        console.log(this.$route.params.party)
-         this.party =  this.$route.params.party 
+        this.party =  this.$route.params.party 
+         
          this.maxPlayers = this.party.maxPlayers
          this.rankParty = this.party.gameRank ? 1 : 0   
          this.party.gameSelected = this.party.gameId
@@ -472,11 +481,9 @@ export default {
          this.gameId = this.party.gameId
          this.value = this.party.filters
          this.party.name = this.party.partyName
-         this.showFormProfile = undefined
          this.value = this.value.map( filter =>{
               return filter.name
           })
-
 
         this.getFilters()
       }// Vai executar em todos os casos(criar ou editar)

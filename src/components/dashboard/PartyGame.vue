@@ -49,7 +49,6 @@ export default {
                 this.data = this.data.concat(res.data.parties)
                 this.page++
                 if(res.data.parties.length === 0) this.loadMore = false
-                console.log(this.data)
                 this.setSize()
              })
 
@@ -58,7 +57,7 @@ export default {
             this.$route.params.id ? this.getGamesById() : this.getGamesAll()
         },
         setSize(){
-            if(this.data.length == 1){
+            if(this.data.length == 1 || undefined){
                 this.cols = [1,1,1,1,1]
             }else{
                 if(this.$mq === 'xs'){
@@ -74,7 +73,6 @@ export default {
                     this.cols = [1,2,2,2,3]
                 }  
                 else if(this.$mq === 'md'){
-                    console.log('Z2')
                     this.cols = [1,2,3,3,3]
                 } 
                 else if(this.$mq === 'lg'){
@@ -95,8 +93,8 @@ export default {
     },
     watch: {
         parties: function(){
-        this.$emit('update:parties',this.parties)
-        this.data = this.parties
+            this.$emit('update:parties',this.parties)
+            this.data = this.parties
         },
         $mq: function(){
             this.setSize()
