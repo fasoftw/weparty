@@ -6,12 +6,12 @@
           <b-tab  title="Games" active>
             <NewGame />
           </b-tab>
-          <b-tab  title="Plataformas">
+ <!--         <b-tab  title="Plataformas">
             <NewPlatform />
-          </b-tab>
-          <b-tab  title="Filtros">
-            <NewFilter />
-          </b-tab>
+          </b-tab> -->
+<!--          <b-tab  title="Filtros">
+            <NewFilter />  
+          </b-tab>-->
           <b-tab  title="Categorias">
             <NewCategory />
           </b-tab>
@@ -25,13 +25,13 @@
 
 <script>
 import NewGame from "./adminGames/NewGame";
-import NewFilter from "./adminFilters/NewFilter";
+//import NewFilter from "./adminFilters/NewFilter";
 import NewCategory from "./adminCategories/NewCategory";
-import NewPlatform from "./adminPlatform/NewPlatform";
+//import NewPlatform from "./adminPlatform/NewPlatform";
 
 export default {
   name: "GamesPage",
-  components: { NewGame, NewFilter, NewCategory, NewPlatform },
+  components: { NewGame, NewCategory},
   
 };
 </script>

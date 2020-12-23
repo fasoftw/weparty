@@ -50,11 +50,20 @@ export default {
           axios.post(`${baseApiUrl}/signin`, this.user)
             .then(res =>{
               this.$store.commit('setUser', res.data);
+              this.$store.commit('setHideUserDropdown',true);
+              this.$store.commit('setHideLogin', false)
               localStorage.setItem(userKey, JSON.stringify(res.data))
-              this.$router.push({path: '/dashboard'})
+              this.$router.push({path: '/dashboard/main'})
 
           }).catch(showError)
+        },
+        init(){
+          this.$store.commit('setHideUserDropdown', true)
+					this.$store.commit('setHideLogin', false)
         }
+    },
+    created(){
+        this.init()
     }
 }
 </script>

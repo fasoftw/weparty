@@ -1,78 +1,119 @@
 <template>
- <b-navbar toggleable="lg" type="dark" variant="info">
+ <b-navbar toggleable="sm" type="dark" variant="info">
+
     <b-navbar-brand href="#">WeParty</b-navbar-brand>
-
+   
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
+    
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item to="/" >Home</b-nav-item>
-            <b-nav-item to="/community" >Comunidade</b-nav-item>
-            <b-nav-item to="/about"  >Sobre</b-nav-item>       
-            <b-nav-item to="/games" >Games</b-nav-item> 
-            <b-nav-item to="/signup" v-if="$mq === 'xs' && hideUserDropdown" >Sign up</b-nav-item>       
-            <b-nav-item to="/signin" v-if="$mq === 'xs' && hideUserDropdown" >Sign in</b-nav-item> 
-            <b-nav-item @click.prevent="logout" v-if="$mq === 'xs' && !hideUserDropdown" >Sign out</b-nav-item>                           
+            <b-nav-item to="/news" >News</b-nav-item>
+            <b-nav-item to="/games" >Search</b-nav-item>
+            <b-nav-item to="/about"  >About</b-nav-item>       
+            <b-nav-item to="/admin" :hidden="admin === 0">Admin</b-nav-item>     
+            <b-nav-item to="/signup" v-if="$mq === 'xs' && !user" >Sign up</b-nav-item>       
+            <b-nav-item to="/signin" v-if="$mq === 'xs' && !user" >Sign in</b-nav-item> 
+            <b-nav-item @click.prevent="logout" v-if="$mq === 'xs' && !hideUserDropdown" >Sign out</b-nav-item>
       </b-navbar-nav>
+      
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
 
-        <b-nav-item-dropdown text="Lang" right>
-          <b-dropdown-item href="#">EN</b-dropdown-item>
-          <b-dropdown-item href="#">ES</b-dropdown-item>
-          <b-dropdown-item href="#">RU</b-dropdown-item>
-          <b-dropdown-item href="#">FA</b-dropdown-item>
-        </b-nav-item-dropdown>
+        <b-nav-form :hidden="hideLogin && $mq !== 'xs'">
+            <b-button :hidden="hideLogin" variant="success"  to="/signup" size= "sm"                
+            class="ml-2 mr-2">Sign up</b-button>
+            <b-button :hidden="hideLogin" variant="light"  to="/signin" size= "sm" 
+            class="mr-2">Sign in</b-button>
+        </b-nav-form>
 
-        <b-navbar-nav class="ml-auto">
+           
 
-            <b-nav-form v-if="hideUserDropdown && $mq !== 'xs'">
-                <b-button variant="success"  to="/signup" size= "sm"                
-                class="ml-2 mr-2">Sign up</b-button>
-                <b-button variant="light"  to="/signin" size= "sm" 
-                class="mr-2">Sign in</b-button>
-            </b-nav-form>
-
-            <b-nav-item-dropdown right v-if="!hideUserDropdown">
+          <b-nav-item-dropdown right :hidden="hideUserDropdown" v-if="($mq !== 'xs')">
             <!-- Using 'button-content' slot -->
-            <template #button-content>
-                
-                <em><b-avatar badge badge-variant="success" src="https://placekitten.com/300/300"></b-avatar></em>
-            </template>
+                <template  #button-content>      
+                    <em><b-avatar :badge="notifications ? notifications.toString() : ''" src="https://placekitten.com/300/300"></b-avatar></em>
+                </template>
+           
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
+            <b-dropdown-item to="/dashboard/main">Dashboard</b-dropdown-item>
+             <b-dropdown-item to="/notifications"> 
+             Notifications 
+             <b-badge variant="light">{{notifications}}</b-badge>                    
+            </b-dropdown-item>
             <b-dropdown-item @click.prevent="logout">Sign Out</b-dropdown-item>
             
-            </b-nav-item-dropdown>
-            <div class="notification" >
-            <Notification v-if="!hideUserDropdown" />
-            </div>
-        </b-navbar-nav>
+        </b-nav-item-dropdown>
+
+        <b-nav-item-dropdown right v-if="!hideUserDropdown && ($mq === 'xs')">
+           
+           
+            <b-dropdown-item to="/profile">Profile</b-dropdown-item>
+            <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
+             <b-dropdown-item to="/profile"> 
+             Notifications 
+             <b-badge variant="light" :badge="notifications ? notifications.toString() : ''">{{notifications}}</b-badge>                    
+            </b-dropdown-item>
+            
+        </b-nav-item-dropdown>
+
       </b-navbar-nav>
+      
     </b-collapse>
+          
   </b-navbar>
 
 </template>
 
 <script>
-import Notification from './Notification'
 import { mapState } from 'vuex'
 import {userKey} from '../../../global'
 
 export default {
     name: "Header",
-    components: {Notification},
-    props: {
-        hideUserDropdown: Boolean
+    data(){
+        return {
+            admin : 0
+        }
     },
-    computed: mapState(['user']),
+    computed: mapState(['user', 'hideUserDropdown','notifications','hideLogin']),
     methods:{
         logout(){
             localStorage.removeItem(userKey)
             this.$store.commit('setUser',null)
+            this.$store.commit('setHideUserDropdown', true)
+            this.$store.commit('setHideLogin', false)
+            this.$store.commit('setNotifications', null)
             this.$router.push({name: 'signin'})
-
             sessionStorage.clear();
+        },
+        getNotifications(){
+            if(this.notifications){
+                return this.notifications.toString()
+            } else {
+                return ""
+            }
+        }
+    },
+    watch:{
+        'notifications': function(){
+            return
+        },
+        '$store.state.user': function(){
+            if(this.$store.state.user){
+                if(this.$store.state.user.admin === 1){
+                    this.admin = 1
+                } else{
+                    this.admin =0
+                }
+            }
+        },
+        'hideUserDropdown':function(){
+            return
+        },
+        'hideLogin':function(){
+            return
         }
     }
 }
@@ -88,6 +129,16 @@ export default {
     /* Extra small devices (phones, 600px and down) */
     @media only screen and (max-width: 600px) {
         *{font-size: 1.0rem;}   
+        .navbar-nav > li{
+        display: flex;
+        flex-direction: column;
+        padding-left: 7px !important;
+        margin-bottom: 0;
+        list-style: none;
+         background-color:#6600cc!important;
+        color: #fff;
+    }
+
     }
 
     /* Small devices (portrait tablets and large phones, 600px and up) */
@@ -143,20 +194,7 @@ export default {
         flex-direction: row;
     }
 
-    .notification{
-         display:flex;
-         justify-content: flex-start;
-         align-items: center;
-         margin-top: 3px;
-         padding:5px;
-    }
-    
-
-    .navbar-dark .navbar-nav .nav-link {
-        background-color:#6600cc!important;
-        padding-left: 5px;
-        
-    }
+ 
 
     .navbar-brand{
         background-color:#6600cc !important;
@@ -174,9 +212,13 @@ export default {
     }
 
     .navbar{
+         background-color:#6600cc!important;
+        color: #fff;
+    }
+
+    .navbar{
         z-index: 9999;
     }
 
 
- 
 </style>
