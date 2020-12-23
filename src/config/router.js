@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Home from '../components/home/Home'
-import Games from '../components/admin/Main.vue'
+import AdminGames from '../components/admin/Main.vue'
 import NewGames from '../components/admin/AdminPages.vue'
 import NewArticles from '../components/admin/news/Articles.vue'
 import SignUp from '../components/user/SignUp'
@@ -13,11 +13,13 @@ import PostDetail from '../components/navigation/blog/PostDetail'
 import About from '../components/navigation/About'
 import Dashboard from '../components/dashboard/Main'
 import Recommendations from '../components/dashboard/recommendation/Recommendations'
-import NewParty from '../components/dashboard/party/NewParty'
-import MyParties from '../components/dashboard/party/MyParties'
 import GameProfile from '../components/dashboard/gameProfile/GameProfile'
-import PartyGame from '../components/dashboard/PartyGame'
 import Notification from '../components/notification/Notifications'
+
+const Games = () => import(/* webpackChunkName: "games" */'../components/search/Games')
+const PartyGame = () => import(/* webpackChunkName: "party-game" */'../components/dashboard/PartyGame')
+const NewParty = () => import(/* webpackChunkName: "new-party" */'../components/dashboard/party/NewParty')
+const MyParties = () => import(/* webpackChunkName: "my-parties" */'../components/dashboard/party/MyParties')
 
 import {userKey} from '../../global'
 
@@ -30,7 +32,7 @@ const routes = [{
 },{
     name: 'admin',
     path: '/admin',
-    component: Games, 
+    component: AdminGames, 
     meta: {
         requiresAdmin: true
     },   
@@ -135,6 +137,11 @@ const routes = [{
     meta: {
         requiresAuth: true
     }
+  },
+  {
+      name:'SearchGame',
+      path: '/games',
+      component: Games
   }
   
 ]

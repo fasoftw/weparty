@@ -337,7 +337,6 @@ export default {
 
         axios.post(`${baseApiUrl}/game/profile/user`, this.gameProfile)
             .then((res) =>{
-                console.log(res)
                 this.party.profiles = res.data
                 this.party.filters = this.value
                 const method = this.party.id ? "put" : "post";
@@ -353,6 +352,7 @@ export default {
       addPlayerParty(partyId){ //ADD PLAYER NA PARTY
         axios.post(`${baseApiUrl}/party/${partyId}/players`, {...this.party, playerId: this.party.userId})
             .then( () => {
+                this.$store.commit('setNotifications', this.$store.state.user.id)
                 this.$toasted.global.defaultSuccess();
                 this.party = {}
                 this.$router.push({path: `/partiesgame/${this.gameId}` })

@@ -125,6 +125,7 @@ export default {
                     //if(res.data === 'closed party'){
                     //}
                     this.init();
+                    this.$store.commit('setNotifications', this.$store.state.user.id)
                 }) 
                 .catch(showError)
             }
@@ -149,6 +150,7 @@ export default {
                 if(res){
                     axios.delete(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
                     .then(() =>{
+                        this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                         //this.party = null
                         //alterar tamanho da party // se for igual a 0 deletar a party. 
@@ -178,6 +180,7 @@ export default {
                 if(res){
                     axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
                     .then(() =>{
+                        this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                     }) 
                     .catch(showError)

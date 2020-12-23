@@ -12,6 +12,7 @@ import './config/mq'
 import './config/resource'
 import './config/paginate'
 import './config/vuelidate'
+import './config/select'
 
 
 Vue.config.productionTip = false

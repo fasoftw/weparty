@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header :hideUserDropdown="!userData"/>
+    <Header />
 	<Loading v-if="validatingToken" />
     <Content />
   </div>
@@ -18,14 +18,16 @@ import { baseApiUrl, userKey } from "../global"
 export default {
   name: 'App',
   components: {Content, Header,Loading},
-  computed: mapState(['user']),
+  computed: mapState(['user','hideUserDropdown']),
 	data: function() {
 			return {
 				validatingToken: true,
 				userData:null
 			}
 	},
-	methods: {async validateToken() {
+	methods: {
+		
+		async validateToken() {
 			this.validatingToken = true
 
 			const json = localStorage.getItem(userKey)
@@ -42,6 +44,10 @@ export default {
 
 			if (res.data) {
 				this.$store.commit('setUser', userData)
+				this.$store.commit('setHideUserDropdown', false)
+				this.$store.commit('setHideLogin', true)
+
+				this.$store.commit('setNotifications', this.$store.state.user.id)
 				
 	
 			} else {
@@ -49,6 +55,9 @@ export default {
 				this.userData = null
 				localStorage.removeItem(userKey)
 				this.$router.push({ path: '/signin' })
+				this.$store.commit('setHideUserDropdown', true)
+				this.$store.commit('setHideLogin', false)
+				this.$store.commit('setNotifications', undefined)
 				
 			}
 
@@ -60,8 +69,23 @@ export default {
 	},
 	watch:{
 		'$store.state.user' : function(){
-			if(this.$store.state.user) 
-			this.userData = this.$store.state.user
+
+			if(this.$store.state.user){
+				this.userData = this.$store.state.user
+				this.$store.commit('setHideUserDropdown', false)
+				this.$store.commit('setHideLogin', true)
+
+				this.$store.commit('setNotifications', this.$store.state.user.id)
+			}else{
+
+				if(this.$store.state.user === null){
+					this.$store.commit('setHideUserDropdown', true)
+					this.$store.commit('setHideLogin', false)
+				
+				}
+			
+
+			}
 		}
 	}
 }

@@ -9,8 +9,9 @@
       <b-navbar-nav>
         <b-nav-item to="/" >Home</b-nav-item>
             <b-nav-item to="/news" >News</b-nav-item>
+            <b-nav-item to="/games" >Search</b-nav-item>
             <b-nav-item to="/about"  >About</b-nav-item>       
-            <b-nav-item to="/admin" v-if="admin === 1">Admin</b-nav-item>     
+            <b-nav-item to="/admin" :hidden="admin === 0">Admin</b-nav-item>     
             <b-nav-item to="/signup" v-if="$mq === 'xs' && !user" >Sign up</b-nav-item>       
             <b-nav-item to="/signin" v-if="$mq === 'xs' && !user" >Sign in</b-nav-item> 
             <b-nav-item @click.prevent="logout" v-if="$mq === 'xs' && !hideUserDropdown" >Sign out</b-nav-item>
@@ -20,46 +21,43 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
 
-        <b-nav-form v-if="!user && $mq !== 'xs'">
-            <b-button variant="success"  to="/signup" size= "sm"                
+        <b-nav-form :hidden="hideLogin && $mq !== 'xs'">
+            <b-button :hidden="hideLogin" variant="success"  to="/signup" size= "sm"                
             class="ml-2 mr-2">Sign up</b-button>
-            <b-button variant="light"  to="/signin" size= "sm" 
+            <b-button :hidden="hideLogin" variant="light"  to="/signin" size= "sm" 
             class="mr-2">Sign in</b-button>
         </b-nav-form>
 
            
 
-        <b-nav-item-dropdown right v-if="user && ($mq !== 'xs')">
+          <b-nav-item-dropdown right :hidden="hideUserDropdown" v-if="($mq !== 'xs')">
             <!-- Using 'button-content' slot -->
                 <template  #button-content>      
-                    <em><b-avatar badge="4" src="https://placekitten.com/300/300"></b-avatar></em>
+                    <em><b-avatar :badge="notifications ? notifications.toString() : ''" src="https://placekitten.com/300/300"></b-avatar></em>
                 </template>
            
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
             <b-dropdown-item to="/dashboard/main">Dashboard</b-dropdown-item>
              <b-dropdown-item to="/notifications"> 
              Notifications 
-             <b-badge variant="light">4</b-badge>                    
+             <b-badge variant="light">{{notifications}}</b-badge>                    
             </b-dropdown-item>
             <b-dropdown-item @click.prevent="logout">Sign Out</b-dropdown-item>
             
         </b-nav-item-dropdown>
 
-        <b-nav-item-dropdown :text="user.name" right v-if="!hideUserDropdown && ($mq === 'xs')">
+        <b-nav-item-dropdown right v-if="!hideUserDropdown && ($mq === 'xs')">
            
            
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
             <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
              <b-dropdown-item to="/profile"> 
              Notifications 
-             <b-badge variant="light">4</b-badge>                    
+             <b-badge variant="light" :badge="notifications ? notifications.toString() : ''">{{notifications}}</b-badge>                    
             </b-dropdown-item>
-            <b-dropdown-item @click.prevent="logout">Sign Out</b-dropdown-item>
             
         </b-nav-item-dropdown>
-            <!-- <div class="notification" >
-            <Notification v-if="!hideUserDropdown" />
-            </div> -->
+
       </b-navbar-nav>
       
     </b-collapse>
@@ -74,31 +72,40 @@ import {userKey} from '../../../global'
 
 export default {
     name: "Header",
-    props: {
-        hideUserDropdown: Boolean
-    },
     data(){
         return {
             admin : 0
         }
     },
-    computed: mapState(['user']),
+    computed: mapState(['user', 'hideUserDropdown','notifications','hideLogin']),
     methods:{
         logout(){
             localStorage.removeItem(userKey)
             this.$store.commit('setUser',null)
+            this.$store.commit('setHideUserDropdown', true)
+             this.$store.commit('setHideLogin', false)
+            this.$store.commit('setNotifications', null)
             this.$router.push({name: 'signin'})
-            this.admin = 0
             sessionStorage.clear();
+        },
+        getNotifications(){
+            if(this.notifications){
+                return this.notifications.toString()
+            } else {
+                return ""
+            }
         }
     },
-    watch: {
-        '$store.state.user' : function(){
+    watch:{
+        'notifications': function(){
+            return
+        },
+        '$store.state.user': function(){
             if(this.$store.state.user){
-                if(this.$store.state.user.admin === 0){
-                    this.admin = 0
-                } else {
+                if(this.$store.state.user.admin === 1){
                     this.admin = 1
+                } else{
+                    this.admin =0
                 }
             }
         }
