@@ -55,6 +55,9 @@ export default {
     },
     toParty(gameId){
       this.$router.push({ name:'PartyGameId', params: {id: gameId}})
+    },
+    teste(){
+      console.log(this.$store.state.user)
     }
   },
   computed: {
@@ -62,6 +65,7 @@ export default {
   },
   mounted() {
     this.loadGames();
+    this.teste()
   },
 };
 </script>

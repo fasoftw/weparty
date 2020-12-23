@@ -56,7 +56,14 @@ export default {
               this.$router.push({path: '/dashboard/main'})
 
           }).catch(showError)
+        },
+        init(){
+          this.$store.commit('setHideUserDropdown', true)
+					this.$store.commit('setHideLogin', false)
         }
+    },
+    created(){
+        this.init()
     }
 }
 </script>

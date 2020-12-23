@@ -43,6 +43,7 @@ export default {
 			const res = await axios.post(`${baseApiUrl}/validateToken`, userData)
 
 			if (res.data) {
+				
 				this.$store.commit('setUser', userData)
 				this.$store.commit('setHideUserDropdown', false)
 				this.$store.commit('setHideLogin', true)
@@ -51,6 +52,7 @@ export default {
 				
 	
 			} else {
+				
 				this.$store.commit('setUser', null)
 				this.userData = null
 				localStorage.removeItem(userKey)

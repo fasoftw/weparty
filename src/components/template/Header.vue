@@ -83,7 +83,7 @@ export default {
             localStorage.removeItem(userKey)
             this.$store.commit('setUser',null)
             this.$store.commit('setHideUserDropdown', true)
-             this.$store.commit('setHideLogin', false)
+            this.$store.commit('setHideLogin', false)
             this.$store.commit('setNotifications', null)
             this.$router.push({name: 'signin'})
             sessionStorage.clear();
@@ -108,6 +108,12 @@ export default {
                     this.admin =0
                 }
             }
+        },
+        'hideUserDropdown':function(){
+            return
+        },
+        'hideLogin':function(){
+            return
         }
     }
 }
