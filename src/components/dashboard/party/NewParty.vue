@@ -315,8 +315,12 @@ export default {
 
 
           axios[method](`${baseApiUrl}/parties${id}`, this.party)
-            .then((res)=>{ 
-                this.addPlayerParty(res.data[0])  //Id Party
+            .then(()=>{ 
+                this.$store.commit('setNotifications', this.$store.state.user.id)
+                this.$toasted.global.defaultSuccess();
+                this.party = {}
+                this.$router.push({path: `/partiesgame/${this.gameId}` })
+               // this.addPlayerParty(res.data[0])  //Id Party
             })
             .catch(showError);
 
