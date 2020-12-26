@@ -152,7 +152,7 @@ export default {
     },
     methods:{
         enterParty(){
-            if(this.profiles.length > 0 )
+            if(this.profiles.length > 0)
             {
                 this.party.profiles = this.profiles[0].id
                 axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
@@ -164,7 +164,7 @@ export default {
                 }) 
                 .catch(showError)
             }
-            else{
+            else if( this.profiles.length === 0 && this.$store.state.user.id !== this.party.userId){
                 this.modalShow = true
             }
         },

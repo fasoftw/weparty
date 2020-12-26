@@ -109,8 +109,8 @@ export default {
              
       },
       onDelete(){
-          this.selected.map(item =>{
-              axios.delete(`${baseApiUrl}/notifications/${item}`)
+        console.log(this.selected)
+              axios.delete(`${baseApiUrl}/notifications/${this.selected}`)
               .then( ()=>{
                    this.$store.commit('setNotifications', this.$store.state.user.id)
                    this.onLoad()
@@ -118,19 +118,17 @@ export default {
                 }
                   
               ).catch(showError)
-          })
+        
       },
       markAsRead(){
-
-          this.selected.map(item =>{
-              axios.put(`${baseApiUrl}/notifications/${item}`)
+              axios.put(`${baseApiUrl}/notifications/${this.selected}`)
               .then( ()=>{
                    this.onLoad()
                    this.$store.commit('setNotifications', this.$store.state.user.id)
                    this.$toasted.global.defaultSuccess()
                 }                  
               ).catch(showError)
-          })
+
       },
       dateFormat(date){ 
         var t = new Date(date)
