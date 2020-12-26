@@ -70,7 +70,7 @@
 
                             
                     <div class="party-buttons">
-                            <b-button class="btn green"   @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
+                            <b-button class="btn green"  @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
                                     <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}} </span>
                                     <span><strong>- {{ cParty.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
@@ -85,12 +85,44 @@
                                     <span><strong>- {{ cParty.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
                     </div>
+
+<div mt-20>
+    <b-modal
+      id="modal-prevent-closing"
+      ref="modal"
+      title="Submit Your Nickname"
+      v-model="modalShow"
+      @hidden="resetModal"
+      @ok="handleOk"
+      centered
+    >
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          label="Nickname"
+          label-for="name-input"
+          invalid-feedback="Nickname is required"
+          :state="nameState"
+        >
+          <b-form-input
+            id="name-input"
+            v-model="nickname"
+            :state="nameState"
+            required
+          ></b-form-input>
+        </b-form-group>
+      </form>
+    </b-modal>
+</div>
                
             </div>
+
+            
        
         </div>
 
+   
     </div>
+    
 </template>
 
 <script>
@@ -111,13 +143,16 @@ export default {
             statusIn: null, 
             partyPlayerId: null, 
             profiles: null,
-            cParty: {}
+            cParty: {},
+            nickname: null,
+            nameState: null,
+            modalShow: false
 
         }
     },
     methods:{
         enterParty(){
-            if(this.profiles.length > 0)
+            if(this.profiles.length > 0 )
             {
                 this.party.profiles = this.profiles[0].id
                 axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
@@ -130,7 +165,7 @@ export default {
                 .catch(showError)
             }
             else{
-                console.log('voce nao tem profile')
+                this.modalShow = true
             }
         },
         leftParty(){
@@ -199,8 +234,28 @@ export default {
         flipCard(){
             this.isFlipped = !this.isFlipped 
         },
+        saveProfile(){
+            let profile = {}
+            profile.userId = this.$store.state.user.id
+            profile.platformId = this.party.platformId
+            profile.gameId = this.party.gameId
+            profile.name = this.nickname
 
-
+            axios.post(`${baseApiUrl}/game/profile/user`,profile)
+            .then((res)=>{
+                this.party.profiles = res.data
+                this.profiles.push({
+                    id: res.data,
+                    name: this.nickname,
+                    userId: this.$store.state.user.id,
+                    platformId: this.party.platformId,
+                    gameId: this.party.gameId
+                })
+                this.$toasted.global.defaultSuccess()
+                this.getProfileGame()
+                this.enterParty()
+            })
+        },
         getTags(id){
              axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
                 this.party.filters = res
@@ -244,12 +299,14 @@ export default {
             }
 
         },
-        getProfileGame(){
-            axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
+        async getProfileGame(){
+            await axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
             .then( res => {
                 this.profiles = res.data
             })
             .catch(showError)
+
+            
         },
         getParty() {
             axios.get(`${baseApiUrl}/parties/${this.party.id}`)
@@ -264,7 +321,33 @@ export default {
             this.userId = this.$store.state.user.id
             this.getParty()
             this.getProfileGame()
-        }
+        },
+        checkFormValidity() {
+        const valid = this.$refs.form.checkValidity()
+        this.nameState = valid
+        return valid
+        },
+        resetModal() {
+            this.nickname = ''
+            this.nameState = null
+        },
+        handleOk(bvModalEvt) {
+            // Prevent modal from closing
+            bvModalEvt.preventDefault()
+            // Trigger submit handler
+            this.handleSubmit()
+        },
+        handleSubmit() {
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+            return
+            }
+            this.saveProfile()
+            this.$nextTick(() => {
+            this.$bvModal.hide('modal-prevent-closing')
+            })
+      }
+    
     },
     mounted(){
         this.init()

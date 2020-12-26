@@ -112,7 +112,7 @@ export default {
           this.selected.map(item =>{
               axios.delete(`${baseApiUrl}/notifications/${item}`)
               .then( ()=>{
-
+                   this.$store.commit('setNotifications', this.$store.state.user.id)
                    this.onLoad()
                    this.$toasted.global.defaultSuccess()
                 }
@@ -126,6 +126,7 @@ export default {
               axios.put(`${baseApiUrl}/notifications/${item}`)
               .then( ()=>{
                    this.onLoad()
+                   this.$store.commit('setNotifications', this.$store.state.user.id)
                    this.$toasted.global.defaultSuccess()
                 }                  
               ).catch(showError)
