@@ -24,10 +24,14 @@
 
                     <div class="party_players_button">
                         <div class = "party-description">
-                            <span> Platform: <strong>   {{party.platformName}}  </strong></span><br>                           
-                            <span> Rank: <strong>   {{party.rank}} </strong></span><br>
-                            <span> Level:<strong>   {{party.level}} </strong></span><br>
-                            <span> Party Leader: <strong> {{party.name}}</strong> </span> <br>
+                            <span> Platform: <strong>   {{party.platformName}}  </strong></span><br>   
+                            <div :hidden="showRank">                      
+                                <span > Rank: <strong>   {{party.rank}} </strong></span><br>
+                            </div>
+                            <div :hidden="showLevel">
+                                <span> Level:<strong>   {{party.level}} </strong></span><br>
+                            </div>
+                            <span> Party Leader: <strong> {{party.userName}}</strong> </span> <br>
                             <span> Description: {{party.description}}</span><br>
                         </div>
 
@@ -72,17 +76,17 @@
                     <div class="party-buttons">
                             <b-button class="btn green"  @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
                                     <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}} </span>
-                                    <span><strong>- {{ cParty.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
+                                    <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
 
                             <b-button class="btn red" v-show="showStatusParty === 'Closed'"> 
                                     <i class="fas fa-lock"></i> <span>{{this.showStatusParty}} </span>
-                                    <span><strong>- {{ cParty.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                                    <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
 
                             <b-button class="btn orange" v-show="showStatusParty === 'Waiting'"> 
                                     <i class="far fa-clock"></i> <span>{{this.showStatusParty}} </span>
-                                    <span><strong>- {{ cParty.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                                    <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                             </b-button>
                     </div>
 
@@ -113,15 +117,9 @@
       </form>
     </b-modal>
 </div>
-               
-            </div>
-
-            
-       
-        </div>
-
-   
-    </div>
+</div>
+</div>
+</div>
     
 </template>
 
@@ -146,23 +144,41 @@ export default {
             cParty: {},
             nickname: null,
             nameState: null,
-            modalShow: false
-
+            modalShow: false,
+            showRank: true,
+            showLevel: true,
+            parties: []
         }
     },
     methods:{
         enterParty(){
+
             if(this.profiles.length > 0)
             {
                 this.party.profiles = this.profiles[0].id
                 axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
-                .then(() =>{
-                    //if(res.data === 'closed party'){
-                    //}
-                    this.init();
+                .then((res) =>{
+                    this.getParties()
+                    this.players = res.data
                     this.$store.commit('setNotifications', this.$store.state.user.id)
                 }) 
                 .catch(showError)
+
+                axios.get(`${baseApiUrl}/players/${this.$store.state.user.id}&
+                ${this.party.id}&${this.party.gameId}&${this.party.platformId}`)
+                 .then((res) =>{
+                    this.cParty = res.data.party[0]
+                    
+                    this.statusIn = res.data.statusIn
+                    this.partyPlayerId = res.data.partyPlayerId
+                    this.profiles = res.data.profiles
+                    this.isPartyClosed()
+                }) 
+                .catch(showError)
+
+               
+
+
             }
             else if( this.profiles.length === 0 && this.$store.state.user.id !== this.party.userId){
                 this.modalShow = true
@@ -185,12 +201,17 @@ export default {
                 if(res){
                     axios.delete(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
                     .then(() =>{
+                        this.getParties()
+                        this.getPlayers()
+                        this.statusIn = false
+                        this.isPartyClosed()
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
+                        
                         //this.party = null
                         //alterar tamanho da party // se for igual a 0 deletar a party. 
                         
-                        this.init();
+                      
                     }) 
                     .catch(showError)
                 }
@@ -215,6 +236,7 @@ export default {
                 if(res){
                     axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
                     .then(() =>{
+                        this.party = {}
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                     }) 
@@ -259,28 +281,36 @@ export default {
         getTags(id){
              axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
                 this.party.filters = res
-               // console.log(this.party.filters)
+             })
+        },
+
+        getParties(){
+             axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
+                this.$emit('update', res.data.parties)
+
              })
         },
        
-        getPlayers(){
-            axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
+        async getPlayers(){
+            await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
              })
         },
-        inTheParty(){
+        async inTheParty(){
                 axios.get(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
                 .then( (res) => {
-                    if(res.data.party.length >= 1){  //Se user esta na party
-                         this.statusIn = true
-                         this.partyPlayerId = res.data.party[0].id
-                         
+                    if(res){
+                        if(res.data.party.length >= 1){  //Se user esta na party
+                            this.statusIn = true
+                            this.partyPlayerId = res.data.party[0].id
+                            
+                        }
+                        else{ // User nao esta na party
+                            this.statusIn = false
+                            this.partyPlayerId = null
+                        }
+                        this.isPartyClosed() //Verificando vagas da party
                     }
-                    else{ // User nao esta na party
-                        this.statusIn = false
-                        this.partyPlayerId = null
-                    }
-                    this.isPartyClosed() //Verificando vagas da party
                 })
         },
         isPartyClosed(){
@@ -300,24 +330,29 @@ export default {
 
         },
         async getProfileGame(){
+
             await axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
-            .then( res => {
+            .then( res => {                
                 this.profiles = res.data
             })
             .catch(showError)
 
             
         },
-        getParty() {
-            axios.get(`${baseApiUrl}/parties/${this.party.id}`)
+        async getParty() {
+            await axios.get(`${baseApiUrl}/parties/${this.party.id}`)
             .then( res => {
-                this.cParty = res.data.party[0]
-                this.inTheParty() 
-                this.getPlayers()
+                if(res){
+                    this.cParty = res.data.party[0]
+                    this.inTheParty() 
+                    this.getPlayers()
+                }
             })
             .catch(showError)
         },
         init(){
+            this.party.rank !== null ? this.showRank = false : this.showRank = true
+            this.party.level !== null ? this.showLevel = false : this.showLevel = true
             this.userId = this.$store.state.user.id
             this.getParty()
             this.getProfileGame()
@@ -356,6 +391,12 @@ export default {
         party: function(){
             this.$emit('update:party', this.party)
             this.numberPlayers = this.party.numberPlayers
+        },
+        'showStatusParty' : function(){
+            return
+        },
+        cParty: function(){
+            return
         }
     }
 }

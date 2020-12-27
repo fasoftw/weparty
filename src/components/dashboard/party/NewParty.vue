@@ -216,8 +216,8 @@
                 </b-card-text>
                 
                     <b-form-group>
-                    <b-button class="mr-2" variant="primary" :disabled="!showForm" @click="onSubmit">Cadastrar</b-button>
-                    <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Limpar</b-button>
+                    <b-button class="mr-2" variant="primary" :disabled="!showForm" @click="onSubmit">Submit</b-button>
+                    <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Reset</b-button>
                     </b-form-group>
             
                 </b-card-body>
@@ -274,10 +274,10 @@ export default {
           required
         },
         profiles:{
-          required: requiredIf(function() {return this.showFormProfile})
+          required: requiredIf(function() {return this.showFormProfile && !this.$route.params.party})
         },
         nickname:{
-          required: requiredIf(function() {return !this.showFormProfile})
+          required: requiredIf(function() {return !this.showFormProfile && !this.$route.params.party})
         },
         numberPlayers:{
           required,
@@ -289,11 +289,13 @@ export default {
     },
     methods: {
       onSubmit(evt) {
+        
         evt.preventDefault()
 
         this.$v.party.$touch();
 
         if (this.$v.party.$anyError) {
+          console.log("ENTREI")
           return;
         }
         
@@ -303,13 +305,15 @@ export default {
             this.party.isOpen = 1
         }
         
-        this.party.platformId = this.party.platformSelected
+          this.party.platformId = this.party.platformSelected
 
           this.party.filters = this.value
+           console.log(this.party)
           const method = this.party.id ? "put" : "post";
           const id = this.party.id ? `/${this.party.id}` : "";
-          
 
+         
+          
           axios[method](`${baseApiUrl}/parties${id}`, this.party)
             .then(()=>{ 
                 this.$store.commit('setNotifications', this.$store.state.user.id)
@@ -319,20 +323,7 @@ export default {
                // this.addPlayerParty(res.data[0])  //Id Party
             })
             .catch(showError);
-    
-           
-      },
-      addPlayerParty(partyId){ //ADD PLAYER NA PARTY
-        axios.post(`${baseApiUrl}/party/${partyId}/players`, {...this.party, playerId: this.party.userId})
-            .then( () => {
-                this.$store.commit('setNotifications', this.$store.state.user.id)
-                this.$toasted.global.defaultSuccess();
-                this.party = {}
-                this.$router.push({path: `/partiesgame/${this.gameId}` })
-              //this.$router.push({path: '/dashboard/party/view'})
-            }) 
-        .catch(showError)
-       
+          
       },
       onReset(evt) {
         evt.preventDefault()
@@ -393,8 +384,6 @@ export default {
           })
       },
       getUserProfilesByGame(){
-
-        console.log(this.party.platformSelected)
         
         axios.get(`${baseApiUrl}/user/${this.$store.state.user.id}/game/${this.gameId}/platform/${this.party.platformSelected}`)
           .then( res => {
@@ -455,11 +444,14 @@ export default {
     },
     mounted(){
       if(this.$route.params.party){ //Vai executar no caso de edição de party
-        this.party =  this.$route.params.party 
-         
+        console.log("teste")
+        
+         this.party =  this.$route.params.party 
+         this.showFormProfile = undefined
          this.maxPlayers = this.party.maxPlayers
          this.rankParty = this.party.gameRank ? 1 : 0   
          this.party.gameSelected = this.party.gameId
+         this.party.id = this.$route.params.party.id
          this.party.platformSelected = this.party.platformId
          this.gameId = this.party.gameId
          this.value = this.party.filters

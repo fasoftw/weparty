@@ -8,7 +8,7 @@
               col	           
               no-gutters	           
               class="mb-2">
-             <PartyItem :party="party" :type="type"/>
+             <PartyItem :party="party" :type="type" @update="onStep1Update"/>
 
               </b-col>
 
@@ -43,7 +43,12 @@ export default {
          getGamesAll(){
             this.data = this.parties
             this.setSize()
-        },        
+        },  
+         onStep1Update (newData) {
+
+           this.data = newData
+           this.$forceUpdate()
+        },    
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.data = this.data.concat(res.data.parties)
@@ -98,7 +103,10 @@ export default {
         },
         $mq: function(){
             this.setSize()
-        }
+        },
+        data: function(){
+            this.$emit('update:data', this.data)
+        },
   },
 }
 </script>
