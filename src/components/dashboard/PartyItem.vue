@@ -152,37 +152,38 @@ export default {
     },
     methods:{
         enterParty(){
+            axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
+            .then( res => {                
+                this.profiles = res.data
+                 if(this.profiles.length > 0){
+                        this.party.profiles = this.profiles[0].id
+                        axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
+                        .then((res) =>{
+                            this.getParties()
+                            this.players = res.data
+                            this.$store.commit('setNotifications', this.$store.state.user.id)
+                        }) 
+                        .catch(showError)
 
-            if(this.profiles.length > 0)
-            {
-                this.party.profiles = this.profiles[0].id
-                axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
-                .then((res) =>{
-                    this.getParties()
-                    this.players = res.data
-                    this.$store.commit('setNotifications', this.$store.state.user.id)
-                }) 
-                .catch(showError)
-
-                axios.get(`${baseApiUrl}/players/${this.$store.state.user.id}&
-                ${this.party.id}&${this.party.gameId}&${this.party.platformId}`)
-                 .then((res) =>{
-                    this.cParty = res.data.party[0]
-                    
-                    this.statusIn = res.data.statusIn
-                    this.partyPlayerId = res.data.partyPlayerId
-                    this.profiles = res.data.profiles
-                    this.isPartyClosed()
-                }) 
-                .catch(showError)
-
-               
-
-
+                        axios.get(`${baseApiUrl}/players/${this.$store.state.user.id}&
+                        ${this.party.id}&${this.party.gameId}&${this.party.platformId}`)
+                        .then((res) =>{
+                            this.cParty = res.data.party[0]
+                            
+                            this.statusIn = res.data.statusIn
+                            this.partyPlayerId = res.data.partyPlayerId
+                            this.profiles = res.data.profiles
+                            this.isPartyClosed()
+                        }) 
+                        .catch(showError)
             }
             else if( this.profiles.length === 0 && this.$store.state.user.id !== this.party.userId){
                 this.modalShow = true
             }
+            })
+            .catch(showError)
+            
+           
         },
         leftParty(){
             this.msgBoxConfirm = ''
@@ -237,6 +238,7 @@ export default {
                     axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
                     .then(() =>{
                         this.party = {}
+                        this.parties.
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                     }) 
@@ -274,7 +276,6 @@ export default {
                     gameId: this.party.gameId
                 })
                 this.$toasted.global.defaultSuccess()
-                this.getProfileGame()
                 this.enterParty()
             })
         },
@@ -329,16 +330,6 @@ export default {
             }
 
         },
-        async getProfileGame(){
-
-            await axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
-            .then( res => {                
-                this.profiles = res.data
-            })
-            .catch(showError)
-
-            
-        },
         async getParty() {
             await axios.get(`${baseApiUrl}/parties/${this.party.id}`)
             .then( res => {
@@ -355,7 +346,6 @@ export default {
             this.party.level !== null ? this.showLevel = false : this.showLevel = true
             this.userId = this.$store.state.user.id
             this.getParty()
-            this.getProfileGame()
         },
         checkFormValidity() {
         const valid = this.$refs.form.checkValidity()
