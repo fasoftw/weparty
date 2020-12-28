@@ -40,6 +40,8 @@
 import axios from "axios";
 import { baseApiUrl } from "../../../global.js";
 import { mapState } from "vuex";
+import {userKey} from '../../../global'
+
 export default {
   name:'home',
   data() {
@@ -57,11 +59,15 @@ export default {
       this.$router.push({ name:'PartyGameId', params: {id: gameId}})
     },
     teste(){
-      console.log(this.$store.state.user)
+      const json = localStorage.getItem(userKey)
+      console.log(json)
+      if(json === null){
+        this.$store.commit('setHideLogin',false)
+      }
     }
   },
   computed: {
-    ...mapState(["user"]),
+    ...mapState(["user","hideLogin"]),
   },
   mounted() {
     this.loadGames();
