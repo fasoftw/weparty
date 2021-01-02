@@ -15,6 +15,7 @@ import './config/vuelidate'
 import './config/select'
 
 
+
 Vue.config.productionTip = false
 
 new Vue({

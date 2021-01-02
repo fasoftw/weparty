@@ -158,7 +158,8 @@
                                   width="12px" heigth="12px">
                               </b-icon>
                       
-                              <b-form-tags id="tags" v-model="value" no-outer-focus class="mb-2">
+                              <b-form-tags id="tags" v-model="value" no-outer-focus duplicate-tag-text size="sm"
+                              class="mb-2">
                               <template v-slot="{ tags, disabled, addTag, removeTag }">
                                   <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
                                   <li v-for="tag in tags" :key="tag" class="list-inline-item">
@@ -308,7 +309,6 @@ export default {
           this.party.platformId = this.party.platformSelected
 
           this.party.filters = this.value
-           console.log(this.party)
           const method = this.party.id ? "put" : "post";
           const id = this.party.id ? `/${this.party.id}` : "";
 
@@ -319,7 +319,8 @@ export default {
                 this.$store.commit('setNotifications', this.$store.state.user.id)
                 this.$toasted.global.defaultSuccess();
                 this.party = {}
-                this.$router.push({path: `/partiesgame/${this.gameId}` })
+                const path = `/game/${this.gameId}/parties`
+                if (this.$route.path !== path) this.$router.push(path)
                // this.addPlayerParty(res.data[0])  //Id Party
             })
             .catch(showError);

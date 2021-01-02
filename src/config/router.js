@@ -117,14 +117,20 @@ const routes = [{
     }  
 ,{
     name: 'PartyGameId',
-    path:'/partiesgame/:id',
+    path:'/game/:id/parties',
     component: PartyGame,
     meta: {
         requiresAuth: true
-    }
+    },
+	children: [
+		{
+        path: 'new',
+        name: 'newParty',
+        component: NewParty
+    }], 
   },{
     name: 'PartyGameAll',
-    path:'/partiesgame/',
+    path:'/game/parties',
     component: PartyGame,
     meta: {
         requiresAuth: true
