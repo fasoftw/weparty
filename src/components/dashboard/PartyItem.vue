@@ -623,7 +623,7 @@ export default {
 }
 
 .card-custom-footer-closed {
-  background-color:   #ef2e55;
+  background-color:   #f14668;
   border-top: 1px solid #ededed;
   display: flex;
   justify-content: center;

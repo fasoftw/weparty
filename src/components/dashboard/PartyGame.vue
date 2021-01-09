@@ -55,7 +55,7 @@
 
         <button v-show="!isComp" v-if="loadMore" @click="loadMoreGames"    
             class="btn btn-lg btn-outline-primary"
-            >Carregar Mais Grupos</button>
+            >Load more</button>
          </div>
         </b-container>
                 </div>
@@ -105,7 +105,7 @@ export default {
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.data = this.data.concat(res.data.parties)
                 this.page++
-                if(res.data.parties.length === 0) this.loadMore = false
+                if(res.data.parties.length === 0 || res.data.parties.length <= 10 ) this.loadMore = false
                 this.setSize()
              })
 
