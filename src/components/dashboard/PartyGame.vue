@@ -13,52 +13,46 @@
     
           <b-row class="ml-4"  style="width:100%" align-v="center">
             <label for="teste1" class="mt-2">Search tag:</label>
-          <v-select class="ml-3 mt-2"  style="width:30%"  :options="filters" v-model="selected"></v-select>   </b-row>
-
-
-
-   
+          <v-select class="ml-3 mt-2"  :style="{ width: `${widthForm}` }" :options="filters" v-model="selected"></v-select>   
+           <div  @click="showLevel= !showLevel" v-if="$mq === 'xs'" class="ml-2 mt-2">
+              <i class="fas fa-filter" ></i>
+          </div>
+          </b-row>
+ 
                 
       <!-- Right side -->
-      <div class="level-right ml-3 mt-4">
+     
+
+      <div class="level-right ml-3 mt-4" :hidden="$mq === 'xs' && showLevel">
         <div  class= "ml-2" @click="options(1)"><p class="level-item"><strong v-if="pressed === 1"> All </strong><a v-else> All </a></p></div>
         <div  class= "ml-2" @click="options(2)"><p class="level-item"><strong v-if="pressed === 2"> In Progress </strong><a v-else> In Progress </a></p></div>
         <div  class= "ml-2" @click="options(3)"><p class="level-item"><strong v-if="pressed === 3"> Closed </strong><a v-else> Closed </a></p></div>
         <!-- <div  class= "ml-2" @click="options(4)"><p class="level-item"><strong v-if="pressed === 4"> Deleted </strong><a v-else> Deleted </a></p></div> -->
-        <p class="level-item ml-2"><a @click="toParty" class="button is-success">New Party</a></p>
+        <p class="level-item ml-2 mr-2"><a @click="toParty" class="button is-success">New Party</a></p>
       </div>
     </nav>
 
         <router-view> </router-view>
 
-      
-                    
-            <div class="parties-games">
+        <div class="parties-games">
             <b-container fluid>  
             <b-row 
             :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]" :cols-xl="cols[4]" >
-            <b-col  	 
-         
-                v-for="party in filterTags" :key="party.id"	           
-                col	           
-                no-gutters	           
-                class="mb-2 mt-4">
-                <PartyItem v-if="showParties"   :party="party" :type="type" @update="onStep1Update"/>  
-                  
-                  <b-row class="ml-2" v-if="showParties">
-                    <div id="tags" class="d-flex flex-row" v-for="(filter,index) in party.filters" :key="index" > 
-                            <span  v-if="filter.name !== null" class="tag is-primary is-medium ml-2"> {{filter.name}}</span>
-                    </div>                     
+              <b-col  	 
+          
+                  v-for="party in filterTags" :key="party.id"	           
+                  col	           
+                  no-gutters	           
+                  class="mb-2 mt-4">
+                  <PartyItem v-if="showParties"   :party="party" :type="type" @update="onStep1Update"/>  
+                                  
 
-                </b-row>                   
+              </b-col>               
+          
+            </b-row>
 
-            </b-col>               
-              
-            
-            
-
-                    </b-row>
         <div class="load-more" v-if="showParties">
+
         <button v-show="!isComp" v-if="loadMore" @click="loadMoreGames"    
             class="btn btn-lg btn-outline-primary"
             >Carregar Mais Grupos</button>
@@ -92,7 +86,9 @@ export default {
             data: [],
             cols: [],
             selected:null,
-            pressed: 1
+            pressed: 1,
+            filters:[],
+            showLevel: true
         }
     },
     methods:{
@@ -147,8 +143,8 @@ export default {
                 }
             }
         },
-        loadFilters(){
-              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/filters`)
+        async loadFilters(){
+              await axios.get(`${baseApiUrl}/game/${this.$route.params.id}/filters`)
               .then((res) => {
                 this.filters = res.data.map(item=>{
                     return {label: item.name, key: item.id}
@@ -199,10 +195,13 @@ export default {
     mounted(){
         this.$route.params.id ? this.getGamesById() : this.getGamesAll()         
         this.checkShow(this.$route.name)
+        
     },
-    
-    computed:{
-        filterTags(){
+    computed: {
+      widthForm() {
+          return this.$mq === 'xs' ? '40%' : `30%`
+      },
+      filterTags(){
             if(this.selected !== null){
              let value= this.filterParty()
              this.data.map(party =>{
@@ -228,6 +227,9 @@ export default {
             this.data = this.parties
         },
         $mq: function(){
+            if(this.$mq === 'xs'){
+              this.showLevel = false
+            }
             this.setSize()
         },
         data: function(){
@@ -241,10 +243,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 /*! bulma.io v0.9.1 | MIT License | github.com/jgthms/bulma */
 /*! Generated by Bulma Customizer v0.2.0 | https://github.com/webmasterish/bulma-customizer */
+
+.card-body{
+  padding:0px
+}
 .tags {
   align-items: center;
   display: flex;
