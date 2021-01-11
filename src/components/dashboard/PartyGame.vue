@@ -115,7 +115,7 @@ export default {
         },
         setSize(){
             if(this.data.length == 1 || undefined){
-                this.cols = [1,1,1,1,1]
+                this.cols = [3,3,3,3,3]
             }else{
                 if(this.$mq === 'xs'){
                     this.cols = [1,1,2,3,3]

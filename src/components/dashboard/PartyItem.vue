@@ -13,14 +13,14 @@
                             <font-awesome-icon icon="info-circle" /> 
                              <b-tooltip target="party-flip" placement="bottom" title="See party players" />
                         </div>
-                          <div id="leave-party" class="party_icon_exit" v-if="statusIn === true" v-on:click="leftParty">
+                          <div id="leave-party" class="party_icon_exit" v-if="statusIn === true && party.userId !== user.id" v-on:click="leftParty">
                                <font-awesome-icon icon="sign-out-alt" /> 
                               <b-tooltip target="leave-party" placement="bottom" title="Leave party" />
                           </div>
                           <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
                                <font-awesome-icon icon="edit" /> 
                           </div>
-                          <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit'">
+                          <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit' || party.userId === user.id">
                                <font-awesome-icon icon="trash" /> 
                           </div>
                       
@@ -55,7 +55,7 @@
 
         <footer :class="customFooter"  @click="flipCardEnter">
             <div class="party-buttons">
-                <b-button class="button is-primary ml-2 mr-2"  @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
+                <b-button class="button is-primary ml-2 mr-2" v-show="showStatusParty === 'Enter'"> 
                          <font-awesome-icon icon="arrow-alt-circle-right" /> 
                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
@@ -90,7 +90,7 @@
                             <b-tooltip target="party-info2" placement="bottom" title="See party informations" />
                         </div>
 
-                         <div id="leave-party2" class="party_icon_exit ml-2" v-if="statusIn === true" v-on:click="leftParty">
+                         <div id="leave-party2" class="party_icon_exit ml-2" v-if="statusIn === true && party.userId !== user.id" v-on:click="leftParty">
                                <font-awesome-icon icon="sign-out-alt" /> 
                               <b-tooltip target="leave-party2" placement="bottom" title="Leave party" />
                           </div>
@@ -129,13 +129,13 @@
 
           <footer :class="customFooter"  @click="enterParty">
             <div class="party-buttons">
-                <b-button class="button is-primary ml-2 mr-2"  @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
+                <b-button class="button is-primary ml-2 mr-2"   v-show="showStatusParty === 'Enter'"> 
                         <font-awesome-icon icon="arrow-alt-circle-right" /> 
                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
-                <b-button class="button is-danger ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Closed'"> 
+                <b-button class="button is-danger ml-2 mr-2"  v-show="showStatusParty === 'Closed'"> 
                          <font-awesome-icon icon="lock" /> 
                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
@@ -188,9 +188,7 @@
 <script>
 import { baseApiUrl,showError } from '../../../global.js'
 import axios from 'axios'
-import { io } from 'socket.io-client';
-
-//const io = require("socket.io-client");
+import {mapState} from 'vuex'
 export default {
     name: 'PartyItem',
     props: ['party','type'],
@@ -212,14 +210,14 @@ export default {
             modalShow: false,
             showRank: true,
             showLevel: true,
-            parties: [],
-            socket: {},
-            connections: 0,
-
+            parties: []
         }
     },
     methods:{
         enterParty(){
+
+          if(this.showStatusParty === 'Enter'){
+          
             axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
             .then( res => {                
                 this.profiles = res.data
@@ -250,7 +248,7 @@ export default {
             }
             })
             .catch(showError)
-            
+          }
            
         },
         leftParty(){
@@ -369,7 +367,7 @@ export default {
         async getPlayers(){
             await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
-                //console.log(this.players)
+                console.log(this.players)
              })
         },
         async inTheParty(){
@@ -498,6 +496,7 @@ export default {
     
     },
     computed:{
+      ...mapState(['user']),
       customFooter(){
         if(this.showStatusParty === 'Enter'){
           return 'card-custom-footer-enter'
@@ -510,27 +509,17 @@ export default {
       
     },
     mounted(){
-        this.socket = io.connect('http://localhost:3000/');
-
-         this.socket.on('connections', (data) =>{
-                 console.log(data)
-         })
-
         this.init()
     },
     watch: {
         party: function(){
-                this.$emit('update:party', this.party)
-                this.numberPlayers = this.party.numberPlayers
-            },
-            'showStatusParty' : function(){
-                return
-            },
+            this.$emit('update:party', this.party)
+            this.numberPlayers = this.party.numberPlayers
+        },
+        'showStatusParty' : function(){
+            return
+        },
         cParty: function(){
-            this.socket.emit('attParty', this.cParty)
-            this.socket.on('newParty', () => {
-               this.init()
-            })
             return
         }
     }
@@ -2328,6 +2317,7 @@ a.tag:hover {
 }
 
 p { cursor: pointer; }
+
 
 
 </style>
