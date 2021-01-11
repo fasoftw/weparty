@@ -15,7 +15,7 @@
             <label for="teste1" class="mt-2">Search tag:</label>
           <v-select class="ml-3 mt-2"  :style="{ width: `${widthForm}` }" :options="filters" v-model="selected"></v-select>   
            <div  @click="showLevel= !showLevel" v-if="$mq === 'xs'" class="ml-2 mt-2">
-              <i class="fas fa-filter" ></i>
+               <font-awesome-icon icon="filter" />
           </div>
           </b-row>
  

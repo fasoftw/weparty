@@ -56,7 +56,7 @@
             >  
             <template #cell(actions)="row">
               <b-button @click="onDelete(row.item)">
-                <i class="fas fa-trash-alt"></i>
+                <font-awesome-icon icon="fa-trash-alt" /> 
               </b-button>
            </template>
           </b-table>

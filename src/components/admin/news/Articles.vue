@@ -44,10 +44,10 @@
         small>
             <template #cell(actions)="row">
                 <b-button variant="warning" @click="loadArticle(row.item)" class="mr-2">
-                     <i class="fas fa-pencil-alt"></i>
+                     <font-awesome-icon icon="pencil-alt" />
                 </b-button>
                 <b-button variant="danger" @click="loadArticle(row.item, 'remove')">
-                    <i class="fa fa-trash"></i>
+                     <font-awesome-icon icon="trash" />
                 </b-button>
             </template>
         </b-table>

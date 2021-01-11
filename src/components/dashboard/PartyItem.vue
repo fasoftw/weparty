@@ -10,18 +10,18 @@
                  <b-col cols="2">
                     <div class="party-game-info mt-2">
                           <div id="party-flip" class="party_icon mr-2" v-on:click="flipCard" v-if="type !== 'edit'">
-                            <i class="fas fa-info-circle"></i>
+                            <font-awesome-icon icon="info-circle" /> 
                              <b-tooltip target="party-flip" placement="bottom" title="See party players" />
                         </div>
                           <div id="leave-party" class="party_icon_exit" v-if="statusIn === true" v-on:click="leftParty">
-                              <i class="fas fa-sign-out-alt"></i>
+                               <font-awesome-icon icon="sign-out-alt" /> 
                               <b-tooltip target="leave-party" placement="bottom" title="Leave party" />
                           </div>
                           <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
-                              <b-icon icon="pencil-square"> </b-icon>
+                               <font-awesome-icon icon="edit" /> 
                           </div>
                           <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit'">
-                              <b-icon icon="trash"> </b-icon>
+                               <font-awesome-icon icon="trash" /> 
                           </div>
                       
                   </div>
@@ -53,20 +53,23 @@
             
         </div> 
 
-        <footer :class="customFooter"  @click="flipCard">
+        <footer :class="customFooter"  @click="flipCardEnter">
             <div class="party-buttons">
                 <b-button class="button is-primary ml-2 mr-2"  @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
-                        <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}} </span>
+                         <font-awesome-icon icon="arrow-alt-circle-right" /> 
+                        <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
                 <b-button class="button is-danger ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Closed'"> 
-                        <i class="fas fa-lock"></i> <span>{{this.showStatusParty}} </span>
+                         <font-awesome-icon icon="lock" /> 
+                        <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
                 <b-button class="button is-warning ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Waiting'"> 
-                        <i class="far fa-clock"></i> <span>{{this.showStatusParty}} </span>
+                        <font-awesome-icon icon="clock" /> 
+                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
          </div>
@@ -83,12 +86,12 @@
                     <div class="party-game-info mt-2">
                         
                           <div id="party-info2" class="party_icon" v-on:click="flipCard" v-if="type !== 'edit'">
-                            <i class="fas fa-undo"></i>
+                             <font-awesome-icon icon="undo" /> 
                             <b-tooltip target="party-info2" placement="bottom" title="See party informations" />
                         </div>
 
                          <div id="leave-party2" class="party_icon_exit ml-2" v-if="statusIn === true" v-on:click="leftParty">
-                              <i class="fas fa-sign-out-alt"></i>
+                               <font-awesome-icon icon="sign-out-alt" /> 
                               <b-tooltip target="leave-party2" placement="bottom" title="Leave party" />
                           </div>
                       
@@ -127,17 +130,20 @@
           <footer :class="customFooter"  @click="enterParty">
             <div class="party-buttons">
                 <b-button class="button is-primary ml-2 mr-2"  @click="enterParty"  v-show="showStatusParty === 'Enter'"> 
-                        <i class="fas fa-arrow-alt-circle-right"></i> <span>{{this.showStatusParty}} </span>
+                        <font-awesome-icon icon="arrow-alt-circle-right" /> 
+                        <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
                 <b-button class="button is-danger ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Closed'"> 
-                        <i class="fas fa-lock"></i> <span>{{this.showStatusParty}} </span>
+                         <font-awesome-icon icon="lock" /> 
+                        <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
                 <b-button class="button is-warning ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Waiting'"> 
-                        <i class="far fa-clock"></i> <span>{{this.showStatusParty}} </span>
+                        <font-awesome-icon icon="clock" /> 
+                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
          </div>
@@ -294,7 +300,6 @@ export default {
                     axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
                     .then(() =>{
                         this.party = {}
-                        this.parties.
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                     }) 
@@ -310,11 +315,15 @@ export default {
         editParty(value){
             this.toParty(value.id, value)
         },
-
-        flipCard(){
-            if(this.showStatusParty === 'Enter'){
+        flipCardEnter(){
+            if(this.showStatusParty === "Enter"){
               this.enterParty()
             }
+            this.isFlipped = !this.isFlipped 
+        },
+
+        flipCard(){
+            
             this.isFlipped = !this.isFlipped 
         },
         saveProfile(){

@@ -43,10 +43,12 @@
             
               <b-card 
                 :title="game.name"
-                :img-src="game.imageUrl"
-                img-alt="Image"
+                :img-src="getPic(game.imageUrl)"
+                :img-alt="game.imageUrl"
+                img-height="170px"
                 img-top
                 style="max-width: 18rem; margin-top: 10px"> 
+                
                 <b-card-text>
                   {{ game.spots }} spots
                 </b-card-text>
@@ -82,6 +84,9 @@ export default {
         }
     },
     methods:{
+         getPic(index) {
+            return require('../../assets/games/'+index+'.jpg')
+        },
         loadCombo(){
             axios.get(`${baseApiUrl}/games`)
             .then(res =>{

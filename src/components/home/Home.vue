@@ -2,6 +2,7 @@
   <div class="home">
     <div class="card-games">
         <b-container fluid>
+
           <b-row cols="1" cols-sm="2" cols-md="3" cols-lg="4">
             <b-col
               v-for="(game, id) in games"
@@ -13,20 +14,24 @@
             
               <b-card 
                 :title="game.name"
-                :img-src="game.imageUrl"
-                img-alt="Image"
+                :img-src="getPic(game.imageUrl)"
+                :img-alt="game.imageUrl"
+                img-height="170px"
                 img-top
                 style="max-width: 18rem; margin-top: 10px"
-              > 
+              >
+
+              
                 <b-card-text>
                   {{ game.description }}
+                  
                 </b-card-text>
 
                 <b-button variant="outline-primary" v-if="user" @click="toParty(game.id)"
-                  >Visualizar</b-button
+                  >View</b-button
                 >
                 <b-button variant="outline-primary" v-else to="/signin"
-                  >Visualizar</b-button
+                  >View</b-button
                 >
               </b-card>  
             </b-col>
@@ -42,6 +47,7 @@ import { baseApiUrl } from "../../../global.js";
 import { mapState } from "vuex";
 import {userKey} from '../../../global'
 
+
 export default {
   name:'home',
   data() {
@@ -50,6 +56,9 @@ export default {
     };
   },
   methods: {
+    getPic(index) {
+      return require('../../assets/games/'+index+'.jpg')
+    },
     loadGames() {
       axios.get(`${baseApiUrl}/games`).then((res) => {
         this.games = res.data;
