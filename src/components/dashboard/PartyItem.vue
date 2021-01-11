@@ -188,6 +188,9 @@
 <script>
 import { baseApiUrl,showError } from '../../../global.js'
 import axios from 'axios'
+import { io } from 'socket.io-client';
+
+//const io = require("socket.io-client");
 export default {
     name: 'PartyItem',
     props: ['party','type'],
@@ -209,7 +212,10 @@ export default {
             modalShow: false,
             showRank: true,
             showLevel: true,
-            parties: []
+            parties: [],
+            socket: {},
+            connections: 0,
+
         }
     },
     methods:{
@@ -363,7 +369,7 @@ export default {
         async getPlayers(){
             await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
-                console.log(this.players)
+                //console.log(this.players)
              })
         },
         async inTheParty(){
@@ -504,17 +510,27 @@ export default {
       
     },
     mounted(){
+        this.socket = io.connect('http://localhost:3000/');
+
+         this.socket.on('connections', (data) =>{
+                 console.log(data)
+         })
+
         this.init()
     },
     watch: {
         party: function(){
-            this.$emit('update:party', this.party)
-            this.numberPlayers = this.party.numberPlayers
-        },
-        'showStatusParty' : function(){
-            return
-        },
+                this.$emit('update:party', this.party)
+                this.numberPlayers = this.party.numberPlayers
+            },
+            'showStatusParty' : function(){
+                return
+            },
         cParty: function(){
+            this.socket.emit('attParty', this.cParty)
+            this.socket.on('newParty', () => {
+               this.init()
+            })
             return
         }
     }

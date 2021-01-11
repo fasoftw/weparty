@@ -63,7 +63,7 @@ export default {
     },
     watch:{
         'tab': function(){
-            console.log(this.tab)
+            //console.log(this.tab)
         }
     }
 }
