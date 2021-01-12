@@ -37,6 +37,7 @@ export default new Vuex.Store({
             state.hideLogin = hide
         },
         setNotifications(state,user){
+            console.log("ENTROU")
             if(user !== undefined){           
                 axios.get(`${baseApiUrl}/notifications/user/${user}`)
                 .then(res =>{

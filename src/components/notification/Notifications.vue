@@ -53,8 +53,17 @@
                   </b-list-group>
         </b-form-checkbox-group>
               </b-col>
+              
           </b-row>
-      </b-form-group>
+  
+    </b-form-group> 
+      <b-button-group class="mr-5">
+      <b-button variant="outline-primary" class="ml-4" :disabled="page === 1" @click="onLoadMinus">Previous </b-button>
+      <b-button variant="outline-primary" class="ml-1" @click="onLoad" :disabled="loadMore === false">Next page</b-button>
+    </b-button-group>
+
+
+
       </b-card>
     </b-card-group>
      </b-container>
@@ -73,7 +82,9 @@ export default {
         selected: [],
         allSelected: false,
         indeterminate: false,
-        notifications:[]
+        notifications:[],
+        page: 1,
+        loadMore: true
       }
     },
     methods: {
@@ -81,13 +92,45 @@ export default {
         this.selected = checked ? this.items.slice() : []
       },
       onLoad(){
-            axios.get(`${baseApiUrl}/notifications/${this.$store.state.user.id}`)
+            axios.get(`${baseApiUrl}/notifications/${this.$store.state.user.id}?page=${this.page}`)
             .then(res =>{
-                res.data.map( item =>{
+
+                res.data.not.map( item =>{
                     this.items.push(item.notificationID)
                 })
+                this.page++
+                
+                if(res.data.not.length === 0 || res.data.not.length < 5 ) this.loadMore = false
 
-                this.notifications = res.data
+                this.notifications = res.data.not
+
+                this.notifications.map( (item,index)=>{
+                  this.notifications[index].time = this.dateAtt(item.createdAt)
+                  this.notifications[index].title = item.title.replace("*name*", item.partyName) 
+                  this.notifications[index].message = item.message.replace("*name*", item.partyName) 
+                  this.notifications[index].message = item.message.replace("*date*", this.dateFormat(item.createdAt))             
+                })
+
+                
+            }).catch(showError)
+
+            
+      },
+       onLoadMinus(){
+            axios.get(`${baseApiUrl}/notifications/${this.$store.state.user.id}?page=${this.page}`)
+            .then(res =>{
+
+                res.data.not.map( item =>{
+                    this.items.push(item.notificationID)
+                })
+                if(this.page === 1){
+                   this.page = 1; this.loadMore = true
+                }else{
+                    this.page--
+                }
+
+                
+                this.notifications = res.data.not
 
                 this.notifications.map( (item,index)=>{
                   this.notifications[index].time = this.dateAtt(item.createdAt)
@@ -105,11 +148,9 @@ export default {
                 this.notifications.map(not =>{
                     this.items.push(not.notificationID)
                 })
-
              
       },
       onDelete(){
-        console.log(this.selected)
               axios.delete(`${baseApiUrl}/notifications/${this.selected}`)
               .then( ()=>{
                    this.$store.commit('setNotifications', this.$store.state.user.id)
@@ -218,4 +259,5 @@ export default {
        flex:0 0 auto;
        align-items: stretch;
     }
+
 </style>
