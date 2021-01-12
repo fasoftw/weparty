@@ -287,6 +287,9 @@ export default {
                     .catch(showError)
                 }
 
+                this.$store.commit('setNotifications', this.$store.state.user.id)
+
+
             })
             .catch(showError)
         },
@@ -362,6 +365,7 @@ export default {
         },
 
         getParties(){
+             this.$store.commit('setNotifications', this.$store.state.user.id)
              axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
                 this.$emit('update', res.data.parties)
 
@@ -369,6 +373,7 @@ export default {
         },
        
         async getPlayers(){
+            this.$store.commit('setNotifications', this.$store.state.user.id)
             await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
              })
