@@ -189,6 +189,8 @@
 import { baseApiUrl,showError } from '../../../global.js'
 import axios from 'axios'
 import {mapState} from 'vuex'
+import { io } from 'socket.io-client';
+
 export default {
     name: 'PartyItem',
     props: ['party','type'],
@@ -210,7 +212,9 @@ export default {
             modalShow: false,
             showRank: true,
             showLevel: true,
-            parties: []
+            parties: [], 
+            socket: {},
+            connections: 0,
         }
     },
     methods:{
@@ -367,7 +371,6 @@ export default {
         async getPlayers(){
             await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
-                console.log(this.players)
              })
         },
         async inTheParty(){
@@ -509,6 +512,21 @@ export default {
       
     },
     mounted(){
+        this.socket = io.connect('http://localhost:3000/', {
+          transports: ['websocket'], 
+          upgrade: false,
+          reconnectionDelayMax: 10000,
+        });
+        this.socket.on('disconnect', () => {
+            console.log('disconectado')
+            this.socket.open();
+        });
+        this.socket.on('connect_error', (error) => {
+          console.log(error)
+        });
+        this.socket.on('connections', (data) =>{
+            console.log(data)
+        })
         this.init()
     },
     watch: {
