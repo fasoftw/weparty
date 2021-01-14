@@ -106,6 +106,7 @@ export default {
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.data = this.data.concat(res.data.parties)
+                this.socket.emit('attParty', this.data);
                 this.page++
                 if(res.data.parties.length === 0 || res.data.parties.length <= 10 ) this.loadMore = false
                 this.setSize()
