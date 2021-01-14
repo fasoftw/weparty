@@ -44,7 +44,7 @@
                   col	           
                   no-gutters	           
                   class="mb-2 ">
-                  <PartyItem v-if="showParties"  :index="index" :party="party" :type="type" @update="onStep1Update"/>  
+                  <PartyItem v-if="showParties"  :index="index" :party="party" :type="type"/>  
                                   
 
               </b-col>               
@@ -95,11 +95,6 @@ export default {
          getGamesAll(){
             this.data = this.parties
             this.setSize()
-        },  
-         onStep1Update (newData) {
-
-           this.data = newData
-           this.$forceUpdate()
         },    
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
