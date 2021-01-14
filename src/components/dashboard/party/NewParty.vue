@@ -296,7 +296,6 @@ export default {
         this.$v.party.$touch();
 
         if (this.$v.party.$anyError) {
-          console.log("ENTREI")
           return;
         }
         
@@ -445,7 +444,6 @@ export default {
     },
     mounted(){
       if(this.$route.params.party){ //Vai executar no caso de edição de party
-        console.log("teste")
         
          this.party =  this.$route.params.party 
          this.showFormProfile = undefined

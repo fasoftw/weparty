@@ -40,11 +40,11 @@
             :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]" :cols-xl="cols[4]" >
               <b-col  	 
           
-                  v-for="party in filterTags" :key="party.id"	           
+                  v-for="(party,index) in filterTags" :key="party.id"	           
                   col	           
                   no-gutters	           
                   class="mb-2 ">
-                  <PartyItem v-if="showParties"   :party="party" :type="type" @update="onStep1Update"/>  
+                  <PartyItem v-if="showParties"  :index="index" :party="party" :type="type" @update="onStep1Update"/>  
                                   
 
               </b-col>               

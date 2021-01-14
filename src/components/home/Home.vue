@@ -69,7 +69,6 @@ export default {
     },
     teste(){
       const json = localStorage.getItem(userKey)
-      console.log(json)
       if(json === null){
         this.$store.commit('setHideLogin',false)
       }

@@ -145,7 +145,7 @@ export default {
               this.gameProfile = {}
         },
         onDelete(item){
-          console.log(item)
+
               axios.delete(`${baseApiUrl}/game/profile/user/${item.id}`)
               .then(() =>{
                   this.$toasted.global.defaultSuccess();

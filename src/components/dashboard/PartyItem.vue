@@ -193,7 +193,7 @@ import { io } from 'socket.io-client';
 
 export default {
     name: 'PartyItem',
-    props: ['party','type'],
+    props: ['party','type','index'],
     data(){
         return{
             showStatusParty: 'Open', //Party aberta ou fechada (ou usuario nela)
@@ -369,6 +369,8 @@ export default {
               this.$store.commit('setNotifications', this.$store.state.user.id)
               axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
                 this.$emit('update', res.data.parties)
+                console.log(this.party)
+                console.log(res.data.parties[this.index])
               })
         },
         
