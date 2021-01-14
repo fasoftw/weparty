@@ -9,6 +9,19 @@
                  <b-col cols="10"> <p class="title is-4 ml-2 mt-2">{{party.partyName}}</p></b-col>
                  <b-col cols="2">
                     <div class="party-game-info mt-2">
+
+                      <div id="party-flip-play" class="party_icon mr-3" v-on:click="ready" v-if="party.spotsFilled === party.numberPlayers && party.userId === user.id 
+                       && party.ready === 0 && party.deletedAt === null">
+                            <font-awesome-icon icon="play-circle" /> 
+                             <b-tooltip target="party-flip-play" placement="lefttop" title="Ready to invite" />
+                      </div>
+
+                        <div id="party-flip-close" class="party_icon mr-3" v-on:click="check" v-if="party.spotsFilled === party.numberPlayers
+                           && party.userId === user.id && party.ready === 1  && party.deletedAt === null">
+                            <font-awesome-icon icon="check" /> 
+                             <b-tooltip target="party-flip-close" placement="lefttop" title="End party" />
+                        </div>
+
                           <div id="party-flip" class="party_icon mr-2" v-on:click="flipCard" v-if="type !== 'edit'">
                             <font-awesome-icon icon="info-circle" /> 
                              <b-tooltip target="party-flip" placement="bottom" title="See party players" />
@@ -53,7 +66,7 @@
             
         </div> 
 
-        <footer :class="customFooter"  @click="flipCardEnter">
+                <footer :class="customFooter"  @click="flipCardEnter">
             <div class="party-buttons">
                 <b-button class="button is-primary ml-2 mr-2" v-show="showStatusParty === 'Enter'"> 
                          <font-awesome-icon icon="arrow-alt-circle-right" /> 
@@ -61,17 +74,31 @@
                         <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
-                <b-button class="button is-danger ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Closed'"> 
-                         <font-awesome-icon icon="lock" /> 
-                        <span>{{this.showStatusParty}} </span>
+                
+                <b-button class="button is-danger ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Done'"> 
+                        <font-awesome-icon icon="lock" /> 
+                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
                 <b-button class="button is-warning ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Waiting'"> 
+                         <font-awesome-icon icon="clock" /> 
+                        <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                  <b-button class="button is-info ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Ready'"> 
+                         <font-awesome-icon icon="play-circle" /> 
+                        <span>{{ " " +this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                  <b-button class="button is-info ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'In Progress'"> 
                         <font-awesome-icon icon="clock" /> 
                          <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
+
          </div>
         </footer> 
         
@@ -127,25 +154,39 @@
             </div>
         </div>
 
-          <footer :class="customFooter"  @click="enterParty">
+                  <footer :class="customFooter"  @click="flipCardEnter">
             <div class="party-buttons">
-                <b-button class="button is-primary ml-2 mr-2"   v-show="showStatusParty === 'Enter'"> 
-                        <font-awesome-icon icon="arrow-alt-circle-right" /> 
+                <b-button class="button is-primary ml-2 mr-2" v-show="showStatusParty === 'Enter'"> 
+                         <font-awesome-icon icon="arrow-alt-circle-right" /> 
                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
-                <b-button class="button is-danger ml-2 mr-2"  v-show="showStatusParty === 'Closed'"> 
-                         <font-awesome-icon icon="lock" /> 
+                
+                <b-button class="button is-danger ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Done'"> 
+                        <font-awesome-icon icon="lock" /> 
+                         <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                <b-button class="button is-warning ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Waiting'"> 
+                         <font-awesome-icon icon="clock" /> 
                         <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
 
-                <b-button class="button is-warning ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Waiting'"> 
+                  <b-button class="button is-info ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Ready'"> 
+                         <font-awesome-icon icon="play-circle" /> 
+                        <span>{{ " " +this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                  <b-button class="button is-info ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'In Progress'"> 
                         <font-awesome-icon icon="clock" /> 
                          <span>{{this.showStatusParty}} </span>
                         <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
                 </b-button>
+
          </div>
         </footer> 
         
@@ -306,7 +347,7 @@ export default {
                 if(res){
                     axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
                     .then(() =>{
-                        this.party = {}
+                        this.getParties()
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                     }) 
@@ -363,7 +404,7 @@ export default {
         getParties(){
               this.$store.commit('setNotifications', this.$store.state.user.id)
               axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
-                this.$emit('update', res.data.parties)
+                this.$emit('update', res.data.parties, null)
               })
         },
         
@@ -390,21 +431,21 @@ export default {
                     }
                 })
         },
-        isPartyClosed(){
-            
-
-            if(this.cParty.isOpen === 1){
+                isPartyClosed(){
+            if(this.party.isOpen === 1 && this.party.ready === 0 
+            && this.party.numberPlayers > this.party.spotsFilled){
                 if(this.statusIn === true){
                     this.showStatusParty = 'Waiting'
                 }else{
                     this.showStatusParty = 'Enter'
                 }
-            }else{
-                if(this.statusIn === true){
-                    this.showStatusParty = 'Closed'
-                }else{
-                    this.showStatusParty = 'Closed'
-                }   
+            } else if(this.party.ready === 1 && this.party.deletedAt === null){
+              this.showStatusParty = "In Progress"
+            } else if(this.party.deletedAt !== null && this.party.ready === 1){
+              this.showStatusParty = "Done"
+            } else if(this.party.numberPlayers === this.party.spotsFilled && this.statusIn &&
+              this.party.deletedAt === null){
+              this.showStatusParty = "Ready"
             }
 
         },
@@ -496,7 +537,29 @@ export default {
           diff /= 60;
           return Math.abs(Math.round(diff));
           
-        }
+        },
+        async ready(){
+            this.$store.commit('setNotifications', this.$store.state.user.id)
+            this.party.ready = 0
+            await axios.post(`${baseApiUrl}/game/parties`, this.party).then(() => {
+               this.$toasted.global.defaultSuccess();
+               this.party.ready = 1
+               this.$emit('update', this.party, this.index)
+               this.showStatusParty ="In Progress"
+             })
+        },
+
+        async check(){
+            
+                this.$store.commit('setNotifications', this.$store.state.user.id)
+                this.party.ready = 1
+                await axios.post(`${baseApiUrl}/game/parties`, this.party).then(() => {
+                  this.$toasted.global.defaultSuccess();
+                  this.$emit('update', this.party, this.index)
+                  this.party.deletedAt = new Date()
+                  this.showStatusParty = "Done"
+                })
+        },
     },
 
     computed:{
@@ -509,9 +572,10 @@ export default {
         } else{
           return 'card-custom-footer-closed'
         }
-      }
+      },
       
-    },
+      
+    },   
 
     mounted(){
         this.init()
@@ -533,6 +597,7 @@ export default {
 </script>
 
 <style>
+
 @import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
 
@@ -634,6 +699,21 @@ export default {
   padding-top:5px;
 }
 
+.card-custom-footer-done {
+  background-color: #f14668;
+  border-top: 1px solid #ededed;
+  display: flex;
+  justify-content: center;
+  padding-top:5px;
+}
+.card-custom-footer-progress {
+  background-color:  #3298dc;
+  border-top: 1px solid #ededed;
+  display: flex;
+  justify-content: center;
+  padding-top:5px;
+}
+
 .card-custom-footer-enter {
   background-color:  #00d1b2;
   border-top: 1px solid #ededed;
@@ -642,8 +722,8 @@ export default {
   padding-top:5px;
 }
 
-.card-custom-footer-closed {
-  background-color:   #f14668;
+.card-custom-footer-Ready {
+  background-color:   #3298dc;
   border-top: 1px solid #ededed;
   display: flex;
   justify-content: center;
@@ -2142,88 +2222,7 @@ a.tag:hover {
   top: calc(50% - (1em / 2));
   position: absolute !important;
 }
-.button.is-static {
-  background-color: whitesmoke;
-  border-color: #dbdbdb;
-  color: #7a7a7a;
-  box-shadow: none;
-  pointer-events: none;
-}
-.button.is-rounded {
-  border-radius: 290486px;
-  padding-left: calc(1em + 0.25em);
-  padding-right: calc(1em + 0.25em);
-}
 
-.buttons {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-.buttons .button {
-  margin-bottom: 0.5rem;
-}
-.buttons .button:not(:last-child):not(.is-fullwidth) {
-  margin-right: 0.5rem;
-}
-.buttons:last-child {
-  margin-bottom: -0.5rem;
-}
-.buttons:not(:last-child) {
-  margin-bottom: 1rem;
-}
-.buttons.are-small .button:not(.is-normal):not(.is-medium):not(.is-large) {
-  font-size: 0.75rem;
-}
-.buttons.are-small .button:not(.is-normal):not(.is-medium):not(.is-large):not(.is-rounded) {
-  border-radius: 2px;
-}
-.buttons.are-medium .button:not(.is-small):not(.is-normal):not(.is-large) {
-  font-size: 1.25rem;
-}
-.buttons.are-large .button:not(.is-small):not(.is-normal):not(.is-medium) {
-  font-size: 1.5rem;
-}
-.buttons.has-addons .button:not(:first-child) {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-}
-.buttons.has-addons .button:not(:last-child) {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  margin-right: -1px;
-}
-.buttons.has-addons .button:last-child {
-  margin-right: 0;
-}
-.buttons.has-addons .button:hover, .buttons.has-addons .button.is-hovered {
-  z-index: 2;
-}
-.buttons.has-addons .button:focus, .buttons.has-addons .button.is-focused, .buttons.has-addons .button:active, .buttons.has-addons .button.is-active, .buttons.has-addons .button.is-selected {
-  z-index: 3;
-}
-.buttons.has-addons .button:focus:hover, .buttons.has-addons .button.is-focused:hover, .buttons.has-addons .button:active:hover, .buttons.has-addons .button.is-active:hover, .buttons.has-addons .button.is-selected:hover {
-  z-index: 4;
-}
-.buttons.has-addons .button.is-expanded {
-  flex-grow: 1;
-  flex-shrink: 1;
-}
-.buttons.is-centered {
-  justify-content: center;
-}
-.buttons.is-centered:not(.has-addons) .button:not(.is-fullwidth) {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
-}
-.buttons.is-right {
-  justify-content: flex-end;
-}
-.buttons.is-right:not(.has-addons) .button:not(.is-fullwidth) {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
-}
 
 .level {
   align-items: center;

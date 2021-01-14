@@ -98,10 +98,16 @@ export default {
             this.data = this.parties
             this.setSize()
         },  
-         onStep1Update (newData) {
-           this.data = newData
-           this.$forceUpdate()
-           this.socket.emit('attParty', this.data);
+         onStep1Update (newData,index) {
+           
+            if(index === null){
+              this.data = newData
+          
+           }  else{
+              this.data[index] = newData
+           }
+            this.$forceUpdate()
+            this.socket.emit('attParty', this.data);
         },    
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
