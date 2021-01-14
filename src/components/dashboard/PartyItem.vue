@@ -370,7 +370,8 @@ export default {
               axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
                 this.$emit('update', res.data.parties)
                 console.log(this.party)
-                console.log(res.data.parties[this.index])
+                this.party  = res.data.parties[this.index]
+                console.log(this.party)
               })
         },
         
