@@ -73,6 +73,7 @@
 import { baseApiUrl, showError } from '../../../global.js'
 import PartyItem from './PartyItem'
 import axios from 'axios'
+import { io } from 'socket.io-client';
 
 export default {
     name: 'PartyGame',
@@ -88,7 +89,8 @@ export default {
             selected:null,
             pressed: 1,
             filters:[],
-            showLevel: true
+            showLevel: true,
+            socket: {},
         }
     },
     methods:{
@@ -97,9 +99,9 @@ export default {
             this.setSize()
         },  
          onStep1Update (newData) {
-
            this.data = newData
            this.$forceUpdate()
+           this.socket.emit('attParty', this.data);
         },    
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
@@ -198,6 +200,20 @@ export default {
 
     },
     mounted(){
+         this.socket = io.connect('http://localhost:3000/', {
+          transports: ['websocket'], 
+          upgrade: false,
+          reconnectionDelayMax: 10000,
+        });
+
+        this.socket.on('connections', (data) =>{
+            console.log(data)
+        })
+
+        this.socket.on('newParties', (data) =>{
+          this.data = data
+           this.loadFilters()
+        })  
         this.$route.params.id ? this.getGamesById() : this.getGamesAll()         
         this.checkShow(this.$route.name)
         
@@ -245,6 +261,9 @@ export default {
         }
 
   },
+  destroyed() {
+      this.socket.close()
+  }
 }
 </script>
 

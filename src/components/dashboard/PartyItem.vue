@@ -189,7 +189,6 @@
 import { baseApiUrl,showError } from '../../../global.js'
 import axios from 'axios'
 import {mapState} from 'vuex'
-import { io } from 'socket.io-client';
 
 export default {
     name: 'PartyItem',
@@ -213,8 +212,6 @@ export default {
             showRank: true,
             showLevel: true,
             parties: [], 
-            socket: {},
-            connections: 0,
         }
     },
     methods:{
@@ -243,7 +240,6 @@ export default {
                             this.partyPlayerId = res.data.partyPlayerId
                             this.profiles = res.data.profiles
                             this.isPartyClosed()
-                            this.attParty()
                         }) 
                         .catch(showError)
             }
@@ -279,7 +275,6 @@ export default {
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                         
-                        this.attParty()
                         //this.party = null
                         //alterar tamanho da party // se for igual a 0 deletar a party. 
                         
@@ -369,8 +364,6 @@ export default {
               this.$store.commit('setNotifications', this.$store.state.user.id)
               axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
                 this.$emit('update', res.data.parties)
-                console.log(this.party)
-                console.log(res.data.parties[this.index])
               })
         },
         
@@ -503,9 +496,6 @@ export default {
           diff /= 60;
           return Math.abs(Math.round(diff));
           
-        },
-        attParty(){
-            this.socket.emit('attParty');
         }
     },
 
@@ -524,29 +514,13 @@ export default {
     },
 
     mounted(){
-        this.socket = io.connect('http://localhost:3000/', {
-          transports: ['websocket'], 
-          upgrade: false,
-          reconnectionDelayMax: 10000,
-        });
-        this.socket.on('connections', (data) =>{
-            console.log(data)
-        })
-
-        this.socket.on('newParty', () =>{
-          this.$emit('update:party', this.party)
-          console.log('dentro')
-          console.log(this.party)
-          this.init()
-        })
-
-        console.log('fora')
         this.init()
     },
     watch: {
         party: function(){
             this.$emit('update:party', this.party)
             this.numberPlayers = this.party.numberPlayers
+            this.init()
         },
         'showStatusParty' : function(){
             return
@@ -554,9 +528,6 @@ export default {
         cParty: function(){
             return
         }
-    },
-    destroyed() {
-        this.socket.close()
     }
 }
 </script>
