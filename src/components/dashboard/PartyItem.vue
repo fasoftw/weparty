@@ -221,11 +221,10 @@ export default {
         enterParty(){
 
           if(this.showStatusParty === 'Enter'){
-          
             axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
             .then( res => {                
                 this.profiles = res.data
-                 if(this.profiles.length > 0){
+                  if(this.profiles.length > 0){
                         this.party.profiles = this.profiles[0].id
                         axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
                         .then((res) =>{
@@ -244,6 +243,7 @@ export default {
                             this.partyPlayerId = res.data.partyPlayerId
                             this.profiles = res.data.profiles
                             this.isPartyClosed()
+                            this.attParty()
                         }) 
                         .catch(showError)
             }
@@ -253,7 +253,7 @@ export default {
             })
             .catch(showError)
           }
-           
+            
         },
         leftParty(){
             this.msgBoxConfirm = ''
@@ -279,6 +279,7 @@ export default {
                         this.$store.commit('setNotifications', this.$store.state.user.id)
                         this.$toasted.global.defaultSuccess();
                         
+                        this.attParty()
                         //this.party = null
                         //alterar tamanho da party // se for igual a 0 deletar a party. 
                         
@@ -293,7 +294,7 @@ export default {
             })
             .catch(showError)
         },
-         remove(){
+          remove(){
             this.msgBoxConfirm = ''
             this.$bvModal.msgBoxConfirm('Are you sure you want to delete?', {
             title: 'Please Confirm',
@@ -359,24 +360,23 @@ export default {
             })
         },
         getTags(id){
-             axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
+              axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
                 this.party.filters = res
-             })
+              })
         },
 
         getParties(){
-             this.$store.commit('setNotifications', this.$store.state.user.id)
-             axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
+              this.$store.commit('setNotifications', this.$store.state.user.id)
+              axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
                 this.$emit('update', res.data.parties)
-
-             })
+              })
         },
-       
+        
         async getPlayers(){
             this.$store.commit('setNotifications', this.$store.state.user.id)
             await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
                 this.players = res.data.party
-             })
+              })
         },
         async inTheParty(){
                 axios.get(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
@@ -396,6 +396,8 @@ export default {
                 })
         },
         isPartyClosed(){
+            
+
             if(this.cParty.isOpen === 1){
                 if(this.statusIn === true){
                     this.showStatusParty = 'Waiting'
@@ -444,65 +446,67 @@ export default {
             this.handleSubmit()
         },
         handleSubmit() {
-            // Exit when the form isn't valid
-            if (!this.checkFormValidity()) {
-            return
-            }
-            this.saveProfile()
-            this.$nextTick(() => {
-            this.$bvModal.hide('modal-prevent-closing')
-            })
-      },
-       dateFormat(date){ 
-        var t = new Date(date)
+              // Exit when the form isn't valid
+              if (!this.checkFormValidity()) {
+              return
+              }
+              this.saveProfile()
+              this.$nextTick(() => {
+              this.$bvModal.hide('modal-prevent-closing')
+              })
+        },
+        dateFormat(date){ 
+          var t = new Date(date)
 
-          var hr = ("0" + t.getHours()).slice(-2);
-          var min = ("0" + t.getMinutes()).slice(-2);
-          var sec = ("0" + t.getSeconds()).slice(-2);
+            var hr = ("0" + t.getHours()).slice(-2);
+            var min = ("0" + t.getMinutes()).slice(-2);
+            var sec = ("0" + t.getSeconds()).slice(-2);
 
-         return (t.getFullYear()+"-"+t.getMonth()+"-"+t.getDate()+" "+hr+":"+min+":"+sec).toString()
-      },
-      dateAtt(date){ 
+          return (t.getFullYear()+"-"+t.getMonth()+"-"+t.getDate()+" "+hr+":"+min+":"+sec).toString()
+        },
+        dateAtt(date){ 
 
-         var oldDate = new Date(date)
-         var newDate = new Date()
+          var oldDate = new Date(date)
+          var newDate = new Date()
 
-  
-        var days = Math.floor((Date.UTC(newDate.getFullYear(), newDate.getMonth(), newDate.getDate()) - Date.UTC(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate()) ) /(1000 * 60 * 60 * 24))
-        let hours = this.diff_minutes(newDate, oldDate)/60
-        var minutes = (this.diff_minutes(newDate, oldDate) % 60)
+    
+          var days = Math.floor((Date.UTC(newDate.getFullYear(), newDate.getMonth(), newDate.getDate()) - Date.UTC(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate()) ) /(1000 * 60 * 60 * 24))
+          let hours = this.diff_minutes(newDate, oldDate)/60
+          var minutes = (this.diff_minutes(newDate, oldDate) % 60)
 
-       
-       if(days === 0){
-      
+        
+        if(days === 0){
+        
 
-          const str = hours.toString();
+            const str = hours.toString();
 
-          // Separamos nas duas partes.
-          const splitted = str.split('.');
+            // Separamos nas duas partes.
+            const splitted = str.split('.');
 
-          // Parte inteira:
-          hours = parseInt(splitted[0]);
+            // Parte inteira:
+            hours = parseInt(splitted[0]);
 
-           return hours + " hrs " + minutes + " min ago";
+            return hours + " hrs " + minutes + " min ago";
 
-        } else {
-           return days + " days ago" 
+          } else {
+            return days + " days ago" 
+          }
+          
+        
+
+        },
+        diff_minutes(dt2, dt1) {
+
+          var diff =(dt2.getTime() - dt1.getTime()) / 1000;
+          diff /= 60;
+          return Math.abs(Math.round(diff));
+          
+        },
+        attParty(){
+            this.socket.emit('attParty');
         }
-        
-      
-
-      },
-      diff_minutes(dt2, dt1) {
-
-        var diff =(dt2.getTime() - dt1.getTime()) / 1000;
-        diff /= 60;
-        return Math.abs(Math.round(diff));
-        
-      }
-    
-    
     },
+
     computed:{
       ...mapState(['user']),
       customFooter(){
@@ -516,22 +520,25 @@ export default {
       }
       
     },
+
     mounted(){
         this.socket = io.connect('http://localhost:3000/', {
           transports: ['websocket'], 
           upgrade: false,
           reconnectionDelayMax: 10000,
         });
-        this.socket.on('disconnect', () => {
-            console.log('disconectado')
-            this.socket.open();
-        });
-        this.socket.on('connect_error', (error) => {
-          console.log(error)
-        });
         this.socket.on('connections', (data) =>{
             console.log(data)
         })
+
+        this.socket.on('newParty', () =>{
+          this.$emit('update:party', this.party)
+          console.log('dentro')
+          console.log(this.party)
+          this.init()
+        })
+
+        console.log('fora')
         this.init()
     },
     watch: {
@@ -545,6 +552,9 @@ export default {
         cParty: function(){
             return
         }
+    },
+    destroyed() {
+        this.socket.close()
     }
 }
 </script>
