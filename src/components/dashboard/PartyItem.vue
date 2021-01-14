@@ -1,280 +1,874 @@
 <template>
-    <div class="parties-games">
-   <b-container fluid class="bv-example-row">
-     <b-row>
-         <b-col>
-                    
-  <b-card-group deck>   
-        
 
-      <b-card  class="text-left">
-          <nav class="level">
-               
+            
+ <div class="party-inner"   :class="type !== 'edit' ? {'flip':!isFlipped } : {'flip':!isFlipped }" > 
     
-          <b-row class="ml-4"  style="width:100%" align-v="center">
-            <label for="teste1" class="mt-2">Search tag:</label>
-          <v-select class="ml-3 mt-2"  :style="{ width: `${widthForm}` }" :options="filters" v-model="selected"></v-select>   
-           <div  @click="showLevel= !showLevel" v-if="$mq === 'xs'" class="ml-2 mt-2">
-               <font-awesome-icon icon="filter" />
-          </div>
-          </b-row>
- 
-                
-      <!-- Right side -->
-     
-
-      <div class="level-right ml-3 mt-4" :hidden="$mq === 'xs' && !showLevel">
-        <div  class= "ml-2" @click="options(1)"><p class="level-item"><strong v-if="pressed === 1"> All </strong><a v-else> All </a></p></div>
-        <div  class= "ml-2" @click="options(2)"><p class="level-item"><strong v-if="pressed === 2"> In Progress </strong><a v-else> In Progress </a></p></div>
-        <div  class= "ml-2" @click="options(3)"><p class="level-item"><strong v-if="pressed === 3"> Closed </strong><a v-else> Closed </a></p></div>
-        <!-- <div  class= "ml-2" @click="options(4)"><p class="level-item"><strong v-if="pressed === 4"> Deleted </strong><a v-else> Deleted </a></p></div> -->
-        <p class="level-item ml-2 mr-2"><a @click="toParty" class="button is-success">New Party</a></p>
-      </div>
-    </nav>
-
-        <router-view> </router-view>
-
-        <div class="parties-games">
-            <b-container fluid>  
-            <b-row 
-            :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" :cols-lg="cols[3]" :cols-xl="cols[4]" >
-              <b-col  	 
-          
-                  v-for="(party,index) in filterTags" :key="party.id"	           
-                  col	           
-                  no-gutters	           
-                  class="mb-2 ">
-                  <PartyItem v-if="showParties"  :index="index" :party="party" :type="type" @update="onStep1Update"/>  
-                                  
-
-              </b-col>               
-          
+      <div class="card-custom">
+        <b-container class="bv-example-row">
+             <b-row class="justify-content-md-center">
+                 <b-col cols="10"> <p class="title is-4 ml-2 mt-2">{{party.partyName}}</p></b-col>
+                 <b-col cols="2">
+                    <div class="party-game-info mt-2">
+                          <div id="party-flip" class="party_icon mr-2" v-on:click="flipCard" v-if="type !== 'edit'">
+                            <font-awesome-icon icon="info-circle" /> 
+                             <b-tooltip target="party-flip" placement="bottom" title="See party players" />
+                        </div>
+                          <div id="leave-party" class="party_icon_exit" v-if="statusIn === true && party.userId !== user.id" v-on:click="leftParty">
+                               <font-awesome-icon icon="sign-out-alt" /> 
+                              <b-tooltip target="leave-party" placement="bottom" title="Leave party" />
+                          </div>
+                          <div class="party_icon_back" v-on:click="editParty(party)" v-if="type === 'edit'">
+                               <font-awesome-icon icon="edit" /> 
+                          </div>
+                          <div class="party_icon_remove ml-2" v-on:click="remove(party)" v-if="type === 'edit' || party.userId === user.id">
+                               <font-awesome-icon icon="trash" /> 
+                          </div>
+                      
+                  </div>
+                 </b-col>
             </b-row>
+             <p class="subtitle is-6  ml-2 ">@{{party.userName}}</p>
 
-        <div class="load-more" v-if="showParties">
-
-        <button v-show="!isComp" v-if="loadMore" @click="loadMoreGames"    
-            class="btn btn-lg btn-outline-primary"
-            >Load more</button>
-         </div>
         </b-container>
-                </div>
-                    </b-card>
-            </b-card-group>
-
-            </b-col>
-        </b-row>
-        </b-container>
+        
+        <div class="card-custom-content-description">
+            <div class="d-flex flex-column bd-highlight mb-3">
+                    <div class="p-2 bd-highlight" :hidden="party.filters.length === 1">
+                        <b-row >
+                            <div id="tags" class="d-flex flex-row ml-2" v-for="(filter,index) in party.filters" :key="index" > 
+                                    <span  v-if="filter.name !== null" class="tag is-primary is-medium ml-2"> {{filter.name}}</span>
+                            </div>         
+                        </b-row> 
+                    </div>
+                    <div class="p-2 bd-highlight flex-grow-2">
+                        <p class="subtitle ">{{party.description}}</p>
+                    </div>
+                    <!-- <div class="p-2 bd-highlight">
+                        <p class="subtitle ">{{party.description}}</p>
+                    </div> -->
             </div>
+        </div>
+        <div class="d-flex align-items-end flex-column bd-highlightmr-2 mr-2">
+                <small>{{dateAtt(party.createdAt)}}  </small>
+            
+        </div> 
+
+        <footer :class="customFooter"  @click="flipCardEnter">
+            <div class="party-buttons">
+                <b-button class="button is-primary ml-2 mr-2" v-show="showStatusParty === 'Enter'"> 
+                         <font-awesome-icon icon="arrow-alt-circle-right" /> 
+                        <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                <b-button class="button is-danger ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Closed'"> 
+                         <font-awesome-icon icon="lock" /> 
+                        <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                <b-button class="button is-warning ml-2 mr-2"  @click="flipCard" v-show="showStatusParty === 'Waiting'"> 
+                        <font-awesome-icon icon="clock" /> 
+                         <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+         </div>
+        </footer> 
+        
+ </div>
+
+<div class="flip-card-back" v-show="!isFlipped">
+      <div class="card-custom">
+        <b-container class="bv-example-row">
+             <b-row class="justify-content-md-center">
+                 <b-col cols="10"> <p class="title is-4 ml-2 mt-2">{{party.partyName}}</p></b-col>
+                 <b-col cols="2">
+                    <div class="party-game-info mt-2">
+                        
+                          <div id="party-info2" class="party_icon" v-on:click="flipCard" v-if="type !== 'edit'">
+                             <font-awesome-icon icon="undo" /> 
+                            <b-tooltip target="party-info2" placement="bottom" title="See party informations" />
+                        </div>
+
+                         <div id="leave-party2" class="party_icon_exit ml-2" v-if="statusIn === true && party.userId !== user.id" v-on:click="leftParty">
+                               <font-awesome-icon icon="sign-out-alt" /> 
+                              <b-tooltip target="leave-party2" placement="bottom" title="Leave party" />
+                          </div>
+                      
+                  </div>
+                 </b-col>
+            </b-row>
+             <p class="subtitle is-6  ml-2 ">@{{party.userName}}</p>
+
+        </b-container>
+        
+        <div class="card-custom-back-content-description">
+            <div class="d-flex flex-column bd-highlight mb-3">
+                    <div class="p-2 bd-highlight">
+                        <b-row >
+                            <div id="tags" class="d-flex flex-row ml-2"  style="min-height: 200px!important" > 
+                                   <ul class="party-players" >
+                                    <li class="party-player " v-for="player in players" :key="player.id">
+                                        <div class="party-player-img">
+                                            <img class="player-img"
+                                                src="@/assets/desconhecido.jpg"
+                                                height="25" width="25" alt="Player">
+                                        </div>
+                                        <div class="party-player-info">
+                                            <span style="font-size: 15px"> {{player.nickname}} </span>
+                                        </div>
+                                        
+                                    </li>
+                                </ul>      
+                             </div>         
+                        </b-row> 
+                    </div>
+        
+            </div>
+        </div>
+
+          <footer :class="customFooter"  @click="enterParty">
+            <div class="party-buttons">
+                <b-button class="button is-primary ml-2 mr-2"   v-show="showStatusParty === 'Enter'"> 
+                        <font-awesome-icon icon="arrow-alt-circle-right" /> 
+                        <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled}} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                <b-button class="button is-danger ml-2 mr-2"  v-show="showStatusParty === 'Closed'"> 
+                         <font-awesome-icon icon="lock" /> 
+                        <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+
+                <b-button class="button is-warning ml-2 mr-2"  @click="enterParty" v-show="showStatusParty === 'Waiting'"> 
+                        <font-awesome-icon icon="clock" /> 
+                         <span>{{this.showStatusParty}} </span>
+                        <span><strong>- {{ party.spotsFilled }} / {{party.numberPlayers}} </strong></span><br>
+                </b-button>
+         </div>
+        </footer> 
+        
+         
+      </div>
+      <div mt-20>
+    <b-modal
+      id="modal-prevent-closing"
+      ref="modal"
+      title="Submit Your Nickname"
+      v-model="modalShow"
+      @hidden="resetModal"
+      @ok="handleOk"
+      centered
+    >
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          label="Nickname"
+          label-for="name-input"
+          invalid-feedback="Nickname is required"
+          :state="nameState"
+        >
+          <b-form-input
+            id="name-input"
+            v-model="nickname"
+            :state="nameState"
+            required
+          ></b-form-input>
+        </b-form-group>
+      </form>
+    </b-modal>
+</div>
+  </div>
+ </div>
+
+
+    
 </template>
 
 <script>
-
-import { baseApiUrl, showError } from '../../../global.js'
-import PartyItem from './PartyItem'
+import { baseApiUrl,showError } from '../../../global.js'
 import axios from 'axios'
-import { io } from 'socket.io-client';
+import {mapState} from 'vuex'
 
 export default {
-    name: 'PartyGame',
-    components: { PartyItem },
-    props:['parties', 'isComp','type'],
+    name: 'PartyItem',
+    props: ['party','type','index'],
     data(){
         return{
-            showParties: true,
-            page: 1,
-            loadMore: true,
-            data: [],
-            cols: [],
-            selected:null,
-            pressed: 1,
-            filters:[],
+            showStatusParty: 'Open', //Party aberta ou fechada (ou usuario nela)
+            isFlipped: true,
+            counter: 0,
+            players: [],
+            numbers: 1,
+            confirmDel: '',
+            userId: null,   
+            statusIn: null, 
+            partyPlayerId: null, 
+            profiles: null,
+            cParty: {},
+            nickname: null,
+            nameState: null,
+            modalShow: false,
+            showRank: true,
             showLevel: true,
-            socket: {},
+            parties: [], 
         }
     },
     methods:{
-         getGamesAll(){
-            this.data = this.parties
-            this.setSize()
-        },  
-         onStep1Update (newData) {
-           this.data = newData
-           this.$forceUpdate()
-           this.socket.emit('attParty', this.data);
-        },    
-        getGamesById(){
-             axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
-                this.data = this.data.concat(res.data.parties)
-                this.page++
-                if(res.data.parties.length === 0 || res.data.parties.length <= 10 ) this.loadMore = false
-                this.setSize()
-             })
+        enterParty(){
 
-        },
-        loadMoreGames(){
-            this.$route.params.id ? this.getGamesById() : this.getGamesAll()
-        },
-        setSize(){
-            if(this.data.length == 1 || undefined){
-              if(this.$mq === 'xs'){
-                this.cols = [1,1,1,1,1]
-              } else{
-                this.cols = [3,3,3,3,3]
-              }
-                
-            }else{
-                if(this.$mq === 'xs'){
-                    this.cols = [1,1,2,3,3]
-                }
-                else if(this.$mq === 'Z0'){
-                    this.cols = [1,1,2,3,3]
-                }
-                else if(this.$mq === 's'){
-                    this.cols = [1,2,2,3,3]
-                }
-                else if(this.$mq === 'Z2'){
-                    this.cols = [1,2,2,2,3]
-                }  
-                else if(this.$mq === 'md'){
-                    this.cols = [1,2,3,3,3]
-                } 
-                else if(this.$mq === 'lg'){
-                    this.cols = [1,2,3,3,3]
-                }
-                else if(this.$mq === 'Z3'){
-                    this.cols = [1,2,3,3,3]
-                } 
-                else if(this.$mq === 'xl'){
-                    this.cols = [1,2,2,3,4]
-                }
+          if(this.showStatusParty === 'Enter'){
+            axios.get(`${baseApiUrl}/user/${this.userId}/game/${this.party.gameId}/platform/${this.party.platformId}`)
+            .then( res => {                
+                this.profiles = res.data
+                  if(this.profiles.length > 0){
+                        this.party.profiles = this.profiles[0].id
+                        axios.post(`${baseApiUrl}/party/${this.party.id}/players`, {...this.party, playerId: this.userId})
+                        .then((res) =>{
+                            this.getParties()
+                            this.players = res.data
+                            this.$store.commit('setNotifications', this.$store.state.user.id)
+                        }) 
+                        .catch(showError)
+
+                        axios.get(`${baseApiUrl}/players/${this.$store.state.user.id}&
+                        ${this.party.id}&${this.party.gameId}&${this.party.platformId}`)
+                        .then((res) =>{
+                            this.cParty = res.data.party[0]
+                            
+                            this.statusIn = res.data.statusIn
+                            this.partyPlayerId = res.data.partyPlayerId
+                            this.profiles = res.data.profiles
+                            this.isPartyClosed()
+                        }) 
+                        .catch(showError)
             }
-        },
-        async loadFilters(){
-              await axios.get(`${baseApiUrl}/game/${this.$route.params.id}/filters`)
-              .then((res) => {
-                this.filters = res.data.map(item=>{
-                    return {label: item.name, key: item.id}
-                })
-             }).catch(showError)
-        },
-        toParty(){
-             this.showParties = false
-             this.$router.push({ name:'newParty'})
-        },
-        checkShow(router){
-             router ===  'newParty' ? this.showParties = false: this.showParties = true
-        },
-        options(value){
-          if(value === 1){
-            this.pressed = 1
-          } else if( value === 2){
-            this.pressed = 2
-          } else if( value === 3){
-            this.pressed = 3
-          } 
-          // else if( value === 4){
-          //   this.pressed = 4
-          // }
-
-        },
-        filterParty(){
-          if(this.pressed === 2){
-               return this.data.filter((item) => {
-                    return item.isOpen === 1;
-                });          
-            
-          } else if(this.pressed === 3){
-             return this.data.filter((item) => {
-                    return item.isOpen === 0;
-                });   
-          } else {
-            return this.data
+            else if( this.profiles.length === 0 && this.$store.state.user.id !== this.party.userId){
+                this.modalShow = true
+            }
+            })
+            .catch(showError)
           }
-        
-        }
-    },
-    created(){
-        this.showParties = true
-        this.loadFilters()
-
-    },
-    mounted(){
-         this.socket = io.connect('http://localhost:3000/', {
-          transports: ['websocket'], 
-          upgrade: false,
-          reconnectionDelayMax: 10000,
-        });
-
-        this.socket.on('connections', (data) =>{
-            console.log(data)
-        })
-
-        this.socket.on('newParties', (data) =>{
-          this.data = data
-           this.loadFilters()
-        })  
-        this.$route.params.id ? this.getGamesById() : this.getGamesAll()         
-        this.checkShow(this.$route.name)
-        
-    },
-    computed: {
-      widthForm() {
-          return this.$mq === 'xs' ? '40%' : `30%`
-      },
-      filterTags(){
-            if(this.selected !== null){
-             let value= this.filterParty()
-             this.data.map(party =>{
-                  party.filters.map(filter =>{
-                    if(filter.name === this.selected.label){
-                      value.push(party)
-                    }
-                  })
-                }
-              )
-              return value
-
             
-            } else{
-                let value= this.filterParty()
-                return value
+        },
+        leftParty(){
+            this.msgBoxConfirm = ''
+            this.$bvModal.msgBoxConfirm('Are you sure you want to leave the party?', {
+            title: 'Please Confirm',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'danger',
+            okTitle: 'YES',
+            cancelTitle: 'NO',
+            footerClass: 'p-2',
+            hideHeaderClose: false,
+            centered: true
+            })
+            .then(res => {
+                if(res){
+                    axios.delete(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
+                    .then(() =>{
+                        this.getParties()
+                        this.getPlayers()
+                        this.statusIn = false
+                        this.isPartyClosed()
+                        this.$store.commit('setNotifications', this.$store.state.user.id)
+                        this.$toasted.global.defaultSuccess();
+                        
+                        //this.party = null
+                        //alterar tamanho da party // se for igual a 0 deletar a party. 
+                        
+                      
+                    }) 
+                    .catch(showError)
+                }
+
+                this.$store.commit('setNotifications', this.$store.state.user.id)
+
+
+            })
+            .catch(showError)
+        },
+          remove(){
+            this.msgBoxConfirm = ''
+            this.$bvModal.msgBoxConfirm('Are you sure you want to delete?', {
+            title: 'Please Confirm',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'danger',
+            okTitle: 'YES',
+            cancelTitle: 'NO',
+            footerClass: 'p-2',
+            hideHeaderClose: false,
+            centered: true
+            })
+            .then(res => {
+                if(res){
+                    axios.delete(`${baseApiUrl}/parties/${this.party.id}`)
+                    .then(() =>{
+                        this.party = {}
+                        this.$store.commit('setNotifications', this.$store.state.user.id)
+                        this.$toasted.global.defaultSuccess();
+                    }) 
+                    .catch(showError)
+                }
+
+            })
+            .catch(showError)
+        },
+        toParty(id, party){
+            this.$router.push({ name:'EditParty', params: {party: party}})
+        },
+        editParty(value){
+            this.toParty(value.id, value)
+        },
+        flipCardEnter(){
+            if(this.showStatusParty === "Enter"){
+              this.enterParty()
             }
+            this.isFlipped = !this.isFlipped 
+        },
+
+        flipCard(){
+            
+            this.isFlipped = !this.isFlipped 
+        },
+        saveProfile(){
+            let profile = {}
+            profile.userId = this.$store.state.user.id
+            profile.platformId = this.party.platformId
+            profile.gameId = this.party.gameId
+            profile.name = this.nickname
+
+            axios.post(`${baseApiUrl}/game/profile/user`,profile)
+            .then((res)=>{
+                this.party.profiles = res.data
+                this.profiles.push({
+                    id: res.data,
+                    name: this.nickname,
+                    userId: this.$store.state.user.id,
+                    platformId: this.party.platformId,
+                    gameId: this.party.gameId
+                })
+                this.$toasted.global.defaultSuccess()
+                this.enterParty()
+            })
+        },
+        getTags(id){
+              axios.get(`${baseApiUrl}/party/${id}/filters`).then((res) => {
+                this.party.filters = res
+              })
+        },
+
+        getParties(){
+              this.$store.commit('setNotifications', this.$store.state.user.id)
+              axios.get(`${baseApiUrl}/game/${this.party.gameId}/parties`).then((res) => {
+                this.$emit('update', res.data.parties)
+              })
+        },
+        
+        async getPlayers(){
+            this.$store.commit('setNotifications', this.$store.state.user.id)
+            await axios.get(`${baseApiUrl}/party/${this.party.id}/players`).then((res) => {
+                this.players = res.data.party
+              })
+        },
+        async inTheParty(){
+                axios.get(`${baseApiUrl}/party/${this.party.id}/user/${this.userId}`)
+                .then( (res) => {
+                    if(res){
+                        if(res.data.party.length >= 1){  //Se user esta na party
+                            this.statusIn = true
+                            this.partyPlayerId = res.data.party[0].id
+                            
+                        }
+                        else{ // User nao esta na party
+                            this.statusIn = false
+                            this.partyPlayerId = null
+                        }
+                        this.isPartyClosed() //Verificando vagas da party
+                    }
+                })
+        },
+        isPartyClosed(){
+            
+
+            if(this.cParty.isOpen === 1){
+                if(this.statusIn === true){
+                    this.showStatusParty = 'Waiting'
+                }else{
+                    this.showStatusParty = 'Enter'
+                }
+            }else{
+                if(this.statusIn === true){
+                    this.showStatusParty = 'Closed'
+                }else{
+                    this.showStatusParty = 'Closed'
+                }   
+            }
+
+        },
+        async getParty() {
+            await axios.get(`${baseApiUrl}/parties/${this.party.id}`)
+            .then( res => {
+                if(res){
+                    this.cParty = res.data.party[0]
+                    this.inTheParty() 
+                    this.getPlayers()
+                }
+            })
+            .catch(showError)
+        },
+        init(){
+            this.party.rank !== null ? this.showRank = false : this.showRank = true
+            this.party.level !== null ? this.showLevel = false : this.showLevel = true
+            this.userId = this.$store.state.user.id
+            this.getParty()
+        },
+        checkFormValidity() {
+        const valid = this.$refs.form.checkValidity()
+        this.nameState = valid
+        return valid
+        },
+        resetModal() {
+            this.nickname = ''
+            this.nameState = null
+        },
+        handleOk(bvModalEvt) {
+            // Prevent modal from closing
+            bvModalEvt.preventDefault()
+            // Trigger submit handler
+            this.handleSubmit()
+        },
+        handleSubmit() {
+              // Exit when the form isn't valid
+              if (!this.checkFormValidity()) {
+              return
+              }
+              this.saveProfile()
+              this.$nextTick(() => {
+              this.$bvModal.hide('modal-prevent-closing')
+              })
+        },
+        dateFormat(date){ 
+          var t = new Date(date)
+
+            var hr = ("0" + t.getHours()).slice(-2);
+            var min = ("0" + t.getMinutes()).slice(-2);
+            var sec = ("0" + t.getSeconds()).slice(-2);
+
+          return (t.getFullYear()+"-"+t.getMonth()+"-"+t.getDate()+" "+hr+":"+min+":"+sec).toString()
+        },
+        dateAtt(date){ 
+
+          var oldDate = new Date(date)
+          var newDate = new Date()
+
+    
+          var days = Math.floor((Date.UTC(newDate.getFullYear(), newDate.getMonth(), newDate.getDate()) - Date.UTC(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate()) ) /(1000 * 60 * 60 * 24))
+          let hours = this.diff_minutes(newDate, oldDate)/60
+          var minutes = (this.diff_minutes(newDate, oldDate) % 60)
+
+        
+        if(days === 0){
+        
+
+            const str = hours.toString();
+
+            // Separamos nas duas partes.
+            const splitted = str.split('.');
+
+            // Parte inteira:
+            hours = parseInt(splitted[0]);
+
+            return hours + " hrs " + minutes + " min ago";
+
+          } else {
+            return days + " days ago" 
+          }
+          
+        
+
+        },
+        diff_minutes(dt2, dt1) {
+
+          var diff =(dt2.getTime() - dt1.getTime()) / 1000;
+          diff /= 60;
+          return Math.abs(Math.round(diff));
+          
         }
+    },
+
+    computed:{
+      ...mapState(['user']),
+      customFooter(){
+        if(this.showStatusParty === 'Enter'){
+          return 'card-custom-footer-enter'
+        } else if(this.showStatusParty === 'Waiting' ){
+          return 'card-custom-footer-waiting'
+        } else{
+          return 'card-custom-footer-closed'
+        }
+      }
+      
+    },
+
+    mounted(){
+        this.init()
     },
     watch: {
-        parties: function(){
-            this.$emit('update:parties',this.parties)
-            this.data = this.parties
+        party: function(){
+            this.$emit('update:party', this.party)
+            this.numberPlayers = this.party.numberPlayers
+            this.init()
         },
-        $mq: function(){
-            if(this.$mq === 'xs'){
-              this.showLevel = false
-            }
-            this.setSize()
+        'showStatusParty' : function(){
+            return
         },
-        data: function(){
-            this.$emit('update:data', this.data)
-        },
-        '$route': function() {
-             this.$route.params.id ? this.getGamesById() : this.getGamesAll() 
+        cParty: function(){
+            return
         }
-
-  },
-  destroyed() {
-      this.socket.close()
-  }
+    }
 }
 </script>
 
-<style scoped>
+<style>
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+
+/*! Generated by Bulma Customizer v0.2.0 | https://github.com/webmasterish/bulma-customizer */
+.card-custom {
+  background-color: white;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+  color: #4a4a4a;
+  max-width: 100%;
+  min-height: 400px;
+  max-height: 400px;
+  position: relative;
+  flex:1;
+}
+
+.card-custom-footer:first-child, .card-custom-content:first-child, .card-custom-header:first-child {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+.card-custom-footer:last-child, .card-custom-content:last-child, .card-custom-header:last-child {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.card-custom-header {
+  background-color: transparent;
+  align-items: stretch;
+  box-shadow: 0 0.125em 0.25em rgba(10, 10, 10, 0.1);
+  display: flex;
+}
+
+.card-custom-header-title {
+  align-items: center;
+  color: #363636;
+  display: flex;
+  flex-grow: 1;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+}
+.card-custom-header-title.is-centered {
+  justify-content: center;
+}
+
+.card-custom-header-icon {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+}
+
+.card-custom-image {
+  display: block;
+  position: relative;
+}
+.card-custom-image:first-child img {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+.card-custom-image:last-child img {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.card-custom-content {
+  background-color: transparent;
+  padding-top: 1.5rem;
+  padding-left: 1.0rem;
+  padding-right: 1.0rem;
+}
+
+
+.card-custom-content-description {
+  display:flex;
+  flex-direction: row;
+  background-color: transparent;
+   padding-left: 1.0rem;
+  padding-right: 1.0rem;
+  min-height: 230px;
+  max-height: 230px;
+}
+
+.card-custom-back-content-description {
+  display:flex;
+  flex-direction: row;
+  background-color: transparent;
+   padding-left: 1.0rem;
+  padding-right: 1.0rem;
+  min-height: 253px;
+  max-height: 253px;
+}
+
+.card-custom-footer-waiting {
+  background-color:  #ffdd57;;
+  border-top: 1px solid #ededed;
+  display: flex;
+  justify-content: center;
+  padding-top:5px;
+}
+
+.card-custom-footer-enter {
+  background-color:  #00d1b2;
+  border-top: 1px solid #ededed;
+  display: flex;
+  justify-content: center;
+  padding-top:5px;
+}
+
+.card-custom-footer-closed {
+  background-color:   #f14668;
+  border-top: 1px solid #ededed;
+  display: flex;
+  justify-content: center;
+  padding-top:5px;
+}
+
+
+.card-custom-date {
+  background-color: transparent;
+  display: flex;
+}
+
+.card-custom-date-item {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.card-custom-footer-item:not(:last-child) {
+  border-right: 1px solid #ededed;
+}
+
+.card-custom .media:not(:last-child) {
+  margin-bottom: 1.5rem;
+}
 
 /*! bulma.io v0.9.1 | MIT License | github.com/jgthms/bulma */
 /*! Generated by Bulma Customizer v0.2.0 | https://github.com/webmasterish/bulma-customizer */
-
-.card-body{
-  padding:0px
+.title:not(:last-child),
+.subtitle:not(:last-child) {
+  margin-bottom: 1.5rem;
 }
+
+.title,
+.subtitle {
+  word-break: break-word;
+}
+.title em,
+.title span,
+.subtitle em,
+.subtitle span {
+  font-weight: inherit;
+}
+.title sub,
+.subtitle sub {
+  font-size: 0.75em;
+}
+.title sup,
+.subtitle sup {
+  font-size: 0.75em;
+}
+.title .tag,
+.subtitle .tag {
+  vertical-align: middle;
+}
+
+.title {
+  color: #363636;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.125;
+}
+.title strong {
+  color: inherit;
+  font-weight: inherit;
+}
+.title + .highlight {
+  margin-top: -0.75rem;
+}
+.title:not(.is-spaced) + .subtitle {
+  margin-top: -1.25rem;
+}
+.title.is-1 {
+  font-size: 3rem;
+}
+.title.is-2 {
+  font-size: 2.5rem;
+}
+.title.is-3 {
+  font-size: 2rem;
+}
+.title.is-4 {
+  font-size: 1.5rem;
+}
+.title.is-5 {
+  font-size: 1.25rem;
+}
+.title.is-6 {
+  font-size: 1rem;
+}
+
+.subtitle {
+  color: #4a4a4a;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+.subtitle strong {
+  color: #363636;
+  font-weight: 600;
+}
+.subtitle:not(.is-spaced) + .title {
+  margin-top: -1.25rem;
+}
+.subtitle.is-1 {
+  font-size: 3rem;
+}
+.subtitle.is-2 {
+  font-size: 2.5rem;
+}
+.subtitle.is-3 {
+  font-size: 2rem;
+}
+.subtitle.is-4 {
+  font-size: 1.5rem;
+}
+.subtitle.is-5 {
+  font-size: 1.25rem;
+}
+.subtitle.is-6 {
+  font-size: 1rem;
+}
+.subtitle.is-7 {
+  font-size: 0.75rem;
+}
+
+.party-inner{
+    display:flex;
+    flex-direction: column;
+    flex-grow: 1; 
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flip {
+  transform: rotateY(180deg) ;
+  
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-card-front {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.flip-card-back {    
+    display: flex;
+    flex-grow: 1;
+    transform: rotateY(180deg);
+}
+
+
+.party-back{
+  padding: 18px 0;
+}
+
+.party-game-info{
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: flex-end;    
+
+}
+
+.party-game-name{
+    flex-grow: 1;
+}
+
+.party-game-name span{
+    font-family:sans-serif;
+    font-weight: 400;
+}
+.party-game-name strong{
+    font-family:sans-serif;
+    font-weight: 800;
+}
+
+
+.party-players-all{
+    flex-grow: 1;
+}
+
+.party-description{
+    flex-grow: 1;
+}
+.party-players{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: space-around !important;
+    flex-wrap: wrap;
+    padding-left: 0;
+}
+
+.party-player{
+    text-align: center;
+    padding: 10px;
+     list-style-type: none;
+}
+
+
+
+.party_players_button{
+    flex-grow: 3;
+    display:flex;
+    flex-direction: column;
+}
+
+.party-buttons{
+    display: flex;
+}
+
+.party-buttons button{
+    flex-grow: 1;
+}
+
 .tags {
   align-items: center;
   display: flex;
@@ -589,7 +1183,348 @@ a.tag:hover {
   border-color: transparent;
   box-shadow: none;
 }
-
+.button.is-ghost {
+  background: none;
+  border-color: transparent;
+  color: #3273dc;
+  text-decoration: none;
+}
+.button.is-ghost:hover, .button.is-ghost.is-hovered {
+  color: #3273dc;
+  text-decoration: underline;
+}
+.button.is-white {
+  background-color: white;
+  border-color: transparent;
+  color: #0a0a0a;
+}
+.button.is-white:hover, .button.is-white.is-hovered {
+  background-color: #f9f9f9;
+  border-color: transparent;
+  color: #0a0a0a;
+}
+.button.is-white:focus, .button.is-white.is-focused {
+  border-color: transparent;
+  color: #0a0a0a;
+}
+.button.is-white:focus:not(:active), .button.is-white.is-focused:not(:active) {
+  box-shadow: 0 0 0 0.125em rgba(255, 255, 255, 0.25);
+}
+.button.is-white:active, .button.is-white.is-active {
+  background-color: #f2f2f2;
+  border-color: transparent;
+  color: #0a0a0a;
+}
+.button.is-white[disabled], fieldset[disabled] .button.is-white {
+  background-color: white;
+  border-color: transparent;
+  box-shadow: none;
+}
+.button.is-white.is-inverted {
+  background-color: #0a0a0a;
+  color: white;
+}
+.button.is-white.is-inverted:hover, .button.is-white.is-inverted.is-hovered {
+  background-color: black;
+}
+.button.is-white.is-inverted[disabled], fieldset[disabled] .button.is-white.is-inverted {
+  background-color: #0a0a0a;
+  border-color: transparent;
+  box-shadow: none;
+  color: white;
+}
+.button.is-white.is-loading::after {
+  border-color: transparent transparent #0a0a0a #0a0a0a !important;
+}
+.button.is-white.is-outlined {
+  background-color: transparent;
+  border-color: white;
+  color: white;
+}
+.button.is-white.is-outlined:hover, .button.is-white.is-outlined.is-hovered, .button.is-white.is-outlined:focus, .button.is-white.is-outlined.is-focused {
+  background-color: white;
+  border-color: white;
+  color: #0a0a0a;
+}
+.button.is-white.is-outlined.is-loading::after {
+  border-color: transparent transparent white white !important;
+}
+.button.is-white.is-outlined.is-loading:hover::after, .button.is-white.is-outlined.is-loading.is-hovered::after, .button.is-white.is-outlined.is-loading:focus::after, .button.is-white.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent #0a0a0a #0a0a0a !important;
+}
+.button.is-white.is-outlined[disabled], fieldset[disabled] .button.is-white.is-outlined {
+  background-color: transparent;
+  border-color: white;
+  box-shadow: none;
+  color: white;
+}
+.button.is-white.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+}
+.button.is-white.is-inverted.is-outlined:hover, .button.is-white.is-inverted.is-outlined.is-hovered, .button.is-white.is-inverted.is-outlined:focus, .button.is-white.is-inverted.is-outlined.is-focused {
+  background-color: #0a0a0a;
+  color: white;
+}
+.button.is-white.is-inverted.is-outlined.is-loading:hover::after, .button.is-white.is-inverted.is-outlined.is-loading.is-hovered::after, .button.is-white.is-inverted.is-outlined.is-loading:focus::after, .button.is-white.is-inverted.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent white white !important;
+}
+.button.is-white.is-inverted.is-outlined[disabled], fieldset[disabled] .button.is-white.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: #0a0a0a;
+  box-shadow: none;
+  color: #0a0a0a;
+}
+.button.is-black {
+  background-color: #0a0a0a;
+  border-color: transparent;
+  color: white;
+}
+.button.is-black:hover, .button.is-black.is-hovered {
+  background-color: #040404;
+  border-color: transparent;
+  color: white;
+}
+.button.is-black:focus, .button.is-black.is-focused {
+  border-color: transparent;
+  color: white;
+}
+.button.is-black:focus:not(:active), .button.is-black.is-focused:not(:active) {
+  box-shadow: 0 0 0 0.125em rgba(10, 10, 10, 0.25);
+}
+.button.is-black:active, .button.is-black.is-active {
+  background-color: black;
+  border-color: transparent;
+  color: white;
+}
+.button.is-black[disabled], fieldset[disabled] .button.is-black {
+  background-color: #0a0a0a;
+  border-color: transparent;
+  box-shadow: none;
+}
+.button.is-black.is-inverted {
+  background-color: white;
+  color: #0a0a0a;
+}
+.button.is-black.is-inverted:hover, .button.is-black.is-inverted.is-hovered {
+  background-color: #f2f2f2;
+}
+.button.is-black.is-inverted[disabled], fieldset[disabled] .button.is-black.is-inverted {
+  background-color: white;
+  border-color: transparent;
+  box-shadow: none;
+  color: #0a0a0a;
+}
+.button.is-black.is-loading::after {
+  border-color: transparent transparent white white !important;
+}
+.button.is-black.is-outlined {
+  background-color: transparent;
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+}
+.button.is-black.is-outlined:hover, .button.is-black.is-outlined.is-hovered, .button.is-black.is-outlined:focus, .button.is-black.is-outlined.is-focused {
+  background-color: #0a0a0a;
+  border-color: #0a0a0a;
+  color: white;
+}
+.button.is-black.is-outlined.is-loading::after {
+  border-color: transparent transparent #0a0a0a #0a0a0a !important;
+}
+.button.is-black.is-outlined.is-loading:hover::after, .button.is-black.is-outlined.is-loading.is-hovered::after, .button.is-black.is-outlined.is-loading:focus::after, .button.is-black.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent white white !important;
+}
+.button.is-black.is-outlined[disabled], fieldset[disabled] .button.is-black.is-outlined {
+  background-color: transparent;
+  border-color: #0a0a0a;
+  box-shadow: none;
+  color: #0a0a0a;
+}
+.button.is-black.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: white;
+  color: white;
+}
+.button.is-black.is-inverted.is-outlined:hover, .button.is-black.is-inverted.is-outlined.is-hovered, .button.is-black.is-inverted.is-outlined:focus, .button.is-black.is-inverted.is-outlined.is-focused {
+  background-color: white;
+  color: #0a0a0a;
+}
+.button.is-black.is-inverted.is-outlined.is-loading:hover::after, .button.is-black.is-inverted.is-outlined.is-loading.is-hovered::after, .button.is-black.is-inverted.is-outlined.is-loading:focus::after, .button.is-black.is-inverted.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent #0a0a0a #0a0a0a !important;
+}
+.button.is-black.is-inverted.is-outlined[disabled], fieldset[disabled] .button.is-black.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: white;
+  box-shadow: none;
+  color: white;
+}
+.button.is-light {
+  background-color: whitesmoke;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light:hover, .button.is-light.is-hovered {
+  background-color: #eeeeee;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light:focus, .button.is-light.is-focused {
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light:focus:not(:active), .button.is-light.is-focused:not(:active) {
+  box-shadow: 0 0 0 0.125em rgba(245, 245, 245, 0.25);
+}
+.button.is-light:active, .button.is-light.is-active {
+  background-color: #e8e8e8;
+  border-color: transparent;
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light[disabled], fieldset[disabled] .button.is-light {
+  background-color: whitesmoke;
+  border-color: transparent;
+  box-shadow: none;
+}
+.button.is-light.is-inverted {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: whitesmoke;
+}
+.button.is-light.is-inverted:hover, .button.is-light.is-inverted.is-hovered {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light.is-inverted[disabled], fieldset[disabled] .button.is-light.is-inverted {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-color: transparent;
+  box-shadow: none;
+  color: whitesmoke;
+}
+.button.is-light.is-loading::after {
+  border-color: transparent transparent rgba(0, 0, 0, 0.7) rgba(0, 0, 0, 0.7) !important;
+}
+.button.is-light.is-outlined {
+  background-color: transparent;
+  border-color: whitesmoke;
+  color: whitesmoke;
+}
+.button.is-light.is-outlined:hover, .button.is-light.is-outlined.is-hovered, .button.is-light.is-outlined:focus, .button.is-light.is-outlined.is-focused {
+  background-color: whitesmoke;
+  border-color: whitesmoke;
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light.is-outlined.is-loading::after {
+  border-color: transparent transparent whitesmoke whitesmoke !important;
+}
+.button.is-light.is-outlined.is-loading:hover::after, .button.is-light.is-outlined.is-loading.is-hovered::after, .button.is-light.is-outlined.is-loading:focus::after, .button.is-light.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent rgba(0, 0, 0, 0.7) rgba(0, 0, 0, 0.7) !important;
+}
+.button.is-light.is-outlined[disabled], fieldset[disabled] .button.is-light.is-outlined {
+  background-color: transparent;
+  border-color: whitesmoke;
+  box-shadow: none;
+  color: whitesmoke;
+}
+.button.is-light.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.7);
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-light.is-inverted.is-outlined:hover, .button.is-light.is-inverted.is-outlined.is-hovered, .button.is-light.is-inverted.is-outlined:focus, .button.is-light.is-inverted.is-outlined.is-focused {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: whitesmoke;
+}
+.button.is-light.is-inverted.is-outlined.is-loading:hover::after, .button.is-light.is-inverted.is-outlined.is-loading.is-hovered::after, .button.is-light.is-inverted.is-outlined.is-loading:focus::after, .button.is-light.is-inverted.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent whitesmoke whitesmoke !important;
+}
+.button.is-light.is-inverted.is-outlined[disabled], fieldset[disabled] .button.is-light.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.7);
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.7);
+}
+.button.is-dark {
+  background-color: #363636;
+  border-color: transparent;
+  color: #fff;
+}
+.button.is-dark:hover, .button.is-dark.is-hovered {
+  background-color: #2f2f2f;
+  border-color: transparent;
+  color: #fff;
+}
+.button.is-dark:focus, .button.is-dark.is-focused {
+  border-color: transparent;
+  color: #fff;
+}
+.button.is-dark:focus:not(:active), .button.is-dark.is-focused:not(:active) {
+  box-shadow: 0 0 0 0.125em rgba(54, 54, 54, 0.25);
+}
+.button.is-dark:active, .button.is-dark.is-active {
+  background-color: #292929;
+  border-color: transparent;
+  color: #fff;
+}
+.button.is-dark[disabled], fieldset[disabled] .button.is-dark {
+  background-color: #363636;
+  border-color: transparent;
+  box-shadow: none;
+}
+.button.is-dark.is-inverted {
+  background-color: #fff;
+  color: #363636;
+}
+.button.is-dark.is-inverted:hover, .button.is-dark.is-inverted.is-hovered {
+  background-color: #f2f2f2;
+}
+.button.is-dark.is-inverted[disabled], fieldset[disabled] .button.is-dark.is-inverted {
+  background-color: #fff;
+  border-color: transparent;
+  box-shadow: none;
+  color: #363636;
+}
+.button.is-dark.is-loading::after {
+  border-color: transparent transparent #fff #fff !important;
+}
+.button.is-dark.is-outlined {
+  background-color: transparent;
+  border-color: #363636;
+  color: #363636;
+}
+.button.is-dark.is-outlined:hover, .button.is-dark.is-outlined.is-hovered, .button.is-dark.is-outlined:focus, .button.is-dark.is-outlined.is-focused {
+  background-color: #363636;
+  border-color: #363636;
+  color: #fff;
+}
+.button.is-dark.is-outlined.is-loading::after {
+  border-color: transparent transparent #363636 #363636 !important;
+}
+.button.is-dark.is-outlined.is-loading:hover::after, .button.is-dark.is-outlined.is-loading.is-hovered::after, .button.is-dark.is-outlined.is-loading:focus::after, .button.is-dark.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent #fff #fff !important;
+}
+.button.is-dark.is-outlined[disabled], fieldset[disabled] .button.is-dark.is-outlined {
+  background-color: transparent;
+  border-color: #363636;
+  box-shadow: none;
+  color: #363636;
+}
+.button.is-dark.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: #fff;
+  color: #fff;
+}
+.button.is-dark.is-inverted.is-outlined:hover, .button.is-dark.is-inverted.is-outlined.is-hovered, .button.is-dark.is-inverted.is-outlined:focus, .button.is-dark.is-inverted.is-outlined.is-focused {
+  background-color: #fff;
+  color: #363636;
+}
+.button.is-dark.is-inverted.is-outlined.is-loading:hover::after, .button.is-dark.is-inverted.is-outlined.is-loading.is-hovered::after, .button.is-dark.is-inverted.is-outlined.is-loading:focus::after, .button.is-dark.is-inverted.is-outlined.is-loading.is-focused::after {
+  border-color: transparent transparent #363636 #363636 !important;
+}
+.button.is-dark.is-inverted.is-outlined[disabled], fieldset[disabled] .button.is-dark.is-inverted.is-outlined {
+  background-color: transparent;
+  border-color: #fff;
+  box-shadow: none;
+  color: #fff;
+}
 .button.is-primary {
   background-color: #00d1b2;
   border-color: transparent;
@@ -1390,4 +2325,7 @@ a.tag:hover {
 p { cursor: pointer; }
 
 
+
 </style>
+
+
