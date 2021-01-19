@@ -1,7 +1,7 @@
 <template>
  <b-navbar toggleable="sm" type="dark" variant="info">
 
-    <b-navbar-brand href="#">WeParty</b-navbar-brand>
+    <b-navbar-brand to="/">WeParty</b-navbar-brand>
    
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     
@@ -33,7 +33,7 @@
           <b-nav-item-dropdown right :hidden="hideUserDropdown" v-if="($mq !== 'xs')">
             <!-- Using 'button-content' slot -->
                 <template  #button-content>      
-                    <em><b-avatar :badge="notifications ? notifications.toString() : ''" src="https://placekitten.com/300/300"></b-avatar></em>
+                    <em><b-avatar badge-offset="-4px" :badge="notifications ? notifications.toString() : '0'" badge-variant="dark" variant="primary" :text="putName"></b-avatar></em>
                 </template>
            
             <b-dropdown-item to="/profile">Profile</b-dropdown-item>
@@ -77,7 +77,16 @@ export default {
             admin : 0
         }
     },
-    computed: mapState(['user', 'hideUserDropdown','notifications','hideLogin']),
+    computed: {
+    ...mapState(['user', 'hideUserDropdown','notifications','hideLogin']),
+     putName(){
+            console.log(this.$store.state.user)
+            const name = (this.$store.state.user.name.charAt(0).toUpperCase() + 
+            this.$store.state.user.lastName.charAt(0).toUpperCase()).toString() 
+            console.log(name)
+            return name
+    }   
+    },
     methods:{
         logout(){
             localStorage.removeItem(userKey)
@@ -94,7 +103,8 @@ export default {
             } else {
                 return ""
             }
-        }
+        },
+       
     },
     watch:{
         'notifications': function(){

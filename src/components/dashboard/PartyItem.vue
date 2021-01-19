@@ -46,9 +46,9 @@
         
         <div class="card-custom-content-description">
             <div class="d-flex flex-column bd-highlight mb-3">
-                    <div class="p-2 bd-highlight" :hidden="party.filters.length === 1">
+                    <div class="p-2 bd-highlight ">
                         <b-row >
-                            <div id="tags" class="d-flex flex-row ml-2" v-for="(filter,index) in party.filters" :key="index" > 
+                            <div id="tags" class="d-flex flex-row ml-2 mt-2" v-for="(filter,index) in party.filters" :key="index" > 
                                     <span  v-if="filter.name !== null" class="tag is-primary is-medium ml-2"> {{filter.name}}</span>
                             </div>         
                         </b-row> 

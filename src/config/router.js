@@ -11,7 +11,6 @@ import News from '../components/navigation/News'
 import PostDetail from '../components/navigation/blog/PostDetail'
 import About from '../components/navigation/About'
 import Dashboard from '../components/dashboard/Main'
-import Recommendations from '../components/dashboard/recommendation/Recommendations'
 import GameProfile from '../components/dashboard/gameProfile/GameProfile'
 import Notification from '../components/notification/Notifications'
 
@@ -118,8 +117,9 @@ const routes = [{
         },
         {
             path: 'main',
-            component: Recommendations
-        }]
+            name: 'main',
+            component: MyParties
+        }, ]
     }  
 ,{
     name: 'PartyGameId',

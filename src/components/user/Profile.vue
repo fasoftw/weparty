@@ -2,23 +2,19 @@
     <div class= "profile">
        <b-card no-body>
             <b-tabs pills card vertical>
-            <b-tab title="Dados do Cadastro" active>
+            <b-tab title="Account" active>
                 <b-card-text>
                 <EditUser :type="isEditUser"/>        
                 </b-card-text>
             </b-tab>
 
-            <b-tab title="Redefinição de senha">
+            <b-tab title="Change password">
                 <b-card-text>
                      <EditUser :type="isPassword"/>    
                 </b-card-text>                
             </b-tab>
 
-            <b-tab title="Meus Jogos">
-                <b-card-text>
-                </b-card-text>
-            </b-tab>
-             <b-tab title="Excluir conta">
+             <b-tab title="Delete your account">
                  <b-card-text>
                      <EditUser :type="isDelete"/>
                  </b-card-text>

@@ -94,7 +94,7 @@ export default {
             }).catch(showError)
         },
         loadCategories(){
-             axios.get(`${baseApiUrl}/categories`)
+             axios.get(`${baseApiUrl}/game/categories`)
             .then(res =>{                
                 this.categories = res.data.map(item =>{
                     return {label: item.name, key: item.id}

@@ -7,8 +7,8 @@
   <b-card-group deck>   
         
 
-      <b-card  class="text-left">
-          <nav class="level">
+      <b-card  class="text-left" >
+          <nav class="level" v-show="!isComp" :hidden="hideButtonNewParty">
                
     
           <b-row class="ml-4"  style="width:100%" align-v="center">
@@ -43,13 +43,22 @@
                   v-for="(party,index) in filterTags" :key="party.id"	           
                   col	           
                   no-gutters	           
-                  class="mb-2 ">
+                  class="mb-2 mt-2">
                   <PartyItem v-if="showParties"  :index="index" :party="party" :type="type" @update="onStep1Update"/>  
                                   
 
               </b-col>               
           
             </b-row>
+
+            <!-- Hero content: will be in the middle -->
+            <div class="hero-body" style="height: 400px" :hidden="resultsFound || hideButtonNewParty">
+              <div class="d-flex justify-content-center">
+                <h1 class="title">
+                  No parties to show. 
+                </h1>
+              </div>
+            </div>
 
         <div class="load-more" v-if="showParties">
 
@@ -74,6 +83,7 @@ import { baseApiUrl, showError } from '../../../global.js'
 import PartyItem from './PartyItem'
 import axios from 'axios'
 import { io } from 'socket.io-client';
+import {mapState} from 'vuex'
 
 export default {
     name: 'PartyGame',
@@ -91,6 +101,7 @@ export default {
             filters:[],
             showLevel: true,
             socket: {},
+            resultsFound: true,
         }
     },
     methods:{
@@ -112,9 +123,11 @@ export default {
         getGamesById(){
              axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/?page=${this.page}`).then((res) => {
                 this.data = this.data.concat(res.data.parties)
+                if(res.data.parties.length === 0) this.resultsFound = false
+      
                 this.socket.emit('attParty', this.data);
                 this.page++
-                if(res.data.parties.length === 0 || res.data.parties.length <= 10 ) this.loadMore = false
+                if(res.data.parties.length === 0  || res.data.parties.length % 20 !== 0) this.loadMore = false
                 this.setSize()
              })
 
@@ -158,7 +171,7 @@ export default {
             }
         },
         async loadFilters(){
-              await axios.get(`${baseApiUrl}/game/${this.$route.params.id}/filters`)
+              await axios.get(`${baseApiUrl}/game/${this.$route.params.id}/parties/filters`)
               .then((res) => {
                 this.filters = res.data.map(item=>{
                     return {label: item.name, key: item.id}
@@ -167,7 +180,8 @@ export default {
         },
         toParty(){
              this.showParties = false
-             this.$router.push({ name:'newParty'})
+             this.$store.commit('setHideButtonNewParty',true)
+             this.$router.push({ name:'newParty', params: {gameId: this.$route.params.id}})
         },
         checkShow(router){
              router ===  'newParty' ? this.showParties = false: this.showParties = true
@@ -207,6 +221,7 @@ export default {
 
     },
     mounted(){
+        
          this.socket = io.connect('http://localhost:3000/', {
           transports: ['websocket'], 
           upgrade: false,
@@ -226,6 +241,7 @@ export default {
         
     },
     computed: {
+      ...mapState(['hideButtonNewParty']),
       widthForm() {
           return this.$mq === 'xs' ? '40%' : `30%`
       },
@@ -245,6 +261,7 @@ export default {
             
             } else{
                 let value= this.filterParty()
+                console.log(this.filterParty())
                 return value
             }
         }
@@ -264,7 +281,8 @@ export default {
             this.$emit('update:data', this.data)
         },
         '$route': function() {
-             this.$route.params.id ? this.getGamesById() : this.getGamesAll() 
+             this.$route.params.id ? this.getGamesById() : this.getGamesAll()
+             
         }
 
   },
@@ -1392,6 +1410,366 @@ a.tag:hover {
   .level-right {
     display: flex;
   }
+}
+
+.hero-video {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.hero {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hero .navbar {
+  background: none;
+}
+.hero .tabs ul {
+  border-bottom: none;
+}
+.hero.is-white {
+  background-color: white;
+  color: #0a0a0a;
+}
+.hero.is-white a:not(.button):not(.dropdown-item):not(.tag):not(.pagination-link.is-current),
+.hero.is-white strong {
+  color: inherit;
+}
+.hero.is-white .title {
+  color: #0a0a0a;
+}
+.hero.is-white .subtitle {
+  color: rgba(10, 10, 10, 0.9);
+}
+.hero.is-white .subtitle a:not(.button),
+.hero.is-white .subtitle strong {
+  color: #0a0a0a;
+}
+@media screen and (max-width: 1023px) {
+  .hero.is-white .navbar-menu {
+    background-color: white;
+  }
+}
+.hero.is-white .navbar-item,
+.hero.is-white .navbar-link {
+  color: rgba(10, 10, 10, 0.7);
+}
+.hero.is-white a.navbar-item:hover, .hero.is-white a.navbar-item.is-active,
+.hero.is-white .navbar-link:hover,
+.hero.is-white .navbar-link.is-active {
+  background-color: #f2f2f2;
+  color: #0a0a0a;
+}
+.hero.is-white .tabs a {
+  color: #0a0a0a;
+  opacity: 0.9;
+}
+.hero.is-white .tabs a:hover {
+  opacity: 1;
+}
+.hero.is-white .tabs li.is-active a {
+  opacity: 1;
+}
+.hero.is-white .tabs.is-boxed a, .hero.is-white .tabs.is-toggle a {
+  color: #0a0a0a;
+}
+.hero.is-white .tabs.is-boxed a:hover, .hero.is-white .tabs.is-toggle a:hover {
+  background-color: rgba(10, 10, 10, 0.1);
+}
+.hero.is-white .tabs.is-boxed li.is-active a, .hero.is-white .tabs.is-boxed li.is-active a:hover, .hero.is-white .tabs.is-toggle li.is-active a, .hero.is-white .tabs.is-toggle li.is-active a:hover {
+  background-color: #0a0a0a;
+  border-color: #0a0a0a;
+  color: white;
+}
+.hero.is-white.is-bold {
+  background-image: linear-gradient(141deg, #e8e3e4 0%, white 71%, white 100%);
+}
+@media screen and (max-width: 768px) {
+  .hero.is-white.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #e8e3e4 0%, white 71%, white 100%);
+  }
+}
+.hero.is-black {
+  background-color: #0a0a0a;
+  color: white;
+}
+.hero.is-black a:not(.button):not(.dropdown-item):not(.tag):not(.pagination-link.is-current),
+.hero.is-black strong {
+  color: inherit;
+}
+.hero.is-black .title {
+  color: white;
+}
+.hero.is-black .subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+.hero.is-black .subtitle a:not(.button),
+.hero.is-black .subtitle strong {
+  color: white;
+}
+@media screen and (max-width: 1023px) {
+  .hero.is-black .navbar-menu {
+    background-color: #0a0a0a;
+  }
+}
+.hero.is-black .navbar-item,
+.hero.is-black .navbar-link {
+  color: rgba(255, 255, 255, 0.7);
+}
+.hero.is-black a.navbar-item:hover, .hero.is-black a.navbar-item.is-active,
+.hero.is-black .navbar-link:hover,
+.hero.is-black .navbar-link.is-active {
+  background-color: black;
+  color: white;
+}
+.hero.is-black .tabs a {
+  color: white;
+  opacity: 0.9;
+}
+.hero.is-black .tabs a:hover {
+  opacity: 1;
+}
+.hero.is-black .tabs li.is-active a {
+  opacity: 1;
+}
+.hero.is-black .tabs.is-boxed a, .hero.is-black .tabs.is-toggle a {
+  color: white;
+}
+.hero.is-black .tabs.is-boxed a:hover, .hero.is-black .tabs.is-toggle a:hover {
+  background-color: rgba(10, 10, 10, 0.1);
+}
+.hero.is-black .tabs.is-boxed li.is-active a, .hero.is-black .tabs.is-boxed li.is-active a:hover, .hero.is-black .tabs.is-toggle li.is-active a, .hero.is-black .tabs.is-toggle li.is-active a:hover {
+  background-color: white;
+  border-color: white;
+  color: #0a0a0a;
+}
+.hero.is-black.is-bold {
+  background-image: linear-gradient(141deg, black 0%, #0a0a0a 71%, #181616 100%);
+}
+@media screen and (max-width: 768px) {
+  .hero.is-black.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, black 0%, #0a0a0a 71%, #181616 100%);
+  }
+}
+.hero.is-light {
+  background-color: whitesmoke;
+  color: rgba(0, 0, 0, 0.7);
+}
+.hero.is-light a:not(.button):not(.dropdown-item):not(.tag):not(.pagination-link.is-current),
+.hero.is-light strong {
+  color: inherit;
+}
+.hero.is-light .title {
+  color: rgba(0, 0, 0, 0.7);
+}
+.hero.is-light .subtitle {
+  color: rgba(0, 0, 0, 0.9);
+}
+.hero.is-light .subtitle a:not(.button),
+.hero.is-light .subtitle strong {
+  color: rgba(0, 0, 0, 0.7);
+}
+@media screen and (max-width: 1023px) {
+  .hero.is-light .navbar-menu {
+    background-color: whitesmoke;
+  }
+}
+.hero.is-light .navbar-item,
+.hero.is-light .navbar-link {
+  color: rgba(0, 0, 0, 0.7);
+}
+.hero.is-light a.navbar-item:hover, .hero.is-light a.navbar-item.is-active,
+.hero.is-light .navbar-link:hover,
+.hero.is-light .navbar-link.is-active {
+  background-color: #e8e8e8;
+  color: rgba(0, 0, 0, 0.7);
+}
+.hero.is-light .tabs a {
+  color: rgba(0, 0, 0, 0.7);
+  opacity: 0.9;
+}
+.hero.is-light .tabs a:hover {
+  opacity: 1;
+}
+.hero.is-light .tabs li.is-active a {
+  opacity: 1;
+}
+.hero.is-light .tabs.is-boxed a, .hero.is-light .tabs.is-toggle a {
+  color: rgba(0, 0, 0, 0.7);
+}
+.hero.is-light .tabs.is-boxed a:hover, .hero.is-light .tabs.is-toggle a:hover {
+  background-color: rgba(10, 10, 10, 0.1);
+}
+.hero.is-light .tabs.is-boxed li.is-active a, .hero.is-light .tabs.is-boxed li.is-active a:hover, .hero.is-light .tabs.is-toggle li.is-active a, .hero.is-light .tabs.is-toggle li.is-active a:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-color: rgba(0, 0, 0, 0.7);
+  color: whitesmoke;
+}
+.hero.is-light.is-bold {
+  background-image: linear-gradient(141deg, #dfd8d9 0%, whitesmoke 71%, white 100%);
+}
+@media screen and (max-width: 768px) {
+  .hero.is-light.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #dfd8d9 0%, whitesmoke 71%, white 100%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero.is-dark.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #1f191a 0%, #363636 71%, #46403f 100%);
+  }
+}
+.hero.is-primary {
+  background-color: #00d1b2;
+  color: #fff;
+}
+.hero.is-primary a:not(.button):not(.dropdown-item):not(.tag):not(.pagination-link.is-current),
+.hero.is-primary strong {
+  color: inherit;
+}
+.hero.is-primary .title {
+  color: #fff;
+}
+.hero.is-primary .subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+.hero.is-primary .subtitle a:not(.button),
+.hero.is-primary .subtitle strong {
+  color: #fff;
+}
+@media screen and (max-width: 1023px) {
+  .hero.is-primary .navbar-menu {
+    background-color: #00d1b2;
+  }
+}
+.hero.is-primary .navbar-item,
+.hero.is-primary .navbar-link {
+  color: rgba(255, 255, 255, 0.7);
+}
+.hero.is-primary a.navbar-item:hover, .hero.is-primary a.navbar-item.is-active,
+.hero.is-primary .navbar-link:hover,
+.hero.is-primary .navbar-link.is-active {
+  background-color: #00b89c;
+  color: #fff;
+}
+.hero.is-primary .tabs a {
+  color: #fff;
+  opacity: 0.9;
+}
+.hero.is-primary .tabs a:hover {
+  opacity: 1;
+}
+.hero.is-primary .tabs li.is-active a {
+  opacity: 1;
+}
+.hero.is-primary .tabs.is-boxed a, .hero.is-primary .tabs.is-toggle a {
+  color: #fff;
+}
+.hero.is-primary .tabs.is-boxed a:hover, .hero.is-primary .tabs.is-toggle a:hover {
+  background-color: rgba(10, 10, 10, 0.1);
+}
+.hero.is-primary .tabs.is-boxed li.is-active a, .hero.is-primary .tabs.is-boxed li.is-active a:hover, .hero.is-primary .tabs.is-toggle li.is-active a, .hero.is-primary .tabs.is-toggle li.is-active a:hover {
+  background-color: #fff;
+  border-color: #fff;
+  color: #00d1b2;
+}
+.hero.is-primary.is-bold {
+  background-image: linear-gradient(141deg, #009e6c 0%, #00d1b2 71%, #00e7eb 100%);
+}
+@media screen and (max-width: 768px) {
+  .hero.is-primary.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #009e6c 0%, #00d1b2 71%, #00e7eb 100%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero.is-link.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #1577c6 0%, #3273dc 71%, #4366e5 100%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero.is-info.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #159dc6 0%, #3298dc 71%, #4389e5 100%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero.is-danger.is-bold .navbar-menu {
+    background-image: linear-gradient(141deg, #fa0a62 0%, #f14668 71%, #f7595f 100%);
+  }
+}
+.hero.is-small .hero-body {
+  padding: 1.5rem;
+}
+@media screen and (min-width: 769px), print {
+  .hero.is-medium .hero-body {
+    padding: 9rem 1.5rem;
+  }
+}
+@media screen and (min-width: 769px), print {
+  .hero.is-large .hero-body {
+    padding: 18rem 1.5rem;
+  }
+}
+.hero.is-halfheight .hero-body, .hero.is-fullheight .hero-body, .hero.is-fullheight-with-navbar .hero-body {
+  align-items: center;
+  display: flex;
+}
+.hero.is-halfheight .hero-body > .container, .hero.is-fullheight .hero-body > .container, .hero.is-fullheight-with-navbar .hero-body > .container {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+.hero.is-halfheight {
+  min-height: 50vh;
+}
+.hero.is-fullheight {
+  min-height: 100vh;
+}
+
+
+@media screen and (max-width: 768px) {
+  .hero-video {
+    display: none;
+  }
+}
+
+.hero-buttons {
+  margin-top: 1.5rem;
+}
+@media screen and (max-width: 768px) {
+  .hero-buttons .button {
+    display: flex;
+  }
+  .hero-buttons .button:not(:last-child) {
+    margin-bottom: 0.75rem;
+  }
+}
+@media screen and (min-width: 769px), print {
+  .hero-buttons {
+    display: flex;
+    justify-content: center;
+  }
+  .hero-buttons .button:not(:last-child) {
+    margin-right: 1.5rem;
+  }
+}
+
+.hero-head,
+.hero-foot {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.hero-body {
+  flex-grow: 1;
+  flex-shrink: 0;
+  padding: 3rem 1.5rem;
 }
 
 p { cursor: pointer; }

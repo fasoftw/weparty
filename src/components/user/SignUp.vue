@@ -16,6 +16,15 @@
                         ></b-form-input>
                     </b-form-group>
 
+                    <b-form-group id="input-name" label="Last Name:" label-for="input-2">
+                        <b-form-input
+                        id="input-last-name"
+                        v-model="user.lastName"
+                        required
+                        placeholder="Enter last name"
+                        ></b-form-input>
+                    </b-form-group>
+
                     <b-form-group
                         id="input-email"
                         label="Email address:"
@@ -47,8 +56,7 @@
                      </b-form-group>
 
                     <b-form-group>
-                      <b-button class="mr-2" variant="primary" @click="onSubmit">Cadastrar</b-button>
-                     <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Limpar</b-button>
+                      <b-button class="mr-2" variant="primary" @click="onSubmit">Create account</b-button>
                     </b-form-group>
 
                 </div>

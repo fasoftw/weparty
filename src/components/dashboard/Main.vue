@@ -30,24 +30,14 @@
                     <b-dropdown-item to="/dashboard/game/profile" >Game Profile</b-dropdown-item>
                     </b-nav-item-dropdown>
 
-                    <b-nav-item-dropdown
-                    id="friends"
-                    text="Friends"
-                    :active="tab === 4"
-                    toggle-class="nav-link-custom"
-                    @toggle="tab = 4"
-                    right>
-                    <b-dropdown-item>One</b-dropdown-item>
-                    <b-dropdown-item>Two</b-dropdown-item>
-                    <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-item>Three</b-dropdown-item>
-                    </b-nav-item-dropdown>
+             
             </b-nav>
-        </b-card-header>    
+        </b-card-header> 
+        <router-view></router-view>   
         </b-col>
         </b-row>   
 
-         <router-view></router-view>
+         
     </b-container>
     </div>
 </template>

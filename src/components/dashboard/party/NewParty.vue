@@ -104,7 +104,8 @@
                             <b-form-textarea
                                 id="textarea-default"
                                 :state="validateState('description')"
-                                aria-describedby="input-textarea-default-feedback"
+                                aria-describedby="input-textarea-default-feedback" 
+                                @keydown="limitTextArea( $event, 90)"
                                 v-model="party.description">
                             </b-form-textarea>
 
@@ -158,7 +159,7 @@
                                   width="12px" heigth="12px">
                               </b-icon>
                       
-                              <b-form-tags id="tags" v-model="value" no-outer-focus duplicate-tag-text size="sm"
+                              <b-form-tags id="tags" v-model="value" :limit="limit" no-outer-focus duplicate-tag-text size="sm"
                               class="mb-2">
                               <template v-slot="{ tags, disabled, addTag, removeTag }">
                                   <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
@@ -258,6 +259,7 @@ export default {
         showForm: false,
         showFormPlatform: false,
         showFormProfile: null,
+        limit: 5
       }
     },
     validations: {
@@ -383,6 +385,12 @@ export default {
             })
           })
       },
+      limitTextArea( event, limit ) {
+
+            if ( this.party.description.length >= limit ) {
+               event.preventDefault();
+            }
+      },
       getUserProfilesByGame(){
         
         axios.get(`${baseApiUrl}/user/${this.$store.state.user.id}/game/${this.gameId}/platform/${this.party.platformSelected}`)
@@ -443,6 +451,8 @@ export default {
       }
     },
     mounted(){
+
+
       if(this.$route.params.party){ //Vai executar no caso de edição de party
         
          this.party =  this.$route.params.party 
@@ -463,6 +473,11 @@ export default {
       }// Vai executar em todos os casos(criar ou editar)
       this.getPlatforms()
       this.loadGames() 
+
+      if(this.$route.params.gameId){
+        this.party.gameSelected =  this.$route.params.gameId
+        this.showForm = true
+      } 
       
      
     },
