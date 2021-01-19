@@ -222,7 +222,7 @@ export default {
     },
     mounted(){
         
-         this.socket = io.connect('http://localhost:3000/', {
+         this.socket = io.connect(baseApiUrl, {
           transports: ['websocket'], 
           upgrade: false,
           reconnectionDelayMax: 10000,
