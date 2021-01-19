@@ -19,7 +19,8 @@ export default new Vuex.Store({
         hideAdminFunctions: false,
         hideUserDropdown : true,
         hideLogin: true,
-        notifications: null
+        notifications: null,
+        hideButtonNewParty: false
     },  
     mutations:{
         setUser(state, user){
@@ -44,6 +45,9 @@ export default new Vuex.Store({
                 }).catch(err => {return err})   
             }    
             
+        },
+        setHideButtonNewParty(state,value){
+          state.hideButtonNewParty = value
         }
            
     },
@@ -59,6 +63,9 @@ export default new Vuex.Store({
         },
         getNotifications(state){
             return state.notifications
+        },
+        getHideButtonNewParty(state){
+            return state.hideButtonNewParty
         }
     }
 })

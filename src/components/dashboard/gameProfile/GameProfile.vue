@@ -56,7 +56,7 @@
             >  
             <template #cell(actions)="row">
               <b-button @click="onDelete(row.item)">
-                <i class="fas fa-trash-alt"></i>
+                <font-awesome-icon icon="fa-trash-alt" /> 
               </b-button>
            </template>
           </b-table>
@@ -145,7 +145,7 @@ export default {
               this.gameProfile = {}
         },
         onDelete(item){
-          console.log(item)
+
               axios.delete(`${baseApiUrl}/game/profile/user/${item.id}`)
               .then(() =>{
                   this.$toasted.global.defaultSuccess();

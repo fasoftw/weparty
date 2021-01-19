@@ -18,7 +18,7 @@ import { baseApiUrl, userKey } from "../global"
 export default {
   name: 'App',
   components: {Content, Header,Loading},
-  computed: mapState(['user','hideUserDropdown']),
+  computed: mapState(['user','hideUserDropdown','hideButtonNewParty']),
 	data: function() {
 			return {
 				validatingToken: true,
@@ -28,12 +28,15 @@ export default {
 	methods: {
 		
 		async validateToken() {
+
 			this.validatingToken = true
 
 			const json = localStorage.getItem(userKey)
 			this.userData = json 
 			const userData = JSON.parse(json)
 			
+			this.$store.commit('setHideButtonNewParty', false)
+
 
 			if(!userData) {
 				this.validatingToken = false
@@ -88,6 +91,14 @@ export default {
 			
 
 			}
+		},
+		'$route':function(){
+			if(this.$route.name === "newParty"){
+				this.$store.commit('setHideButtonNewParty', true)
+			} else{
+				this.$store.commit('setHideButtonNewParty', false)
+			}
+			
 		}
 	}
 }

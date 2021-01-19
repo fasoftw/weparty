@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Home from '../components/home/Home'
 import AdminGames from '../components/admin/Main.vue'
 import NewGames from '../components/admin/AdminPages.vue'
 import NewArticles from '../components/admin/news/Articles.vue'
@@ -12,14 +11,20 @@ import News from '../components/navigation/News'
 import PostDetail from '../components/navigation/blog/PostDetail'
 import About from '../components/navigation/About'
 import Dashboard from '../components/dashboard/Main'
-import Recommendations from '../components/dashboard/recommendation/Recommendations'
 import GameProfile from '../components/dashboard/gameProfile/GameProfile'
 import Notification from '../components/notification/Notifications'
 
+// When we register our components this way, webpack automatically splits our code into chunks.
+// It is also possible to group these files into one chunk.
+// A great scenario would be grouping components related by route into one chunk.
+// By using the comment to explicitly specify the chunk name, 
+// webpack automatically bundles the compiled components into the same chunk.
+
+const Home = () => import (/* webpackChunkName: "games" */'../components/home/Home')
 const Games = () => import(/* webpackChunkName: "games" */'../components/search/Games')
-const PartyGame = () => import(/* webpackChunkName: "party-game" */'../components/dashboard/PartyGame')
-const NewParty = () => import(/* webpackChunkName: "new-party" */'../components/dashboard/party/NewParty')
-const MyParties = () => import(/* webpackChunkName: "my-parties" */'../components/dashboard/party/MyParties')
+const PartyGame = () => import(/* webpackChunkName: "party" */'../components/dashboard/PartyGame')
+const NewParty = () => import(/* webpackChunkName: "party" */'../components/dashboard/party/NewParty')
+const MyParties = () => import(/* webpackChunkName: "party" */'../components/dashboard/party/MyParties')
 
 import {userKey} from '../../global'
 
@@ -112,19 +117,26 @@ const routes = [{
         },
         {
             path: 'main',
-            component: Recommendations
-        }]
+            name: 'main',
+            component: MyParties
+        }, ]
     }  
 ,{
     name: 'PartyGameId',
-    path:'/partiesgame/:id',
+    path:'/game/:id/parties',
     component: PartyGame,
     meta: {
         requiresAuth: true
-    }
+    },
+	children: [
+		{
+        path: 'new',
+        name: 'newParty',
+        component: NewParty
+    }], 
   },{
     name: 'PartyGameAll',
-    path:'/partiesgame/',
+    path:'/game/parties',
     component: PartyGame,
     meta: {
         requiresAuth: true
@@ -141,7 +153,10 @@ const routes = [{
   {
       name:'SearchGame',
       path: '/games',
-      component: Games
+      component: Games,
+      meta: {
+        requiresAuth: true
+      }
   }
   
 ]
@@ -160,13 +175,14 @@ router.beforeEach((to, from, next) => {
     if(to.matched.some(record => record.meta.requiresAdmin)) {
         const user = JSON.parse(json)
         user && user.admin ? next() : next({ path: '/' })
+        
     } else if(to.matched.some(record => record.meta.requiresAuth)) {
 
 
         if (localStorage.getItem(userKey) == null) {
 
             next({
-                path: '/',
+                path: '/signin',
                 params: { nextUrl: to.fullPath }
             })
         } else{

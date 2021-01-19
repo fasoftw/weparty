@@ -12,6 +12,16 @@
             <b-form-input id="name" v-model="user.name" type="text"></b-form-input>
         </b-form-group>
 
+        <b-form-group
+            id="last-name"
+            label="Last Name:"
+            v-if="type === 'isEditUser'"
+            label-cols-sm="4"
+            label-cols-lg="3"
+            label-for="last-name">
+            <b-form-input id="last-name" v-model="user.lastName" type="text"></b-form-input>
+        </b-form-group>
+
          <b-form-group
             id="email"
             v-if="type === 'isEditUser'"
@@ -37,7 +47,7 @@
          <b-form-group
             id="password"
             v-if="type === 'isPassword'"
-            label= "Senha:"
+            label= "Password:"
             label-cols-sm="4"
             label-cols-lg="3"
             label-for="password">
@@ -47,7 +57,7 @@
          <b-form-group
             id="confirmPassword"
             v-if="type === 'isPassword'"
-            label= "Confirme a senha:"
+            label= "Password confirm:"
             label-cols-sm="4"
             label-cols-lg="3"
             label-for="confirmPassword">

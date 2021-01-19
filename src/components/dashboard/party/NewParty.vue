@@ -52,6 +52,7 @@
                             :state="validateState('platformSelected')" 
                             aria-describedby="input-platforms-feedback"
                             :options="platforms"
+                            v-on:change="getUserProfilesByGame"
                             :disabled="showFormProfile === undefined">
                             </b-form-select>
 
@@ -66,13 +67,12 @@
 
                             
                             <b-form-group v-if="showFormProfile && showFormProfile !== undefined">
-                                <label for="profiles"> Selected profile</label>
-                                <b-form-select id="profiles" v-model="party.profiles" 
+                                <label for="profiles"> Nickname</label>
+                                <b-form-input id="profiles" v-model="party.profiles" 
                                   :state="validateState('profiles')" 
-                                  aria-describedby="input-profiles-feedback"
-                                  :options="profiles"
-                                  v-on:change="getUserProfilesByGame">>
-                                </b-form-select>
+                                  aria-describedby="input-profiles-feedback">
+
+                                </b-form-input>
 
                                 <b-form-invalid-feedback
                                 id="input-profiles-feedback">This is a required field.
@@ -81,7 +81,7 @@
 
 
                             <b-form-group v-if="!showFormProfile && showFormProfile !== undefined">
-                                <label for="input-gameProfile">Nickname </label>  
+                                <label for="input-gameProfile">Nickname</label>  
                                 
                                 <b-form-input
                                     id="input-gameProfile"
@@ -104,7 +104,8 @@
                             <b-form-textarea
                                 id="textarea-default"
                                 :state="validateState('description')"
-                                aria-describedby="input-textarea-default-feedback"
+                                aria-describedby="input-textarea-default-feedback" 
+                                @keydown="limitTextArea( $event, 90)"
                                 v-model="party.description">
                             </b-form-textarea>
 
@@ -158,7 +159,8 @@
                                   width="12px" heigth="12px">
                               </b-icon>
                       
-                              <b-form-tags id="tags" v-model="value" no-outer-focus class="mb-2">
+                              <b-form-tags id="tags" v-model="value" :limit="limit" no-outer-focus duplicate-tag-text size="sm"
+                              class="mb-2">
                               <template v-slot="{ tags, disabled, addTag, removeTag }">
                                   <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
                                   <li v-for="tag in tags" :key="tag" class="list-inline-item">
@@ -216,8 +218,8 @@
                 </b-card-text>
                 
                     <b-form-group>
-                    <b-button class="mr-2" variant="primary" :disabled="!showForm" @click="onSubmit">Cadastrar</b-button>
-                    <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Limpar</b-button>
+                    <b-button class="mr-2" variant="primary" :disabled="!showForm" @click="onSubmit">Submit</b-button>
+                    <b-button type="reset" class="mr-2" @click="onReset" variant="danger">Reset</b-button>
                     </b-form-group>
             
                 </b-card-body>
@@ -242,13 +244,14 @@ export default {
       return {
         rankParty: 0,
         gameChoosed: {},
-        party: {},
+        party: {
+          profiles: null
+        },
         maxPlayers: 0,
         optionsTags: ['Nenhum jogo foi selecionado'],
         search: '',
         value: [],
         platforms:['Nenhum jogo foi selecionado'],
-       // game: null,  => Nao ta usando
         games:[],
         profiles:[],
         gameProfile: {},
@@ -256,6 +259,7 @@ export default {
         showForm: false,
         showFormPlatform: false,
         showFormProfile: null,
+        limit: 5
       }
     },
     validations: {
@@ -273,10 +277,10 @@ export default {
           required
         },
         profiles:{
-          required: requiredIf(function() {return this.showFormProfile})
+          required: requiredIf(function() {return this.showFormProfile && !this.$route.params.party})
         },
         nickname:{
-          required: requiredIf(function() {return !this.showFormProfile})
+          required: requiredIf(function() {return !this.showFormProfile && !this.$route.params.party})
         },
         numberPlayers:{
           required,
@@ -288,6 +292,7 @@ export default {
     },
     methods: {
       onSubmit(evt) {
+        
         evt.preventDefault()
 
         this.$v.party.$touch();
@@ -302,68 +307,25 @@ export default {
             this.party.isOpen = 1
         }
         
-        this.party.platformId = this.party.platformSelected
-
-        if(this.showFormProfile){ //SE O PROFILE DO USUÁRIO PARA O JOGO/PLATAFORMA JÁ ESTIVER CADASTRADO
-          console.log(this.party.profiles)
+          this.party.platformId = this.party.platformSelected
 
           this.party.filters = this.value
           const method = this.party.id ? "put" : "post";
           const id = this.party.id ? `/${this.party.id}` : "";
-        
-        
 
-
+         
+          
           axios[method](`${baseApiUrl}/parties${id}`, this.party)
             .then(()=>{ 
                 this.$store.commit('setNotifications', this.$store.state.user.id)
                 this.$toasted.global.defaultSuccess();
                 this.party = {}
-                this.$router.push({path: `/partiesgame/${this.gameId}` })
+                const path = `/game/${this.gameId}/parties`
+                if (this.$route.path !== path) this.$router.push(path)
                // this.addPlayerParty(res.data[0])  //Id Party
             })
             .catch(showError);
-
-        }
-        else{ //SE NÃO (VAMOS CRIAR O PROFILE)
-          this.addGameProfile()
-        }
-
-        
-           
-      },
-      addGameProfile(){
-        this.gameProfile.userId = this.$store.state.user.id
-        this.gameProfile.platformId = this.party.platformId
-        this.gameProfile.gameId = this.party.gameId
-        this.gameProfile.name = this.party.nickname
-
-
-        axios.post(`${baseApiUrl}/game/profile/user`, this.gameProfile)
-            .then((res) =>{
-                this.party.profiles = res.data
-                this.party.filters = this.value
-                const method = this.party.id ? "put" : "post";
-                const id = this.party.id ? `/${this.party.id}` : "";
-                axios[method](`${baseApiUrl}/parties${id}`, this.party)
-                  .then((resposta)=>{ 
-                      this.addPlayerParty(resposta.data[0])  //Id Party
-                })
-                .catch(showError);
-            }).catch(showError); 
-        
-      },
-      addPlayerParty(partyId){ //ADD PLAYER NA PARTY
-        axios.post(`${baseApiUrl}/party/${partyId}/players`, {...this.party, playerId: this.party.userId})
-            .then( () => {
-                this.$store.commit('setNotifications', this.$store.state.user.id)
-                this.$toasted.global.defaultSuccess();
-                this.party = {}
-                this.$router.push({path: `/partiesgame/${this.gameId}` })
-              //this.$router.push({path: '/dashboard/party/view'})
-            }) 
-        .catch(showError)
-       
+          
       },
       onReset(evt) {
         evt.preventDefault()
@@ -423,18 +385,32 @@ export default {
             })
           })
       },
+      limitTextArea( event, limit ) {
+
+            if ( this.party.description.length >= limit ) {
+               event.preventDefault();
+            }
+      },
       getUserProfilesByGame(){
         
         axios.get(`${baseApiUrl}/user/${this.$store.state.user.id}/game/${this.gameId}/platform/${this.party.platformSelected}`)
           .then( res => {
-            this.profiles  = res.data.map( profiles =>{
-               return { ...profiles, value: profiles.id, text: profiles.name}
-            })
-            if(!this.$route.params.party){
-            this.profiles.length >= 1 ? this.showFormProfile = true : this.showFormProfile = false
-            }
-            else{
-              this.showFormProfile = undefined
+ 
+            if(res.data.length > 0){
+              this.party.profiles = res.data[0].name
+
+              this.profiles  = res.data.map( profiles =>{
+                return { ...profiles, value: profiles.id, text: profiles.name}
+              })
+              if(!this.$route.params.party){
+              this.profiles.length >= 1 ? this.showFormProfile = true : this.showFormProfile = false
+              }
+              else{
+                this.showFormProfile = undefined
+              }
+            } else{
+              this.showFormProfile = false
+              this.party.profiles = undefined
             }
           })
       },
@@ -475,12 +451,16 @@ export default {
       }
     },
     mounted(){
+
+
       if(this.$route.params.party){ //Vai executar no caso de edição de party
-        this.party =  this.$route.params.party 
-         
+        
+         this.party =  this.$route.params.party 
+         this.showFormProfile = undefined
          this.maxPlayers = this.party.maxPlayers
          this.rankParty = this.party.gameRank ? 1 : 0   
          this.party.gameSelected = this.party.gameId
+         this.party.id = this.$route.params.party.id
          this.party.platformSelected = this.party.platformId
          this.gameId = this.party.gameId
          this.value = this.party.filters
@@ -493,6 +473,11 @@ export default {
       }// Vai executar em todos os casos(criar ou editar)
       this.getPlatforms()
       this.loadGames() 
+
+      if(this.$route.params.gameId){
+        this.party.gameSelected =  this.$route.params.gameId
+        this.showForm = true
+      } 
       
      
     },

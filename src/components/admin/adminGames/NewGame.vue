@@ -165,10 +165,10 @@
       <b-table hover striped :items="games" :fields="fields">
         <template #cell(actions)="row">
           <b-button @click="loadGame(row.item)" class="mr-2">
-            <i class="fas fa-pencil-alt"></i>
+            <font-awesome-icon icon="pencil-alt" />
           </b-button>
           <b-button @click="loadGame(row.item, 'remove')">
-            <i class="fas fa-trash-alt"></i>
+            <font-awesome-icon icon="trash" />
           </b-button>
         </template>
       </b-table>

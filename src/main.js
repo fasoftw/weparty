@@ -1,4 +1,4 @@
-import '@fortawesome/fontawesome-free/js/all.js';
+
 import 'vue-search-select/dist/VueSearchSelect.css'
 import "vue-select/dist/vue-select.css";
 import Vue from 'vue'
@@ -13,6 +13,8 @@ import './config/resource'
 import './config/paginate'
 import './config/vuelidate'
 import './config/select'
+import './config/icons.js'
+
 
 
 Vue.config.productionTip = false

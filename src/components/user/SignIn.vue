@@ -6,13 +6,13 @@
           id="input-group-1"
           label="Email address:"
           label-for="input-1"
-          description="We'll never share your email with anyone else.">
+          >
           <b-form-input
             id="input-1"
             v-model="user.email"
             type="email"
             required
-            placeholder="Enter email">
+          >
           </b-form-input>
 
         </b-form-group>
@@ -24,9 +24,15 @@
           aria-describedby="password-help-block"></b-input>
         </b-form-group>
 
+        <b-row>
+        
+        <span class="ml-3" style="font-size: 80%; font-weight: 400;">Don't have a WeParty account? <b-link  style="font-size: 90%!important; font-weight: 500!important;" href="/signup" >Sign Up Now</b-link></span>
 
-      <b-button variant="primary" class="mr-2" @click="onSubmit" @keydown.enter="onSubmit">Entrar</b-button>
-      <b-button variant="danger" >Cancelar</b-button>
+        </b-row>
+
+
+      <b-button variant="primary" class="mr-2 mt-2" @click="onSubmit" @keydown.enter="onSubmit">Login</b-button>
+      <b-button variant="danger" to="/" class="mt-2">Cancel</b-button>
 
     
     </b-form>
@@ -53,7 +59,7 @@ export default {
               this.$store.commit('setHideUserDropdown',true);
               this.$store.commit('setHideLogin', false)
               localStorage.setItem(userKey, JSON.stringify(res.data))
-              this.$router.push({path: '/dashboard/main'})
+              this.$router.push({path: '/games'})
 
           }).catch(showError)
         },
