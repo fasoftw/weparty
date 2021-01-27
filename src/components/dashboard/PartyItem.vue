@@ -26,7 +26,9 @@
                             <font-awesome-icon icon="info-circle" /> 
                              <b-tooltip target="party-flip" placement="bottom" title="See party players" />
                         </div>
-                          <div id="leave-party" class="party_icon_exit" v-if="statusIn === true && party.userId !== user.id" v-on:click="leftParty">
+                          <div id="leave-party" class="party_icon_exit" v-if="statusIn === true 
+                          && party.userId !== user.id
+                          && party.deletedAt === null" v-on:click="leftParty">
                                <font-awesome-icon icon="sign-out-alt" /> 
                               <b-tooltip target="leave-party" placement="bottom" title="Leave party" />
                           </div>
@@ -117,7 +119,9 @@
                             <b-tooltip target="party-info2" placement="bottom" title="See party informations" />
                         </div>
 
-                         <div id="leave-party2" class="party_icon_exit ml-2" v-if="statusIn === true && party.userId !== user.id" v-on:click="leftParty">
+                         <div id="leave-party2" class="party_icon_exit ml-2" v-if="statusIn === true 
+                         && party.userId !== user.id
+                        && party.deletedAt === null" v-on:click="leftParty">
                                <font-awesome-icon icon="sign-out-alt" /> 
                               <b-tooltip target="leave-party2" placement="bottom" title="Leave party" />
                           </div>
@@ -431,7 +435,7 @@ export default {
                     }
                 })
         },
-                isPartyClosed(){
+        isPartyClosed(){
             if(this.party.isOpen === 1 && this.party.ready === 0 
             && this.party.numberPlayers > this.party.spotsFilled){
                 if(this.statusIn === true){
@@ -555,9 +559,9 @@ export default {
                 this.party.ready = 1
                 await axios.post(`${baseApiUrl}/game/parties`, this.party).then(() => {
                   this.$toasted.global.defaultSuccess();
-                  this.$emit('update', this.party, this.index)
                   this.party.deletedAt = new Date()
                   this.showStatusParty = "Done"
+                  this.$emit('update', this.party, this.index)
                 })
         },
     },
