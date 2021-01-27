@@ -200,18 +200,29 @@ export default {
 
         },
         filterParty(){
-          if(this.pressed === 2){
-               return this.data.filter((item) => {
-                    return item.isOpen === 1;
-                });          
+
+           let parties = null
+
+          if(this.pressed === 2){           
+                parties = this.data.filter((item) => {
+                    return item.ready === 1 && item.deletedAt === null 
+                    || item.spotsFilled < item.numberPlayers;
+                });                                  
             
           } else if(this.pressed === 3){
-             return this.data.filter((item) => {
-                    return item.isOpen === 0;
+                parties = this.data.filter((item) => {
+                    return item.deletedAt !== null;
                 });   
+                
           } else {
             return this.data
           }
+
+          if(parties.length === 0){
+                  this.resultsFound = false
+                } else{
+                  return parties
+          }  
         
         }
     },
