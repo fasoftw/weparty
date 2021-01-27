@@ -475,7 +475,10 @@ export default {
 
       if(this.$route.params.gameId){
         this.party.gameSelected =  this.$route.params.gameId
+        this.gameId = this.$route.params.gameId
         this.showForm = true
+        this.getUserProfilesByGame()
+        this.getGameId(this.gameId)
       } 
 
       this.getPlatforms()
