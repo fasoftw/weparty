@@ -471,13 +471,18 @@ export default {
 
         this.getFilters()
       }// Vai executar em todos os casos(criar ou editar)
-      this.getPlatforms()
-      this.loadGames() 
+
 
       if(this.$route.params.gameId){
         this.party.gameSelected =  this.$route.params.gameId
+        this.gameId = this.$route.params.gameId
         this.showForm = true
+        this.getUserProfilesByGame()
+        this.getGameId(this.gameId)
       } 
+
+      this.getPlatforms()
+      this.loadGames() 
       
      
     },

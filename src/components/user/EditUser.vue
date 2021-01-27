@@ -117,11 +117,11 @@ export default {
                     this.user.password = this.newPassword
                     this.onSubmit()
                 } else {
-                    this.msg = 'Confirme corretamente a senha informada!'
+                    this.msg = 'Confirm Password'
                 }
             } else {
                 if(this.user.confirmPassword === undefined && this.$props.type === 'isEditUser'){
-                    this.user.confirmPassword = this.user.password
+                    this.user.password = null
                     this.onSubmit()
                     
                 }
@@ -145,7 +145,7 @@ export default {
             ).catch(showError)
         },
         onSubmit(){
-           
+             
              axios.put(`${baseApiUrl}/users/${this.$store.state.user.id}`, this.user).then(
                 () =>{ 
                    this.$toasted.global.defaultSuccess();           

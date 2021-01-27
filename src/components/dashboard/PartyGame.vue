@@ -1,10 +1,10 @@
 <template>
     <div class="parties-games">
-   <b-container fluid class="bv-example-row">
-     <b-row>
+   <b-container fluid class="bv-example-row ">
+     <b-row >
          <b-col>
                     
-  <b-card-group deck>   
+  <b-card-group deck >   
         
 
       <b-card  class="text-left" >
@@ -222,7 +222,8 @@ export default {
     },
     mounted(){
         
-         this.socket = io.connect('http://localhost:3000/', {
+         //this.socket = io.connect('http://wepartygamesapi-net.umbler.net', {
+        this.socket = io.connect('http://localhost:3000', {
           transports: ['websocket'], 
           upgrade: false,
           reconnectionDelayMax: 10000,
